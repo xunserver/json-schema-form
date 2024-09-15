@@ -16,6 +16,7 @@ import {
   isCoreForbiddenPackage,
   isFirstPartyPackage,
   isHostPackage,
+  isMuiForbiddenPackage,
   isReverseEdge,
   packageNameFromSpecifier,
   type FirstPartyPackage,
@@ -236,6 +237,16 @@ function checkManifestPolicy(pkg: DiscoveredPackage): ArchitectureDiagnostic[] {
         file: path.join(pkg.directory, "package.json"),
       });
     }
+
+    if ((pkg.name === "@form/mui" || pkg.name === "@form/react") && isMuiForbiddenPackage(target)) {
+      diagnostics.push({
+        sourcePackage: pkg.name,
+        targetPackage: target,
+        rule: RULE.forbiddenMuiXPackage,
+        message: `React/MUI packages must not depend on "${target}".`,
+        file: path.join(pkg.directory, "package.json"),
+      });
+    }
   }
 
   const requiredPeers = REQUIRED_PEERS[pkg.name as FirstPartyPackage] ?? [];
@@ -311,6 +322,18 @@ function checkSourceImports(
           targetPackage: targetName,
           rule: RULE.forbiddenCorePackage,
           message: `Only @form/validator-ajv may import "${targetName}".`,
+          file,
+          specifier,
+        });
+        continue;
+      }
+
+      if ((pkg.name === "@form/mui" || pkg.name === "@form/react") && isMuiForbiddenPackage(targetName)) {
+        diagnostics.push({
+          sourcePackage: pkg.name,
+          targetPackage: targetName,
+          rule: RULE.forbiddenMuiXPackage,
+          message: `React/MUI packages must not import "${targetName}".`,
           file,
           specifier,
         });
@@ -426,6 +449,7 @@ function collectSourceFiles(root: string): string[] {
       entry.isFile() &&
       SOURCE_EXTENSIONS.includes(path.extname(entry.name)) &&
       !entry.name.endsWith(".test.ts") &&
+      !entry.name.endsWith(".test.tsx") &&
       !entry.name.endsWith(".d.ts")
     ) {
       files.push(fullPath);

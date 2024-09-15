@@ -7,12 +7,8 @@ describe("vue + element-plus architecture matrix", () => {
   test("does not implement React, MUI, or a Universal Renderer", () => {
     const vue = fs.readFileSync(path.join(REPO_ROOT, "packages/vue/src/index.ts"), "utf8");
     const elementPlus = fs.readFileSync(path.join(REPO_ROOT, "packages/element-plus/src/index.ts"), "utf8");
-    const react = fs.readFileSync(path.join(REPO_ROOT, "packages/react/src/index.ts"), "utf8");
-    const mui = fs.readFileSync(path.join(REPO_ROOT, "packages/mui/src/index.ts"), "utf8");
     expect(vue).not.toMatch(/ReactUIAdapter|UniversalRenderer|@form\/react|@form\/mui/);
     expect(elementPlus).not.toMatch(/@form\/react|@form\/mui|ReactUIAdapter/);
-    expect(react.trim()).toBe("export {};");
-    expect(mui.trim()).toBe("export {};");
   });
 
   test("records Core owner ports as already published", () => {

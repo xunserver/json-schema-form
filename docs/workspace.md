@@ -11,7 +11,7 @@
 | `pnpm typecheck` | 构建期类型检查，外加 Core 内部 type-test 与消费者正向契约检查。 |
 | `pnpm test` | 运行 unit、type-contract、export-isolation、Core-independence 与 fault-injection 测试。 |
 | `pnpm check:boundaries` | 用 TypeScript parser/module resolution 校验 manifest 与源码 import 是否符合规范依赖图。 |
-| `pnpm verify` | `build && typecheck && test && check:boundaries`。干净 checkout 的完整验收入口。 |
+| `pnpm verify` | `build && typecheck && test && check:boundaries && example:vue && example:react`。干净 checkout 的完整验收入口。 |
 
 根 package 为 private，并通过 `packageManager` 固定 pnpm。共享语言设置在 `tsconfig.base.json`；各 package 使用自己的 composite project，不使用会绕过 package exports 的根级 `paths` alias。pnpm 11 需要在 `pnpm-workspace.yaml` 中允许 `esbuild` 的 `allowBuilds`，否则 vitest/tsx 无法安装其原生绑定。
 
@@ -22,11 +22,11 @@
 | `@form/core` | `packages/core` | 框架无关的 authoring、静态编译与事务化 Runtime；提供 Extension Plugin/Environment | Path、ID、Diagnostic、Form Definition、`defineForm()`、`compileForm()`、`createForm()` / `createFormEngine()`、Compiled Model、CompileResult/CompileError、`FormInstance` / `ArrayInstance` / `ScopedFormInstance`、Rule AST / effective state（含 `required`）/ View source state（`focused`/`collapsed`/`activeTab`）/ `blur()` `setCollapsed()` `setActiveTab()` / `serialize()` / `validate()` / `applyErrors()` / `submit()` / `FormConfig.valueInitializer`；`@form/core/runtime` 导出只读 selector/subscription（含 `effectiveStateSelector`、`presentableErrorSelector`、`InstanceBinding`、`RenderScope`、`getRenderScope()`）与 array identity resolver；`@form/core/extension` 导出 Plugin/Environment/Widget/Registry 契约、`defineWidget()`、`defineRuleFunction()`、`defineValidator()`、`SchemaDialectDefinition` / `SchemaExtensionDefinition` / `ValueInitializerDefinition` 与 factory |
 | `@form/validator-ajv` | `packages/validator-ajv` | Draft 2020-12 Schema Validator Adapter | `createAjvValidator()` / `AJV_VALIDATOR_KEY`；生产依赖 `ajv` 与 `@form/core` |
 | `@form/vue` | `packages/vue` | Vue Renderer 边界 | `FormRenderer` / `ViewRenderer` / `FieldRenderer`、readonly composables、`defineVueUIAdapter()` / `createVueRendererEnvironment()` 与 adapter diagnostics；peer 为 `vue` |
-| `@form/react` | `packages/react` | React Renderer 边界 | 空 ESM 入口；peer 为 `react` |
+| `@form/react` | `packages/react` | React Renderer 边界 | `FormRenderer` / `ViewRenderer` / `FieldRenderer`、readonly hooks、`defineReactUIAdapter()` / `createReactRendererEnvironment()` 与 adapter diagnostics；peer 为 `react` |
 | `@form/element-plus` | `packages/element-plus` | Element Plus Adapter 边界 | `elementPlusAdapter` / `createElementPlusAdapter()` / `extendElementPlusAdapter()`；依赖 `@form/vue` 与 `@form/core`，peer 为 `vue` 与 `element-plus` |
-| `@form/mui` | `packages/mui` | MUI Adapter 边界 | 空 ESM 入口；依赖 `@form/react` 与 `@form/core`，peer 为 `react` 与 `@mui/material` |
+| `@form/mui` | `packages/mui` | MUI Adapter 边界 | `muiAdapter` / `createMuiAdapter()` / `extendMuiAdapter()`；依赖 `@form/react` 与 `@form/core`，peer 为 `react` 与 `@mui/material` |
 
-叶子 package 中 `@form/vue` 与 `@form/element-plus` 已提供 Vue Renderer 与 Element Plus Adapter。`@form/react` / `@form/mui` 仍是可构建的空边界。`@form/core` 已提供 `defineForm()`、`compileForm()` 静态编译（含 Rule AST 与 Schema Dynamics）、事务 Runtime、array identity / `array()` / `scope()`、`blur()` / `setCollapsed()` / `setActiveTab()`、`RenderScope` / `InstanceBinding`、effective state（含 `required`）、`serialize()` 以及 Validation owner（`validate()` / `applyErrors()` / `submit()`）。AJV 只允许出现在 `@form/validator-ajv`。Renderer 用法见 [`vue-element-plus.md`](./vue-element-plus.md)。
+叶子 package 中 `@form/vue` / `@form/element-plus` 与 `@form/react` / `@form/mui` 分别提供两条框架渲染链路。`@form/core` 已提供 `defineForm()`、`compileForm()` 静态编译（含 Rule AST 与 Schema Dynamics）、事务 Runtime、array identity / `array()` / `scope()`、`blur()` / `setCollapsed()` / `setActiveTab()`、`RenderScope` / `InstanceBinding`、effective state（含 `required`）、`serialize()` 以及 Validation owner（`validate()` / `applyErrors()` / `submit()`）。AJV 只允许出现在 `@form/validator-ajv`。Renderer 用法见 [`vue-element-plus.md`](./vue-element-plus.md) 与 [`react-mui.md`](./react-mui.md)。
 
 ## 允许的依赖图
 

@@ -1,0 +1,25 @@
+{
+  "name": "@form/example-react-mui",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json --pretty false",
+    "typecheck": "tsc -p tsconfig.json --pretty false --noEmit",
+    "smoke": "node --import tsx src/smoke.ts"
+  },
+  "dependencies": {
+    "@form/core": "workspace:*",
+    "@form/mui": "workspace:*",
+    "@form/react": "workspace:*",
+    "@form/validator-ajv": "workspace:*"
+  },
+  "devDependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^7.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

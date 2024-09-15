@@ -137,3 +137,42 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **GIVEN** example编译并实例化含嵌套object/array、动态visible、validation与九类Widget的Definition
 - **WHEN** Vue + Element Plus renderer执行输入、blur、array move与submit流程
 - **THEN** UI只通过semantic commands更新Core，identity/presentable errors/ARIA正确，workspace build/typecheck/test/boundary checks均通过
+
+### Requirement: React 与 MUI 渲染包只公开受支持入口
+`@form/react` 根入口必须（MUST）公开 React renderers、readonly hooks、`ReactUIAdapter` 与 `ReactRendererEnvironment` 的创建/组合契约及结构化 diagnostics；`@form/mui` 根入口必须（MUST）公开冻结 `mui` adapter 及其受支持的组合/扩展入口。内部 Context、component factories、registry storage、mapper helpers 与 UI library implementation types 不得（MUST NOT）成为可依赖 deep import；`RenderScope`/`InstanceBinding` 等 Core-owned共享类型必须（MUST）从其 Core owning 入口导入，React包只消费而不得重新定义或建立第二个owner。
+
+#### Scenario: 消费者只使用根入口
+- **GIVEN** 外部应用使用 TypeScript NodeNext 编译 React+MUI 表单
+- **WHEN** 它从 `@form/react` 与 `@form/mui` 根入口导入公开 API
+- **THEN** declarations 与 runtime exports 一致且无需 deep import
+
+#### Scenario: 内部模块不可跨包导入
+- **GIVEN** 消费者或 `@form/mui` 尝试导入 `@form/react` 未导出的内部 Context/registry 文件
+- **WHEN** package exports resolution 执行
+- **THEN** 该 deep import 不可解析，而受支持公开 adapter types 可从根入口解析
+
+### Requirement: React 与 MUI 依赖方向保持单向
+`@form/react` 必须（MUST）只依赖 `@form/core` 并把 React 声明为兼容 peer；`@form/mui` 必须（MUST）只依赖 `@form/core`、`@form/react` 并把 React 与 `@mui/material` 声明为兼容 peer。React、React DOM、MUI、Emotion 等 host runtime 不得（MUST NOT）被打包进库产物，Core 不得（MUST NOT）新增 React/MUI/DOM 依赖；默认 adapter 不得（MUST NOT）强制依赖 MUI X 或日期对象库。
+
+#### Scenario: manifest 与产物边界通过
+- **GIVEN** workspace 构建 `@form/react` 与 `@form/mui`
+- **WHEN** manifest-policy、bundle/external 与 dependency-boundary 检查运行
+- **THEN** 依赖方向符合白名单，host peers 保持 external，`@form/core` 仍可在无 DOM/React/MUI 环境导入
+
+#### Scenario: React renderer 可 headless 测试
+- **GIVEN** 测试只提供 React、Core 与一个无 UI library 的 fake ReactUIAdapter
+- **WHEN** 渲染 resolved ViewTree 并驱动语义交互
+- **THEN** `@form/react` 不要求 MUI、Vue、Element Plus 或浏览器 validation store 即可工作
+
+### Requirement: React 与 MUI 提供完整集成验收入口
+Workspace 必须（MUST）包含 React headless contract、StrictMode subscription cleanup、SSR/hydration、MUI 九种 Widget/codec/props/ARIA/layout 集成测试，以及一个仅使用各包公开入口的 React+MUI example。跨栈验收必须（MUST）复用与 Vue/Element Plus 相同的 Core Definition/Plugin fixture 来比较 values、identity、effective state、validation 与 submit 结果，但不得（MUST NOT）让 React/MUI 包导入 Vue 协议或建立 Universal Renderer。
+
+#### Scenario: React+MUI 示例覆盖端到端行为
+- **GIVEN** example 编译并实例化含嵌套 object/array、动态 visible、validation 与九种 Widget 的 Definition
+- **WHEN** 用户编辑、重排、blur、验证并提交
+- **THEN** UI 只经公开 semantic APIs 改变同一 Core truth，且 build、typecheck 与 integration tests 通过
+
+#### Scenario: SSR 与浏览器集成均受覆盖
+- **GIVEN** 同一 React fixture 可在 server renderer 和浏览器测试环境运行
+- **WHEN** 执行 render-to-string、hydrate、StrictMode remount 与后续 commit
+- **THEN** 初始 markup 一致、订阅无泄漏且 selector 精准更新契约持续成立

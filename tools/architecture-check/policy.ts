@@ -32,6 +32,17 @@ export const HOST_PACKAGES = [
   "element-plus",
   "@mui/material",
   "@mui/system",
+  "@emotion/react",
+  "@emotion/styled",
+] as const;
+
+export const MUI_FORBIDDEN_PACKAGES = [
+  "@mui/x-date-pickers",
+  "@mui/x-date-pickers-pro",
+  "dayjs",
+  "luxon",
+  "moment",
+  "date-fns",
 ] as const;
 
 export const CORE_FORBIDDEN_PACKAGES = [
@@ -47,6 +58,7 @@ export const RULE = {
   relativeCrossPackageImport: "relative-cross-package-import",
   forbiddenEdge: "forbidden-edge",
   forbiddenCorePackage: "forbidden-core-package",
+  forbiddenMuiXPackage: "forbidden-mui-x-package",
   hostPeerPlacement: "host-peer-placement",
   missingPeer: "missing-peer",
   coreLayout: "core-layout",
@@ -113,6 +125,10 @@ export function isHostPackage(name: string): boolean {
 
 export function isCoreForbiddenPackage(name: string): boolean {
   return (CORE_FORBIDDEN_PACKAGES as readonly string[]).includes(name);
+}
+
+export function isMuiForbiddenPackage(name: string): boolean {
+  return (MUI_FORBIDDEN_PACKAGES as readonly string[]).includes(name);
 }
 
 export function packageNameFromSpecifier(specifier: string): string | undefined {

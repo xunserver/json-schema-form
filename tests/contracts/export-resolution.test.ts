@@ -70,14 +70,20 @@ describe("runtime export resolution", () => {
     );
   });
 
-  test("resolves Vue and Element Plus root entries and rejects deep paths", () => {
+  test("resolves Vue, React, Element Plus and MUI root entries and rejects deep paths", () => {
     expect(resolveWithNode("@form/vue").stdout.trim()).toMatch(/packages\/vue\/dist\/index\.js$/);
     expect(resolveWithNode("@form/element-plus").stdout.trim()).toMatch(
       /packages\/element-plus\/dist\/index\.js$/,
     );
+    expect(resolveWithNode("@form/react").stdout.trim()).toMatch(/packages\/react\/dist\/index\.js$/);
+    expect(resolveWithNode("@form/mui").stdout.trim()).toMatch(/packages\/mui\/dist\/index\.js$/);
     const vueDeep = resolveWithNode("@form/vue/src/renderer/FormRenderer.js");
     expect(vueDeep.status).not.toBe(0);
     const plusDeep = resolveWithNode("@form/element-plus/src/widgets/mapper.js");
     expect(plusDeep.status).not.toBe(0);
+    const reactDeep = resolveWithNode("@form/react/src/renderer/FormRenderer.js");
+    expect(reactDeep.status).not.toBe(0);
+    const muiDeep = resolveWithNode("@form/mui/src/widgets/mapper.js");
+    expect(muiDeep.status).not.toBe(0);
   });
 });

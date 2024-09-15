@@ -81,6 +81,22 @@ describe("fault injection commands", () => {
     expect(result.stderr).toContain(RULE.hostPeerPlacement);
   });
 
+  test("MUI X date pickers fail the boundary command", () => {
+    const root = copyRepoPackages();
+    mutateManifest(root, "mui", (manifest) => {
+      manifest.dependencies = {
+        ...manifest.dependencies,
+        "@mui/x-date-pickers": "^8.0.0",
+      };
+    });
+
+    const result = runBoundaryCheck(root);
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain("@form/mui");
+    expect(result.stderr).toContain("@mui/x-date-pickers");
+    expect(result.stderr).toContain(RULE.forbiddenMuiXPackage);
+  });
+
   test("DOM global fails Core production typecheck command", () => {
     const root = makeTempDir("form-dom-");
     writeText(path.join(root, "uses-document.ts"), "export const node = document.body;\n");
@@ -108,13 +124,19 @@ describe("fault injection commands", () => {
     expect(`${result.stdout}\n${result.stderr}`).toMatch(/Cannot find module|has no exported member|TS2307|TS2305/);
   });
 
-  test("Vue and Element Plus deep imports fail consumer typecheck", () => {
+  test("Vue, React, Element Plus and MUI deep imports fail consumer typecheck", () => {
     const vue = runTsc(path.join(REPO_ROOT, "tests/contracts/negative/vue-deep-import.tsconfig.json"));
     expect(vue.status).not.toBe(0);
     expect(`${vue.stdout}\n${vue.stderr}`).toMatch(/Cannot find module|TS2307/);
     const plus = runTsc(path.join(REPO_ROOT, "tests/contracts/negative/element-plus-deep-import.tsconfig.json"));
     expect(plus.status).not.toBe(0);
     expect(`${plus.stdout}\n${plus.stderr}`).toMatch(/Cannot find module|TS2307/);
+    const react = runTsc(path.join(REPO_ROOT, "tests/contracts/negative/react-deep-import.tsconfig.json"));
+    expect(react.status).not.toBe(0);
+    expect(`${react.stdout}\n${react.stderr}`).toMatch(/Cannot find module|TS2307/);
+    const mui = runTsc(path.join(REPO_ROOT, "tests/contracts/negative/mui-deep-import.tsconfig.json"));
+    expect(mui.status).not.toBe(0);
+    expect(`${mui.stdout}\n${mui.stderr}`).toMatch(/Cannot find module|TS2307/);
   });
 
   test("unexpected Core directory fails the boundary command", () => {

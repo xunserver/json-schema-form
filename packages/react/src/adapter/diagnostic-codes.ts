@@ -1,0 +1,41 @@
+export const RENDERER_DIAGNOSTIC_CODES = Object.freeze({
+  INVALID_ID: "adapter.invalid-id",
+  INVALID_DESCRIPTOR: "adapter.invalid-descriptor",
+  DUPLICATE_ID: "adapter.duplicate-id",
+  PROTOCOL_INCOMPATIBLE: "adapter.protocol-incompatible",
+  MISSING_ROLE: "adapter.missing-role",
+  INVALID_BINDING: "adapter.invalid-binding",
+  REGISTRY_CONFLICT: "adapter.registry-conflict",
+  OVERRIDE_WILDCARD: "adapter.override-wildcard",
+  OVERRIDE_OWNER_MISMATCH: "adapter.override-owner-mismatch",
+  OVERRIDE_UNUSED: "adapter.override-unused",
+  MISSING_CAPABILITY: "adapter.missing-capability",
+  CODEC_FAILURE: "adapter.codec-failure",
+  MAPPER_PROTECTED_KEY: "adapter.mapper-protected-key",
+  RENDER_FAILURE: "adapter.render-failure",
+  INVALID_TAB: "adapter.invalid-tab",
+  CONFIG: "adapter.config",
+} as const);
+
+export type RendererDiagnosticCode =
+  (typeof RENDERER_DIAGNOSTIC_CODES)[keyof typeof RENDERER_DIAGNOSTIC_CODES];
+
+export const RENDERER_DIAGNOSTIC_CODE_RANK: Readonly<Record<RendererDiagnosticCode, number>> =
+  Object.freeze({
+    [RENDERER_DIAGNOSTIC_CODES.INVALID_ID]: 0,
+    [RENDERER_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR]: 1,
+    [RENDERER_DIAGNOSTIC_CODES.DUPLICATE_ID]: 2,
+    [RENDERER_DIAGNOSTIC_CODES.PROTOCOL_INCOMPATIBLE]: 3,
+    [RENDERER_DIAGNOSTIC_CODES.MISSING_ROLE]: 4,
+    [RENDERER_DIAGNOSTIC_CODES.INVALID_BINDING]: 5,
+    [RENDERER_DIAGNOSTIC_CODES.REGISTRY_CONFLICT]: 6,
+    [RENDERER_DIAGNOSTIC_CODES.OVERRIDE_WILDCARD]: 7,
+    [RENDERER_DIAGNOSTIC_CODES.OVERRIDE_OWNER_MISMATCH]: 8,
+    [RENDERER_DIAGNOSTIC_CODES.OVERRIDE_UNUSED]: 9,
+    [RENDERER_DIAGNOSTIC_CODES.MISSING_CAPABILITY]: 10,
+    [RENDERER_DIAGNOSTIC_CODES.CODEC_FAILURE]: 11,
+    [RENDERER_DIAGNOSTIC_CODES.MAPPER_PROTECTED_KEY]: 12,
+    [RENDERER_DIAGNOSTIC_CODES.RENDER_FAILURE]: 13,
+    [RENDERER_DIAGNOSTIC_CODES.INVALID_TAB]: 14,
+    [RENDERER_DIAGNOSTIC_CODES.CONFIG]: 15,
+  });

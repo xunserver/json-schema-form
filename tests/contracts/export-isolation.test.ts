@@ -140,6 +140,24 @@ describe("consumer export isolation", () => {
     );
   });
 
+  test("rejects React internal deep imports", () => {
+    const diagnostics = typecheckFiles(
+      [path.join(REPO_ROOT, "tests/contracts/negative/react-deep-import.ts")],
+      consumerOptions,
+    );
+    expect(diagnostics.length).toBeGreaterThan(0);
+    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@form\/react\/src\/renderer\/FormRenderer\.js'/);
+  });
+
+  test("rejects MUI internal deep imports", () => {
+    const diagnostics = typecheckFiles(
+      [path.join(REPO_ROOT, "tests/contracts/negative/mui-deep-import.ts")],
+      consumerOptions,
+    );
+    expect(diagnostics.length).toBeGreaterThan(0);
+    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@form\/mui\/src\/widgets\/mapper\.js'/);
+  });
+
   test("rejects React/MUI types from Vue packages", () => {
     const diagnostics = typecheckFiles(
       [path.join(REPO_ROOT, "tests/contracts/negative/vue-cross-framework.ts")],
@@ -147,5 +165,14 @@ describe("consumer export isolation", () => {
     );
     expect(diagnostics.length).toBeGreaterThan(0);
     expect(formatDiagnostics(diagnostics)).toMatch(/has no exported member 'ReactUIAdapter'/);
+  });
+
+  test("rejects Vue types from React packages", () => {
+    const diagnostics = typecheckFiles(
+      [path.join(REPO_ROOT, "tests/contracts/negative/react-cross-framework.ts")],
+      consumerOptions,
+    );
+    expect(diagnostics.length).toBeGreaterThan(0);
+    expect(formatDiagnostics(diagnostics)).toMatch(/has no exported member 'VueUIAdapter'/);
   });
 });

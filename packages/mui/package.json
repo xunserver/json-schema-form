@@ -23,5 +23,10 @@
   "peerDependencies": {
     "react": "^19.0.0 || ^18.0.0",
     "@mui/material": "^7.0.0 || ^6.0.0"
+  },
+  "devDependencies": {
+    "@mui/material": "^7.0.0",
+    "@types/react": "^19.0.0",
+    "react": "^19.0.0"
   }
 }
