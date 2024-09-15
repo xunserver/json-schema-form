@@ -1,0 +1,25 @@
+{
+  "name": "@form/react",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "dependencies": {
+    "@form/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0 || ^18.0.0"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/validator-ajv" },
+    { "path": "./packages/vue" },
+    { "path": "./packages/react" },
+    { "path": "./packages/element-plus" },
+    { "path": "./packages/mui" }
+  ]
+}

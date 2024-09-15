@@ -19,14 +19,14 @@
 
 | Package | 目录 | 职责 | 当前公共表面 |
 |---|---|---|---|
-| `@form/core` | `packages/core` | 框架无关的 authoring/compile-time 契约；预留 runtime 入口，并提供 Extension Plugin/Environment | Path、ID、Diagnostic、Form Definition、`defineForm()`、Compiled Model、CompileResult/CompileError；`@form/core/extension` 导出 Plugin/Environment/Widget/Registry 契约与 factory |
+| `@form/core` | `packages/core` | 框架无关的 authoring、静态编译与事务化 Runtime；提供 Extension Plugin/Environment | Path、ID、Diagnostic、Form Definition、`defineForm()`、`compileForm()`、`createForm()` / `createFormEngine()`、Compiled Model、CompileResult/CompileError、`FormInstance`；`@form/core/runtime` 导出只读 selector/subscription；`@form/core/extension` 导出 Plugin/Environment/Widget/Registry 契约与 factory |
 | `@form/validator-ajv` | `packages/validator-ajv` | 具体 JSON Schema validator 边界 | 空 ESM 入口；后续才允许引入 AJV |
 | `@form/vue` | `packages/vue` | Vue Renderer 边界 | 空 ESM 入口；peer 为 `vue` |
 | `@form/react` | `packages/react` | React Renderer 边界 | 空 ESM 入口；peer 为 `react` |
 | `@form/element-plus` | `packages/element-plus` | Element Plus Adapter 边界 | 空 ESM 入口；依赖 `@form/vue` 与 `@form/core`，peer 为 `vue` 与 `element-plus` |
 | `@form/mui` | `packages/mui` | MUI Adapter 边界 | 空 ESM 入口；依赖 `@form/react` 与 `@form/core`，peer 为 `react` 与 `@mui/material` |
 
-叶子 package 目前只提供可构建的空边界，不实现 Compiler、Runtime、Renderer 或 Adapter 行为。
+叶子 package 目前只提供可构建的空边界。`@form/core` 已提供 `defineForm()`、`compileForm()` 静态编译，以及基础事务 Runtime；Rule/Validation/Array/Renderer 行为仍待后续切片。
 
 ## 允许的依赖图
 
@@ -57,11 +57,11 @@
 
 | 入口 | 用途 |
 |---|---|
-| `@form/core` | Application 契约：Path、公共 ID、Diagnostic、FormDefinition、`defineForm()`、CompiledFormModel、CompileResult、CompileError |
-| `@form/core/runtime` | 预留 Advanced Runtime API；当前为空模块边界 |
+| `@form/core` | Application 契约：Path、公共 ID、Diagnostic、FormDefinition、`defineForm()`、`compileForm()` / `CompileOptions`、`createForm()` / `createFormEngine()`、FormInstance/FieldInstance、CompiledFormModel、CompileResult、CompileError、`FormRuntimeError` |
+| `@form/core/runtime` | Advanced Runtime API：只读 selector factory、`createSelector()`、snapshot read、subscription 与 Runtime diagnostic observation |
 | `@form/core/extension` | Extension API：`definePlugin()`、`createFormEnvironment()`、只读 Registry/Widget/Plugin 契约、protocol constant 与 `EnvironmentBuildError` |
 
-根入口导出的是面向应用的只读契约，不导出 `RuntimeNodeId`、TransactionManager、CompilerContext、Scheduler、可变 Store 或其他内部实现符号。未写入 `exports` 的 deep path 不是公共 API。
+根入口导出的是面向应用的只读契约与基础实例 factory，不导出 `RuntimeNodeId`、TransactionManager、ChangeQueue、CompilerContext、Scheduler、可变 Store、Environment identity token 或其他内部实现符号。未写入 `exports` 的 deep path 不是公共 API。`setValues()` 是 root replacement；数组 index path 目前会返回 capability diagnostic，尚不创建数组项身份。
 
 ## 提出未来公共 export 的规则
 

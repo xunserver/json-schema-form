@@ -1,0 +1,29 @@
+{
+  "name": "json-schema-form",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=20.19.0",
+    "pnpm": ">=11"
+  },
+  "scripts": {
+    "build": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false && tsc --noEmit -p packages/core/tsconfig.type-tests.json --pretty false && tsc --noEmit -p tests/contracts/positive/tsconfig.json --pretty false",
+    "test": "vitest run",
+    "check:boundaries": "tsx tools/architecture-check/cli.ts",
+    "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm check:boundaries"
+  },
+  "devDependencies": {
+    "@form/core": "workspace:*",
+    "@form/element-plus": "workspace:*",
+    "@form/mui": "workspace:*",
+    "@form/react": "workspace:*",
+    "@form/validator-ajv": "workspace:*",
+    "@form/vue": "workspace:*",
+    "@types/node": "^24.3.1",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
