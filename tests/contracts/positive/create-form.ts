@@ -13,6 +13,7 @@ export const compiled = compileForm(
 );
 
 export const form: FormInstance = createForm(compiled.model, { initialValues: { title: "Ada" } });
+void form.serialize();
 export const engine = createFormEngine();
 void 0 as unknown as ArrayInstance;
 void 0 as unknown as ScopedFormInstance;

@@ -38,7 +38,8 @@ const complete = defineForm({
     {
       kind: "state",
       target: "products[].name",
-      when: { eq: { field: "country" } },
+      when: { eq: [{ field: "country" }, "CN"] },
+      action: { visible: true },
     },
   ],
   config: {

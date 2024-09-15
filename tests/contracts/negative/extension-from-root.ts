@@ -1,4 +1,9 @@
-import { createFormEnvironment, definePlugin } from "@form/core";
+import { createFormEnvironment, definePlugin, defineWidget } from "@form/core";
 
-export const leaked = definePlugin({ id: "leaked" });
+export const leakedPlugin = definePlugin({ id: "leaked" });
+export const leakedWidget = defineWidget({
+  name: "leaked",
+  valueContract: { jsonTypes: ["string"], canonical: "json-scalar" },
+  interaction: { setValue: true },
+});
 export const environment = createFormEnvironment();

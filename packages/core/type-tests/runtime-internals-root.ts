@@ -12,6 +12,12 @@ import type { EnvironmentIdentity } from "../src/index.js";
 import type { ArrayStateStore } from "../src/index.js";
 // @ts-expect-error RuntimeNodeId is not part of the public root barrel
 import type { RuntimeNodeId } from "../src/index.js";
+// @ts-expect-error RuleDynamicsEngine is not part of the public root barrel
+import type { RuleDynamicsEngine } from "../src/index.js";
+// @ts-expect-error DependencyScheduler is not part of the public root barrel
+import type { DependencyScheduler } from "../src/index.js";
+// @ts-expect-error evaluateRuleExpression is not part of the public root barrel
+import { evaluateRuleExpression } from "../src/index.js";
 
 declare const transactionManager: TransactionManager;
 declare const changeQueue: ChangeQueue;
@@ -28,3 +34,9 @@ declare const arrayStore: ArrayStateStore;
 declare const runtimeNodeId: RuntimeNodeId;
 void arrayStore;
 void runtimeNodeId;
+
+declare const engine: RuleDynamicsEngine;
+declare const dependencyScheduler: DependencyScheduler;
+void engine;
+void dependencyScheduler;
+void evaluateRuleExpression;

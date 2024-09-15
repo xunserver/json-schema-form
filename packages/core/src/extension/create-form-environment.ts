@@ -21,6 +21,7 @@ import type {
   ValueInitializerDefinition,
 } from "./contributions.js";
 import type { WidgetDefinition } from "./widget.js";
+import { inspectWidgetInteraction, widgetDescriptorHasRuntimeHandler } from "./widget.js";
 import {
   CORE_EXTENSION_PROTOCOL,
   isProtocolCompatible,
@@ -415,6 +416,14 @@ function registerContribution(
     return;
   }
 
+  if (!validateNamedProvider(snapshot, kind, key, cloned.value, tracked)) {
+    return;
+  }
+
+  if (kind === "widgets" && !validateWidgetContribution(snapshot, key, cloned.value, tracked)) {
+    return;
+  }
+
   const store = stores[kind];
   const existing = store.get(key);
   if (existing === undefined) {
@@ -465,6 +474,155 @@ function registerContribution(
       },
     }),
   );
+}
+
+function validateNamedProvider(
+  snapshot: PluginSnapshot,
+  kind: RegistryKind,
+  key: string,
+  value: unknown,
+  tracked: TrackedDiagnostic[],
+): boolean {
+  if (kind !== "ruleFunctions" && kind !== "serializers") {
+    return true;
+  }
+  if (!isPlainObject(value)) {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" contributed an invalid ${kind} descriptor for "${key}"`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: kind,
+        key,
+        metadata: { registry: kind, key, reason: "non-plain-descriptor" },
+      }),
+    );
+    return false;
+  }
+  const name = value.name;
+  if (typeof name !== "string" || name.length === 0) {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" ${kind} descriptor "${key}" is missing a name`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: kind,
+        key,
+        metadata: { registry: kind, key, name, reason: "missing-name" },
+      }),
+    );
+    return false;
+  }
+  if (name !== key) {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" ${kind} key "${key}" does not match descriptor name "${name}"`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: kind,
+        key,
+        metadata: { registry: kind, key, name, pluginId: snapshot.id },
+      }),
+    );
+    return false;
+  }
+  if (kind === "ruleFunctions" && typeof value.evaluate !== "function") {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" ruleFunctions descriptor "${key}" must provide a synchronous evaluate() provider`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: kind,
+        key,
+        metadata: { registry: kind, key, name, reason: "invalid-evaluate" },
+      }),
+    );
+    return false;
+  }
+  if (kind === "serializers" && typeof value.serialize !== "function") {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" serializers descriptor "${key}" must provide a synchronous serialize() provider`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: kind,
+        key,
+        metadata: { registry: kind, key, name, reason: "invalid-serialize" },
+      }),
+    );
+    return false;
+  }
+  return true;
+}
+
+function validateWidgetContribution(
+  snapshot: PluginSnapshot,
+  key: string,
+  value: unknown,
+  tracked: TrackedDiagnostic[],
+): boolean {
+  if (!isPlainObject(value)) {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" contributed an invalid widgets descriptor for "${key}"`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: "widgets",
+        key,
+        metadata: { registry: "widgets", key, reason: "non-plain-descriptor" },
+      }),
+    );
+    return false;
+  }
+  if (widgetDescriptorHasRuntimeHandler(value)) {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" widgets descriptor "${key}" must not include Runtime handlers`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: "widgets",
+        key,
+        metadata: { registry: "widgets", key, reason: "runtime-handler" },
+      }),
+    );
+    return false;
+  }
+  const interaction = inspectWidgetInteraction(value.interaction);
+  if (!interaction.ok) {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" widgets descriptor "${key}" has an invalid interaction contract`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: "widgets",
+        key,
+        metadata: {
+          registry: "widgets",
+          key,
+          reason: interaction.reason,
+          ...(interaction.action === undefined ? {} : { action: interaction.action }),
+        },
+      }),
+    );
+    return false;
+  }
+  return true;
 }
 
 function storeEntries<T>(store: Map<string, RegistryEntryInspection<T>>): RegistryEntryInspection<T>[] {

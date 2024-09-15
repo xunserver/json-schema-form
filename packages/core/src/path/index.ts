@@ -31,6 +31,7 @@ export {
   parseInstancePath,
   toInstancePath,
 } from "./instance-path.js";
+export { bindTemplatePath, listIndexes } from "./bind-path.js";
 export {
   ROOT_SCHEMA_PATH,
   asSchemaPath,

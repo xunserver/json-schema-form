@@ -8,6 +8,8 @@ export function emptyRuleModel(): RuleModel {
   return deepFreeze({
     rules: [],
     byPath: createReadonlyKeyedCollection([]),
+    computedOrder: [],
+    serialization: { serializeInactive: false },
   });
 }
 
@@ -20,5 +22,7 @@ export function emptyValidationModel(): ValidationModel {
 export function emptySchemaDynamics(): SchemaDynamics {
   return deepFreeze({
     activations: [],
+    plans: [],
+    byPath: createReadonlyKeyedCollection([]),
   });
 }

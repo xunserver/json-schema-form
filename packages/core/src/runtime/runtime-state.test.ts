@@ -102,8 +102,8 @@ describe("readonly snapshot cache", () => {
     form.setValue("name", "Grace");
     expect(form.getState()).not.toBe(first);
     expect(form.getField("age").getState()).toBe(field);
-    expect(form.getState()).not.toHaveProperty("active");
-    expect(form.getState()).not.toHaveProperty("visible");
+    expect(form.getState()).toHaveProperty("active", true);
+    expect(form.getState()).toHaveProperty("visible", true);
     expect(form.getState()).not.toHaveProperty("valid");
   });
 

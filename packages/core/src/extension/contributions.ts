@@ -1,3 +1,5 @@
+import type { JsonValue } from "../definition/json-value.js";
+
 export interface SchemaDialectDefinition {
   readonly id: string;
   readonly $schema?: string;
@@ -10,6 +12,7 @@ export interface SchemaExtensionDefinition {
 
 export interface RuleFunctionDefinition {
   readonly name: string;
+  readonly evaluate: (args: readonly JsonValue[]) => JsonValue;
 }
 
 export interface ValidatorDefinition {
@@ -18,8 +21,14 @@ export interface ValidatorDefinition {
   readonly dependencies?: readonly string[];
 }
 
+export interface SerializerContext {
+  readonly version: number;
+  readonly includeInactive: boolean;
+}
+
 export interface SerializerDefinition {
   readonly name: string;
+  readonly serialize: (value: JsonValue, context: SerializerContext) => JsonValue;
 }
 
 export interface ValueInitializerDefinition {

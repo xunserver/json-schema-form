@@ -3,11 +3,13 @@ import { EnvironmentBuildError } from "./environment-build-error.js";
 import { definePlugin } from "./plugin.js";
 import type { FormPlugin } from "./plugin.js";
 import type { WidgetDefinition } from "./widget.js";
+import { FULL_WIDGET_INTERACTION } from "./widget.js";
 
 export function sampleWidget(name: string): WidgetDefinition {
   return {
     name,
     valueContract: { jsonTypes: ["string"], canonical: "json-scalar" },
+    interaction: FULL_WIDGET_INTERACTION,
   };
 }
 

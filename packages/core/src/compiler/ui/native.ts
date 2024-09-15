@@ -4,7 +4,7 @@ import type { ModelPath } from "../../path/index.js";
 import { CloneShapeError, clonePlain } from "../immutable.js";
 import { DiagnosticBag, compilerError } from "../diagnostics.js";
 
-const RESERVED_NATIVE_KEYS = new Set(["value", "disabled", "readonly", "errors"]);
+const RESERVED_NATIVE_KEYS = new Set(["value", "disabled", "readonly", "errors", "required"]);
 
 export function compileNativeOptions(
   native: Readonly<Record<AdapterId, NativeFieldOptions>> | undefined,

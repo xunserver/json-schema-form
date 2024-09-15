@@ -1,4 +1,5 @@
 import type { FormDefinition } from "../src/definition/form-definition.js";
+import type { FieldUI } from "../src/definition/ui-schema.js";
 
 const schemaOnly: FormDefinition = {
   schema: {
@@ -30,7 +31,8 @@ const withOptionalContracts: FormDefinition = {
     {
       kind: "state",
       target: "name",
-      when: { eq: { field: "country" } },
+      when: { eq: [{ field: "country" }, "CN"] },
+      action: { visible: true },
     },
   ],
   config: {
@@ -77,6 +79,18 @@ const arrayItemUi: FormDefinition = {
 };
 
 void arrayItemUi;
+
+type FieldUIKeys = keyof FieldUI;
+type AssertNoFieldRequired = Extract<FieldUIKeys, "required"> extends never ? true : never;
+const noFieldRequired: AssertNoFieldRequired = true;
+void noFieldRequired;
+
+const rejectedFieldRequired: FieldUI = {
+  widget: "text",
+  // @ts-expect-error FieldUI does not include required
+  required: true,
+};
+void rejectedFieldRequired;
 
 type FormDefinitionKeys = keyof FormDefinition;
 type UnexpectedDefinitionKeys =

@@ -1,8 +1,19 @@
 import type { AdapterId, FieldBehavior, FieldDisplay, WidgetProps } from "../definition/ui-schema.js";
 import type { DataNodeId, ViewNodeId } from "../identity/index.js";
-import type { ModelPath } from "../path/index.js";
+import type { ModelPath, SchemaPath } from "../path/index.js";
 import type { NativeFieldOptions } from "../definition/ui-schema.js";
+import type { PropertyRequiredStatus } from "./data.js";
 import type { ReadonlyKeyedCollection } from "./readonly-collection.js";
+
+export type FieldRequirementStatus = PropertyRequiredStatus;
+
+export interface FieldRequirementPresentation {
+  readonly status: FieldRequirementStatus;
+  readonly ownerPath: ModelPath;
+  readonly property: string;
+  readonly schemaRefs: readonly SchemaPath[];
+  readonly activationSources?: readonly SchemaPath[];
+}
 
 export interface FieldDescriptor {
   readonly dataNodeId: DataNodeId;
@@ -12,6 +23,7 @@ export interface FieldDescriptor {
   readonly props?: WidgetProps;
   readonly behavior?: FieldBehavior;
   readonly native?: Readonly<Record<AdapterId, NativeFieldOptions>>;
+  readonly requirement?: FieldRequirementPresentation;
 }
 
 export type ViewNodeKind = "field" | "object" | "array" | "group" | "layout";

@@ -1,5 +1,6 @@
 import type { FormEnvironment } from "../../extension/environment.js";
 import type { WidgetDefinition, WidgetMatcher } from "../../extension/widget.js";
+import { inspectWidgetInteraction } from "../../extension/widget.js";
 import type { FieldUI } from "../../definition/ui-schema.js";
 import type { DataNode } from "../../model/data.js";
 import { COMPILER_DIAGNOSTIC_CODES } from "../../model/diagnostic-codes.js";
@@ -221,6 +222,9 @@ function isCompatible(
   const contract = definition.propsContract?.properties;
   if (props !== undefined && contract !== undefined) {
     for (const key of Object.keys(props)) {
+      if (key === "required") {
+        continue;
+      }
       const expected = contract[key];
       if (expected === undefined) {
         diagnostics.push(
@@ -262,6 +266,25 @@ function isCompatible(
         COMPILER_DIAGNOSTIC_CODES.WIDGET_INCOMPATIBLE,
         `Widget "${definition.name}" does not support readonly behavior`,
         { modelPath: path, metadata: { widget: definition.name, capability: "readonly" } },
+      ),
+    );
+    return false;
+  }
+
+  const interaction = inspectWidgetInteraction(definition.interaction);
+  if (!interaction.ok) {
+    diagnostics.push(
+      compilerError(
+        COMPILER_DIAGNOSTIC_CODES.WIDGET_INCOMPATIBLE,
+        `Widget "${definition.name}" has an invalid interaction contract`,
+        {
+          modelPath: path,
+          metadata: {
+            widget: definition.name,
+            reason: interaction.reason,
+            ...(interaction.action === undefined ? {} : { action: interaction.action }),
+          },
+        },
       ),
     );
     return false;

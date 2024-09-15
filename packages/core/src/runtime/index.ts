@@ -8,6 +8,7 @@ export {
   arrayOrderSelector,
   createSelector,
   currentBindingSelector,
+  effectiveStateSelector,
   fieldSelector,
   formSelector,
   itemPathSelector,
@@ -20,6 +21,7 @@ export type { ArrayIdentityResolver, ArrayIdentityResolverBinding } from "./iden
 export type {
   ArrayItemSnapshot,
   CurrentBindingSnapshot,
+  EffectiveState,
   FieldSnapshot,
   FormSnapshot,
   JsonValue,

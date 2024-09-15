@@ -92,4 +92,80 @@ describe("createFormEnvironment", () => {
     expect(Object.isFrozen(environment.diagnostics)).toBe(true);
     expect(Object.isFrozen(environment.diagnostics[0]?.metadata)).toBe(true);
   });
+
+  test("rejects widgets whose interaction contract is missing, unknown, or executable", () => {
+    const missing = expectBuildError(() =>
+      createFormEnvironment({
+        plugins: [
+          {
+            id: "missing-set-value",
+            contributes: {
+              widgets: {
+                broken: {
+                  name: "broken",
+                  valueContract: { jsonTypes: ["string"], canonical: "json-scalar" },
+                  interaction: {},
+                } as never,
+              },
+            },
+          },
+        ],
+      }),
+    );
+    expect(codesOf(missing)).toEqual([PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR]);
+    expect(missing.diagnostics[0]?.source).toBe("plugin");
+    expect(missing.diagnostics[0]?.metadata).toMatchObject({
+      registry: "widgets",
+      key: "broken",
+      reason: "missing-setValue",
+    });
+    expect("environment" in missing).toBe(false);
+
+    const unknown = expectBuildError(() =>
+      createFormEnvironment({
+        plugins: [
+          {
+            id: "unknown-action",
+            contributes: {
+              widgets: {
+                broken: {
+                  name: "broken",
+                  valueContract: { jsonTypes: ["string"], canonical: "json-scalar" },
+                  interaction: { setValue: true, submit: true },
+                } as never,
+              },
+            },
+          },
+        ],
+      }),
+    );
+    expect(unknown.diagnostics[0]?.metadata).toMatchObject({
+      registry: "widgets",
+      reason: "unknown-action",
+      action: "submit",
+    });
+
+    const handler = expectBuildError(() =>
+      createFormEnvironment({
+        plugins: [
+          {
+            id: "runtime-handler",
+            contributes: {
+              widgets: {
+                broken: {
+                  name: "broken",
+                  valueContract: { jsonTypes: ["string"], canonical: "json-scalar" },
+                  interaction: { setValue: true, onChange: () => undefined },
+                } as never,
+              },
+            },
+          },
+        ],
+      }),
+    );
+    expect(handler.diagnostics[0]?.metadata).toMatchObject({
+      registry: "widgets",
+      reason: "runtime-handler",
+    });
+  });
 });

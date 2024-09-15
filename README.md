@@ -1,6 +1,6 @@
 # JSON Schema Form
 
-以 JSON Schema 为数据契约的表单引擎。当前仓库完成的是 pnpm/TypeScript 工作区、六个首期 package 边界，以及 `@form/core` 的框架无关公共契约：无副作用的 `defineForm()`、可诊断的冻结 `FormEnvironment`、把 Draft 2020-12 Schema / UI Schema 编译为不可变静态模型的 `compileForm()`，以及事务化的基础 `createForm()` / `createFormEngine()` Runtime。Rule、Validation、数组项身份、Renderer 和业务 Validator 仍由后续垂直切片交付。
+以 JSON Schema 为数据契约的表单引擎。当前仓库完成的是 pnpm/TypeScript 工作区、六个首期 package 边界，以及 `@form/core` 的框架无关公共契约：无副作用的 `defineForm()`、可诊断的冻结 `FormEnvironment`、把 Draft 2020-12 Schema / UI Schema / Rule AST / Schema Dynamics 编译为不可变静态模型的 `compileForm()`，以及事务化的 `createForm()` / `createFormEngine()` Runtime（含 Rule 求值、activation、effective state 与 `serialize()`）。完整 Validation owner、async Rule 和 Renderer 仍由后续垂直切片交付。
 
 架构基线见 [`docs/architecture.md`](docs/architecture.md)。工作区命令、package 职责和公共 export 规则见 [`docs/workspace.md`](docs/workspace.md)。
 
@@ -44,13 +44,21 @@ pnpm verify
 
 `defineForm()` 只做 authoring，不编译、不创建 Runtime、也不注册全局状态。`compileForm(definition)` 使用默认 Core Environment；需要业务 Plugin 时，从 `@form/core/extension` 显式构建同一个冻结 `FormEnvironment` 并传入 `compileForm(definition, { environment })`。编译不修改输入，也不访问 global registry。
 
-静态 `ModelPath` 使用 `products[].name`、转义 property 的 JSON-string bracket，以及 tuple 的 `[#n]`；`products[0]` 属于未来 Runtime `InstancePath`，不会出现在 Compiled DataModel。Field Registry 与 ViewTree 分离：检查 Field 用 `model.ui.fields`，检查呈现结构用已解析的 `model.ui.viewTree`。当前产物只装配冻结的 Rule / Validation / SchemaDynamics 边界，不编译或执行 Rule、业务 Validation 或 Schema activation。
+静态 `ModelPath` 使用 `products[].name`、转义 property 的 JSON-string bracket，以及 tuple 的 `[#n]`；`products[0]` 属于 Runtime `InstancePath`，不会出现在 Compiled DataModel。Field Registry 与 ViewTree 分离：检查 Field 用 `model.ui.fields`，检查呈现结构用已解析的 `model.ui.viewTree`。来自 Object property edge 的 Field 带有只读 `requirement` presentation source（`required` / `optional` / `conditional`）；`required` 不是 `FieldUI` 成员，实例级 effective `required` 由后续 Runtime 绑定端口组合 activation state 后再交给 FieldChrome。
+
+自定义逻辑 Widget 使用 `@form/core/extension` 的 `defineWidget()`：它只保留 identity 与 literal inference，不安装 Registry。`WidgetDefinition.interaction` 以纯数据声明 `setValue` / `touch` / `focus` / `blur`；framework Adapter 的 capability preflight、`blur()` / `RenderScope` 与 effective `required` snapshot 由 `add-renderer-interaction-and-binding-ports` 承接。已声明 `x-*` 拆分与非 Draft 2020-12 dialect adapter 由 `align-core-contributions-and-layout` 承接。
+
+`FormDefinition.rules` 使用 JSON-compatible 的 `RuleExpression` AST（scalar / `{ const }` / `{ field }` / `{ call, args }` / 固定 operator），分为 State、Computed、Validation、Effect 四类。named function 只通过 `@form/core/extension` 的 `defineRuleFunction()` 注册到 Environment，Compiled Model 只保存 function key。数组 Rule 按同一 item 的相对 `ModelPath` 绑定，不接受无法唯一确定的 sibling/descendant collection。`oneOf`/`anyOf`/`if`/`dependentSchemas` 编译为有限 activation plan；无法保真的 predicate 在编译期阻断。
+
+effective `active` 由 ancestor、Schema activation 与 active Rule 以 AND 组成（root 恒为 active）；`visible` 再 AND UI/Rule visible，因此 hidden 仍可保持 active。`disabled`/`readonly` 以 OR 组成，Computed target 强制 readonly。`serialize()` 默认按 Compiled `serializeInactive`（缺省 false）做 active-only prune，显式 `{ includeInactive }` 或 named Serializer key 可覆盖；serialize 不看 visible/disabled/readonly。Validation Rule 只产生后续 owner 的 plan，本切片不提供 `validate()` / `valid` / 完整 AJV Validation。
 
 ```ts
 import { compileForm, CompileError, defineForm } from "@form/core";
 import {
   createFormEnvironment,
   definePlugin,
+  defineRuleFunction,
+  defineWidget,
   EnvironmentBuildError,
 } from "@form/core/extension";
 
@@ -78,6 +86,7 @@ const definition = defineForm({
 const { model, diagnostics } = compileForm(definition);
 void model.data.nodes.get("products[].name");
 void model.ui.fields.get("products[].name")?.widget;
+void model.ui.fields.get("products[].name")?.requirement;
 void model.ui.viewTree;
 void diagnostics;
 
@@ -86,13 +95,20 @@ const companyPlugin = definePlugin({
   dependsOn: ["core"],
   contributes: {
     widgets: {
-      sku: {
+      sku: defineWidget({
         name: "sku",
         valueContract: {
           jsonTypes: ["string"],
           canonical: "json-scalar",
         },
-      },
+        interaction: { setValue: true, touch: true, focus: true, blur: true },
+      }),
+    },
+    ruleFunctions: {
+      "company.tax": defineRuleFunction({
+        name: "company.tax",
+        evaluate: (args) => args[0] ?? 0,
+      }),
     },
   },
 });
@@ -114,7 +130,9 @@ try {
 
 公开 snapshot 只读。`setValues(nextValues)` 是一次原子的 root replacement，不是隐式 deep-merge。写入必须经过 command/transaction；effective no-op 不增加 `version`。
 
-`FormInstance.array(path)` 与 `scope(path)` 返回共享同一 Runtime 的轻量 facade。数组 index 只是当前地址，`ArrayItemId` 才是 item 身份：`move` 后 Field/View source state 跟随 ID，`remove`/`replaceItem`/`reset` 以及默认 whole-array `setValue` 会作废旧 ID 与 scope。`setItemValue` 保留根 item ID；未配置 Identity Resolver 时，有效的整个数组替换会重建全部 item ID，而不会按 index 或业务字段猜测复用。可在 `createForm` 选项中按数组 `ModelPath` 提供纯同步 `ArrayIdentityResolver`（从 `@form/core/runtime` 导入类型）做 key reconcile；重复 key 或抛错会使 transaction 回滚。固定 tuple 现存 slot 可 `setItemValue`/`replaceItem`，但不支持 append/insert/remove/move/clear。Rule、Validation、Renderer 仍由后续切片拥有，本 Runtime 不求值 active/visible，也不提供 `validate()`/`submit()`/`serialize()`。
+`FormInstance.array(path)` 与 `scope(path)` 返回共享同一 Runtime 的轻量 facade。数组 index 只是当前地址，`ArrayItemId` 才是 item 身份：`move` 后 Field/View source state 跟随 ID，`remove`/`replaceItem`/`reset` 以及默认 whole-array `setValue` 会作废旧 ID 与 scope。`setItemValue` 保留根 item ID；未配置 Identity Resolver 时，有效的整个数组替换会重建全部 item ID，而不会按 index 或业务字段猜测复用。可在 `createForm` 选项中按数组 `ModelPath` 提供纯同步 `ArrayIdentityResolver`（从 `@form/core/runtime` 导入类型）做 key reconcile；重复 key 或抛错会使 transaction 回滚。固定 tuple 现存 slot 可 `setItemValue`/`replaceItem`，但不支持 append/insert/remove/move/clear。
+
+`createForm()` 在返回实例前会无 publish 地稳定 Computed/Effect/activation，`version` 仍为 0，稳定后的 values 作为 dirty baseline。`FormInstance.serialize(options?)` 读取已提交 snapshot；默认 active-only。不要假设存在 async Rule、完整 Validation 或 Renderer：Core 不提供 `validate()` / `submit()`，也不渲染 UI。
 
 只读 selector / subscription / Runtime diagnostic observer 以及 array order/item/binding selector 从 `@form/core/runtime` 导入，不从根入口重导出。
 
@@ -156,7 +174,9 @@ subscribeRuntime(form, valueSelector("name"), (name) => {
 });
 subscribeRuntime(form, formSelector(), (snapshot) => {
   void snapshot.version;
+  void snapshot.active;
 });
+void form.serialize();
 
 try {
   form.setValue("products[0].name", "x");

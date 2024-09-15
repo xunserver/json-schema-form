@@ -5,11 +5,13 @@ import type { WidgetDefinition } from "./widget.js";
 const text: WidgetDefinition = {
   name: "text",
   valueContract: { jsonTypes: ["string"], canonical: "json-scalar" },
+  interaction: { setValue: true },
 };
 
 const number: WidgetDefinition = {
   name: "number",
   valueContract: { jsonTypes: ["number"], canonical: "json-scalar" },
+  interaction: { setValue: true },
 };
 
 describe("createRegistry", () => {

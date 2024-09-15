@@ -14,12 +14,14 @@ import { FormRuntime, type FormRuntimeOptions } from "./form-runtime.js";
 import { bindFormRuntime } from "./handle.js";
 import type { RuntimeSubtreeOwner } from "./subtree-lifecycle.js";
 import type { PhaseSet } from "./phases.js";
+import type { AffectedValidationRulePlan } from "./rule/engine.js";
 
 export interface CreateFormInternals {
   readonly phases?: Partial<PhaseSet>;
   readonly commandLimit?: number;
   readonly iterationLimit?: number;
   readonly subtreeOwners?: readonly RuntimeSubtreeOwner[];
+  readonly validationOwner?: (plan: AffectedValidationRulePlan) => void;
 }
 
 export function createForm(model: CompiledFormModel, options?: CreateFormOptions): FormInstance {
@@ -59,6 +61,7 @@ export function instantiateForm(
     ...(internals?.commandLimit === undefined ? {} : { commandLimit: internals.commandLimit }),
     ...(internals?.iterationLimit === undefined ? {} : { iterationLimit: internals.iterationLimit }),
     ...(internals?.subtreeOwners === undefined ? {} : { subtreeOwners: internals.subtreeOwners }),
+    ...(internals?.validationOwner === undefined ? {} : { validationOwner: internals.validationOwner }),
   };
   const runtime = new FormRuntime(model, environment, runtimeOptions);
   bindFormRuntime(runtime.facade, runtime);

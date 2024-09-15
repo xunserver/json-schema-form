@@ -30,7 +30,9 @@ export type {
   LayoutNode,
   NativeFieldOptions,
   RuleAst,
+  RuleCallExpression,
   RuleDefinition,
+  RuleExpression,
   RuleKind,
   UISchema,
   ValidationTrigger,
@@ -55,6 +57,8 @@ export type {
   DataNode,
   DataNodeKind,
   FieldDescriptor,
+  FieldRequirementPresentation,
+  FieldRequirementStatus,
   FieldView,
   GroupView,
   LayoutView,
@@ -72,11 +76,14 @@ export type {
   SchemaActivation,
   SchemaDiagnosticCode,
   SchemaDynamics,
+  SerializationPlan,
   UIModel,
   UnionDataNode,
   ValidationModel,
   ViewNode,
   ViewNodeKind,
+  ActivationPlan,
+  NormalizedRuleExpression,
 } from "./model/index.js";
 
 export {
@@ -98,6 +105,7 @@ export type {
   CreateFormEngineOptions,
   CreateFormOptions,
   CurrentBindingSnapshot,
+  EffectiveState,
   FieldInstance,
   FieldSnapshot,
   FormEngine,
@@ -106,5 +114,6 @@ export type {
   JsonPrimitive,
   JsonValue,
   ScopedFormInstance,
+  SerializeOptions,
   ViewSnapshot,
 } from "./runtime/contracts.js";

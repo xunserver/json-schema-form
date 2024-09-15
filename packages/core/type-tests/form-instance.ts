@@ -40,10 +40,14 @@ void state.version;
 void fieldState.dirty;
 
 type FormKeys = keyof FormInstance;
-type ForbiddenFacades = Extract<FormKeys, "validate" | "applyErrors" | "submit" | "serialize">;
+type ForbiddenFacades = Extract<FormKeys, "validate" | "applyErrors" | "submit">;
 type AssertNoLaterFacades = ForbiddenFacades extends never ? true : never;
 const noLaterFacades: AssertNoLaterFacades = true;
 void noLaterFacades;
+
+const serialized = form.serialize();
+void serialized;
+form.serialize({ includeInactive: true });
 
 const array = form.array;
 const scoped = form.scope;
@@ -64,6 +68,11 @@ const snapshot = form.getState();
 // @ts-expect-error Form snapshot version is readonly
 snapshot.version = 2;
 
+void snapshot.active;
+void snapshot.visible;
+void snapshot.disabled;
+void snapshot.readonly;
+
 const rootValues = form.getValues();
 if (typeof rootValues === "object" && rootValues !== null && !Array.isArray(rootValues)) {
   // @ts-expect-error public values snapshot is readonly
@@ -73,14 +82,6 @@ if (typeof rootValues === "object" && rootValues !== null && !Array.isArray(root
 const fieldValues = field.getState();
 // @ts-expect-error field snapshot is readonly
 fieldValues.touched = true;
-
-// @ts-expect-error baseline snapshots do not claim active
-const active = snapshot.active;
-void active;
-
-// @ts-expect-error baseline snapshots do not claim visible
-const visible = snapshot.visible;
-void visible;
 
 // @ts-expect-error baseline snapshots do not claim valid
 const valid = snapshot.valid;

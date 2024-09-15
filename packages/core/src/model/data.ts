@@ -93,3 +93,24 @@ export interface DataModel {
   readonly root: DataNode;
   readonly nodes: ReadonlyKeyedCollection<ModelPath, DataNode>;
 }
+
+export function objectPropertyEdges(node: DataNode): readonly PropertyEdge[] {
+  if (node.kind === "object") {
+    return node.properties;
+  }
+  if (node.kind !== "union") {
+    return [];
+  }
+  const seen = new Set<string>();
+  const edges: PropertyEdge[] = [];
+  for (const variant of node.variants) {
+    for (const edge of objectPropertyEdges(variant)) {
+      if (seen.has(edge.name)) {
+        continue;
+      }
+      seen.add(edge.name);
+      edges.push(edge);
+    }
+  }
+  return edges;
+}

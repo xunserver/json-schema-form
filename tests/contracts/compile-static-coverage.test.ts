@@ -251,11 +251,99 @@ const SCENARIOS: readonly { spec: string; scenario: string; files: readonly stri
     scenario: "ViewTree 不泄漏 Render-time state",
     files: ["packages/core/src/compiler/ui-model.test.ts", "packages/core/type-tests/data-ui-boundaries.ts"],
   },
+  {
+    spec: "core-plugin-environment",
+    scenario: "保留自定义 Widget identity 与 literal",
+    files: [
+      "packages/core/src/extension/define-widget.test.ts",
+      "packages/core/type-tests/define-widget.ts",
+      "tests/contracts/positive/extension-entry.ts",
+    ],
+  },
+  {
+    spec: "core-plugin-environment",
+    scenario: "helper 调用不触发 Registry 冲突",
+    files: ["packages/core/src/extension/define-widget.test.ts"],
+  },
+  {
+    spec: "core-plugin-environment",
+    scenario: "默认 Widget 提供完整 semantic action capability",
+    files: ["packages/core/src/extension/built-in.test.ts"],
+  },
+  {
+    spec: "core-plugin-environment",
+    scenario: "自定义 Widget 只声明逻辑能力",
+    files: [
+      "packages/core/src/compiler/ui-model.test.ts",
+      "packages/core/type-tests/define-widget.ts",
+      "tests/contracts/adapter-interaction-preflight.test.ts",
+    ],
+  },
+  {
+    spec: "core-plugin-environment",
+    scenario: "拒绝非法 interaction descriptor",
+    files: [
+      "packages/core/src/extension/create-form-environment.test.ts",
+      "packages/core/src/compiler/ui/widget-resolver.test.ts",
+    ],
+  },
+  {
+    spec: "core-plugin-environment",
+    scenario: "Adapter capability 不足时不得静默降级",
+    files: ["tests/contracts/adapter-interaction-preflight.test.ts"],
+  },
+  {
+    spec: "core-public-contracts",
+    scenario: "从 Extension 子路径声明 Widget",
+    files: [
+      "tests/contracts/positive/extension-entry.ts",
+      "tests/contracts/declarations.test.ts",
+      "tests/contracts/export-resolution.test.ts",
+    ],
+  },
+  {
+    spec: "core-public-contracts",
+    scenario: "根入口不重导出 Advanced 或 Extension factory",
+    files: [
+      "tests/contracts/negative/extension-from-root.ts",
+      "tests/contracts/export-isolation.test.ts",
+      "tests/contracts/export-resolution.test.ts",
+    ],
+  },
+  {
+    spec: "static-ui-model",
+    scenario: "投影静态 required 与 optional 来源",
+    files: [
+      "packages/core/src/compiler/ui-model.test.ts",
+      "packages/core/type-tests/data-ui-boundaries.ts",
+    ],
+  },
+  {
+    spec: "static-ui-model",
+    scenario: "conditional required 只记录 Dynamics 来源",
+    files: [
+      "packages/core/src/compiler/ui-model.test.ts",
+      "tests/contracts/requirement-handoff.test.ts",
+    ],
+  },
+  {
+    spec: "static-ui-model",
+    scenario: "非 property Field 不伪造 required",
+    files: ["packages/core/src/compiler/ui-model.test.ts"],
+  },
+  {
+    spec: "static-ui-model",
+    scenario: "UI 与 Validation 不能覆盖 required 真相",
+    files: [
+      "packages/core/src/compiler/ui-model.test.ts",
+      "packages/core/type-tests/definition.ts",
+    ],
+  },
 ];
 
 describe("compile-static-form-model scenario coverage", () => {
   test("maps every delta spec scenario to an existing unit, type, contract, or integration test", () => {
-    expect(SCENARIOS).toHaveLength(47);
+    expect(SCENARIOS).toHaveLength(59);
     for (const entry of SCENARIOS) {
       expect(entry.files.length, entry.scenario).toBeGreaterThan(0);
       for (const relative of entry.files) {

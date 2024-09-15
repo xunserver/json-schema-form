@@ -10,6 +10,7 @@ import {
   parseInstancePath,
   ROOT_INSTANCE_PATH,
   toModelPath,
+  asInstancePath,
   type InstancePath,
   type InstancePathLike,
 } from "../path/index.js";
@@ -23,6 +24,7 @@ import type {
   FormSnapshot,
   JsonValue,
   ScopedFormInstance,
+  SerializeOptions,
   ViewSnapshot,
 } from "./contracts.js";
 import { canMaterializeObject, isFieldPath } from "./binding.js";
@@ -71,6 +73,12 @@ import { derefNode, indexDataNodes } from "./templates.js";
 import type { ArrayIdentityResolver } from "./identity-resolver.js";
 import type { RuntimeSubtreeOwner } from "./subtree-lifecycle.js";
 import { freezeBindingView } from "./subtree-lifecycle.js";
+import {
+  RuleDynamicsEngine,
+  type AffectedValidationRulePlan,
+  type RuleDraftState,
+} from "./rule/engine.js";
+import { DEFAULT_EFFECTIVE } from "./effective.js";
 
 export interface FormRuntimeOptions {
   readonly initialValues?: unknown;
@@ -82,6 +90,7 @@ export interface FormRuntimeOptions {
     readonly resolve: ArrayIdentityResolver;
   }[];
   readonly subtreeOwners?: readonly RuntimeSubtreeOwner[];
+  readonly validationOwner?: (plan: AffectedValidationRulePlan) => void;
 }
 
 interface SelectorCacheEntry {
@@ -127,6 +136,7 @@ export class FormRuntime implements SelectorHost {
   readonly bindings = new BindingIndex();
   readonly kernel: ArrayKernel;
   readonly interner = new RuntimeNodeInterner();
+  readonly engine: RuleDynamicsEngine;
   lastCommandResult: RuntimeCommandResult = undefined;
   ownerGenerations = new Map<string, number>();
 
@@ -147,6 +157,11 @@ export class FormRuntime implements SelectorHost {
   private readonly pending = new ChangeQueue();
   private affectedKeys: ReadonlySet<string> | undefined;
   private formSnapshotStamp = "";
+  private originalInitial: JsonValue;
+  private derivedRevision = 1;
+  private workingRule: RuleDraftState | undefined;
+  private readonly validationOwner: ((plan: AffectedValidationRulePlan) => void) | undefined;
+  private forceAllRules = false;
 
   constructor(model: CompiledFormModel, environment: FormEnvironment, options?: FormRuntimeOptions) {
     this.model = model;
@@ -154,15 +169,18 @@ export class FormRuntime implements SelectorHost {
     this.phases = freezePhaseSet(options?.phases);
     this.commandLimit = options?.commandLimit ?? RUNTIME_COMMAND_LIMIT;
     this.iterationLimit = options?.iterationLimit ?? RUNTIME_ITERATION_LIMIT;
+    this.validationOwner = options?.validationOwner;
     this.viewIndex = indexViews(model.ui.viewTree);
     this.values = new ValueStoreImpl(readInitialValues(model, options?.initialValues));
+    this.originalInitial = this.values.current;
+    this.engine = new RuleDynamicsEngine(model, environment);
     this.arrays = new ArrayStateStore(`f${nextInstanceNonce()}`);
     this.kernel = new ArrayKernel(
       model,
       indexDataNodes(model),
       this.interner,
       freezeResolvers(model, options?.arrayIdentityResolvers),
-      options?.subtreeOwners ?? [],
+      [this.engine, ...(options?.subtreeOwners ?? [])],
     );
     const bootstrap = emptyKernelDraft(this.values.current, this.arrays, this.bindings);
     this.kernel.materializeTree(
@@ -176,6 +194,7 @@ export class FormRuntime implements SelectorHost {
     );
     this.transaction = new TransactionManager(this);
     this.facade = this.createFacade();
+    this.stabilizeInitial();
   }
 
   dispatch(command: RuntimeCommand): RuntimeCommandResult {
@@ -221,6 +240,7 @@ export class FormRuntime implements SelectorHost {
       dirty: !jsonEqual(this.values.current, this.values.initial),
       touched: this.fields.touched.size > 0,
       version: this.form.version,
+      ...this.effectiveAt(ROOT_INSTANCE_PATH),
     });
     this.cachedFormSnapshot = snapshot;
     this.formSnapshotStamp = stamp;
@@ -311,6 +331,7 @@ export class FormRuntime implements SelectorHost {
     for (const command of commands) {
       queue.enqueue(command);
     }
+    this.workingRule = this.engine.snapshot();
 
     try {
       let applied = 0;
@@ -343,9 +364,9 @@ export class FormRuntime implements SelectorHost {
         const beforeValues = draft.values;
         const beforeTouched = new Map(draft.touched);
         const beforeFocused = new Map(draft.focused);
-        this.runPhase("activation", draft, queue, committedVersion, originalValues, originalTouched, originalFocused);
+        this.runPhase("activation", draft, queue, committedVersion, originalValues, originalTouched, originalFocused, applyQueued);
         applyQueued();
-        this.runPhase("rule", draft, queue, committedVersion, originalValues, originalTouched, originalFocused);
+        this.runPhase("rule", draft, queue, committedVersion, originalValues, originalTouched, originalFocused, applyQueued);
         applyQueued();
         progressed = draftDiffers(draft, beforeValues, beforeTouched, beforeFocused);
       }
@@ -368,13 +389,16 @@ export class FormRuntime implements SelectorHost {
         ]);
       }
 
-      if (!draftDiffers(draft, originalValues, originalTouched, originalFocused) && !draft.identityChanged) {
+      if (!draftDiffers(draft, originalValues, originalTouched, originalFocused) && !draft.identityChanged && !this.workingRule?.derivedChanged) {
         return;
       }
 
       committedChangeSet = this.changeSetOf(draft, originalValues, originalTouched, originalFocused);
       this.commitDraft(draft, committedChangeSet);
       this.lastCommandResult = draft.result;
+      if (this.workingRule !== undefined && this.workingRule.oneOfDiagnostics.length > 0) {
+        this.emitNonBlocking(this.workingRule.oneOfDiagnostics);
+      }
     } catch (error) {
       if (error instanceof FormRuntimeError) {
         throw error;
@@ -388,6 +412,7 @@ export class FormRuntime implements SelectorHost {
       ]);
     } finally {
       this.running = false;
+      this.workingRule = undefined;
     }
 
     if (committedChangeSet === undefined || this.form.version === committedVersion) {
@@ -637,14 +662,14 @@ export class FormRuntime implements SelectorHost {
   }
 
   private applyReset(draft: TransactionDraft): void {
-    const valuesChanged = !jsonEqual(draft.values, this.values.initial);
+    const valuesChanged = !jsonEqual(draft.values, this.originalInitial);
     const touchChanged = draft.touched.size > 0;
     const focusChanged = draft.focused.size > 0;
     const hadItems = arrayItemCount(draft.arrays) > 0 || arrayItemCount(this.arrays) > 0;
     if (!valuesChanged && !touchChanged && !focusChanged && !hadItems) {
       return;
     }
-    draft.values = this.values.initial;
+    draft.values = this.originalInitial;
     draft.touched.clear();
     draft.focused.clear();
     draft.reset = true;
@@ -678,7 +703,37 @@ export class FormRuntime implements SelectorHost {
     }
     this.form.version += 1;
     this.form.revision += 1;
+    if (draft.reset) {
+      this.values.initial = draft.values;
+    }
     this.extraSelectorKeys = new Set();
+    if (this.workingRule !== undefined) {
+      const previous = this.engine.peekState();
+      const changed = this.engine.changedEffectivePaths(previous, this.workingRule);
+      this.engine.commit(this.workingRule);
+      if (changed.length > 0) {
+        this.derivedRevision += 1;
+      }
+      const marked = new Set<string>();
+      const mark = (path: InstancePath): void => {
+        if (marked.has(path)) {
+          return;
+        }
+        marked.add(path);
+        this.extraSelectorKeys.add(`effective:${path}`);
+        this.extraSelectorKeys.add(`field:${path}`);
+        this.fieldSnapshots.delete(path);
+      };
+      for (const path of changed) {
+        mark(path);
+        for (const candidate of this.bindings.pathToId.keys()) {
+          const child = candidate as InstancePath;
+          if (isUnderInstancePath(child, path)) {
+            mark(child);
+          }
+        }
+      }
+    }
     for (const path of draft.affectedArrayOrders) {
       this.extraSelectorKeys.add(`array-order:${path}`);
     }
@@ -726,6 +781,9 @@ export class FormRuntime implements SelectorHost {
     }
     for (const id of changeSet.viewIds) {
       this.viewSnapshots.delete(id);
+    }
+    if (this.workingRule?.derivedChanged) {
+      this.viewSnapshots.clear();
     }
   }
 
@@ -776,6 +834,7 @@ export class FormRuntime implements SelectorHost {
     originalValues: JsonValue,
     originalTouched: ReadonlyMap<string, true>,
     originalFocused: ReadonlyMap<string, true>,
+    flush: () => void = () => undefined,
   ): void {
     const context: TransactionPhaseContext = Object.freeze({
       phase,
@@ -799,9 +858,28 @@ export class FormRuntime implements SelectorHost {
           ]);
         }
         queue.enqueue(command);
+        if (phase === "rule") {
+          flush();
+        }
       },
     });
     try {
+      if (phase === "activation" && this.workingRule !== undefined) {
+        this.engine.activate(draft, this.workingRule);
+      }
+      if (phase === "rule" && this.workingRule !== undefined) {
+        this.engine.runRules(
+          draft,
+          this.workingRule,
+          context.changeSet.valuePaths,
+          (command) => context.enqueue(command),
+          draft.reset || this.forceAllRules,
+        );
+      }
+      if (phase === "syncValidation" && this.workingRule !== undefined) {
+        const plan = this.engine.validationPlan(this.workingRule);
+        this.validationOwner?.(plan);
+      }
       this.phases[phase](context);
     } catch (error) {
       if (error instanceof FormRuntimeError) {
@@ -897,12 +975,17 @@ export class FormRuntime implements SelectorHost {
     const initial = getJsonAt(this.values.initial, parseInstancePath(path) ?? []);
     const dirty = !jsonEqual(value, initial);
     const touched = this.isAggregateTouched(path);
+    const effective = this.effectiveAt(path);
     const cached = this.fieldSnapshots.get(path);
     if (
       cached !== undefined &&
       Object.is(cached.value, value) &&
       cached.dirty === dirty &&
-      cached.touched === touched
+      cached.touched === touched &&
+      cached.active === effective.active &&
+      cached.visible === effective.visible &&
+      cached.disabled === effective.disabled &&
+      cached.readonly === effective.readonly
     ) {
       return cached;
     }
@@ -911,6 +994,7 @@ export class FormRuntime implements SelectorHost {
       value,
       dirty,
       touched,
+      ...effective,
     });
     this.fieldSnapshots.set(path, snapshot);
     return snapshot;
@@ -931,13 +1015,22 @@ export class FormRuntime implements SelectorHost {
 
   private viewSnapshotAt(id: ViewNodeId): ViewSnapshot {
     const focused = this.views.focused.has(id);
+    const effective = this.viewEffective(id);
     const cached = this.viewSnapshots.get(id);
-    if (cached !== undefined && cached.focused === focused) {
+    if (
+      cached !== undefined &&
+      cached.focused === focused &&
+      cached.active === effective.active &&
+      cached.visible === effective.visible &&
+      cached.disabled === effective.disabled &&
+      cached.readonly === effective.readonly
+    ) {
       return cached;
     }
     const snapshot: ViewSnapshot = Object.freeze({
       id,
       focused,
+      ...effective,
     });
     this.viewSnapshots.set(id, snapshot);
     return snapshot;
@@ -1008,11 +1101,91 @@ export class FormRuntime implements SelectorHost {
   }
 
   private sourceStamp(): string {
-    return `${this.values.revision}:${this.fields.revision}:${this.views.revision}:${this.form.revision}`;
+    return `${this.values.revision}:${this.fields.revision}:${this.views.revision}:${this.form.revision}:${this.derivedRevision}`;
   }
 
   private throwDiagnostics(diagnostics: readonly Diagnostic[]): never {
     throw new FormRuntimeError(sortRuntimeDiagnostics(diagnostics));
+  }
+
+  private effectiveAt(path: InstancePath) {
+    const draft = this.committedView();
+    const state = this.workingRule ?? this.engine.peekState();
+    return this.engine.effective(path, draft, state);
+  }
+
+  private viewEffective(id: ViewNodeId) {
+    const node = this.viewIndex.get(id);
+    if (node?.kind === "field") {
+      const instance = node.fieldPath.includes("[]") || node.fieldPath.includes("[#")
+        ? undefined
+        : asInstancePath(node.fieldPath);
+      if (instance !== undefined) {
+        try {
+          return this.effectiveAt(instance);
+        } catch {
+          return DEFAULT_EFFECTIVE;
+        }
+      }
+    }
+    if (node && "path" in node && typeof node.path === "string" && !node.path.includes("[]")) {
+      try {
+        return this.effectiveAt(asInstancePath(node.path));
+      } catch {
+        return DEFAULT_EFFECTIVE;
+      }
+    }
+    return this.effectiveAt(ROOT_INSTANCE_PATH);
+  }
+
+  serialize(options?: SerializeOptions): JsonValue {
+    const draft = this.committedView();
+    const state = this.engine.peekState();
+    return this.engine.serialize(draft, state, options, this.form.version);
+  }
+
+  private stabilizeInitial(): void {
+    this.forceAllRules = true;
+    const state = this.engine.snapshot();
+    this.workingRule = state;
+    const draft = this.createDraft();
+    const queue = new ChangeQueue();
+    const applyQueued = (): void => {
+      while (queue.size > 0) {
+        const command = queue.dequeue();
+        if (command !== undefined) {
+          this.applyCommand(draft, command);
+        }
+      }
+    };
+    try {
+      let iterations = 0;
+      let progressed = true;
+      while (progressed) {
+        iterations += 1;
+        if (iterations > this.iterationLimit) {
+          this.throwDiagnostics([limitDiagnostic(0, iterations, this.commandLimit, this.iterationLimit)]);
+        }
+        const before = draft.values;
+        this.engine.activate(draft, state);
+        applyQueued();
+        this.engine.runRules(draft, state, [], (command) => {
+          queue.enqueue(command);
+          applyQueued();
+        }, true);
+        applyQueued();
+        progressed = !jsonEqual(draft.values, before);
+      }
+      this.validationOwner?.(this.engine.validationPlan(state));
+      this.values.current = draft.values;
+      this.values.initial = draft.values;
+      this.engine.commit(state);
+      this.derivedRevision += 1;
+      this.cachedFormSnapshot = undefined;
+    } finally {
+      this.forceAllRules = false;
+      this.workingRule = undefined;
+    }
   }
 
   private createFacade(): FormInstance {
@@ -1051,6 +1224,9 @@ export class FormRuntime implements SelectorHost {
       },
       scope(path) {
         return runtime.createScope(path);
+      },
+      serialize(options) {
+        return runtime.serialize(options);
       },
     };
     return Object.freeze(facade);
@@ -1620,6 +1796,13 @@ function isAggregateTouched(path: InstancePath, touched: ReadonlyMap<string, tru
     }
   }
   return false;
+}
+
+function isUnderInstancePath(path: InstancePath, ancestor: InstancePath): boolean {
+  if (ancestor === ROOT_INSTANCE_PATH) {
+    return path !== ROOT_INSTANCE_PATH;
+  }
+  return path.startsWith(`${ancestor}.`) || path.startsWith(`${ancestor}[`);
 }
 
 function affectedDependencyKeys(changeSet: NormalizedChangeSet, extra: ReadonlySet<string> = new Set()): Set<string> {

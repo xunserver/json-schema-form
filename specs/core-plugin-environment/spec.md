@@ -139,3 +139,78 @@ Environment build 成功后，Environment、Plugin 清单与所有公开 Registr
 - **GIVEN** 冲突 Diagnostic 包含 Registry 类别、key 和相关 Plugin ID
 - **WHEN** 调用者读取该 Diagnostic
 - **THEN** metadata 可用于定位问题但不能通过公共类型被修改
+
+### Requirement: defineRuleFunction 是无副作用authoring helper
+Core必须（SHALL）从`@form/core/extension`暴露`defineRuleFunction()`，保留Rule Function descriptor的name、同步provider和具体参数/结果类型。该helper必须（MUST）返回输入identity，不安装function、不构建Environment、不执行provider，也不得（MUST NOT）读写global Registry。
+
+#### Scenario: 声明named Rule Function
+- **GIVEN** extension author提供唯一name和同步pure provider
+- **WHEN** 调用`defineRuleFunction()`
+- **THEN** 返回值保留literal name与provider类型，默认或既有Environment不会因此新增Registry entry
+
+#### Scenario: 重复authoring不产生全局状态
+- **GIVEN** 独立声明两个同名Rule Function但尚未放入Plugin
+- **WHEN** 分别调用helper
+- **THEN** 两个descriptor保持独立，冲突只在它们实际进入同一Environment Registry时按既有策略诊断
+
+### Requirement: Rule Function 与Serializer provider是纯同步只读边界
+`RuleFunctionDefinition`必须（MUST）包含只接收readonly JSON-compatible args并同步返回JSON-compatible结果的provider；`SerializerDefinition`必须（MUST）包含只接收readonly JSON-compatible value与readonly serialization context并同步返回JSON-compatible结果的provider。公共provider contract不得（MUST NOT）包含FormInstance、mutable Store、Transaction Manager、DependencyScheduler、RuntimeNodeId、fetch/remote source或command capability，也不得返回Promise/thenable。
+
+#### Scenario: Plugin注册可调用providers
+- **GIVEN** Plugin contributions包含由helper创建的Rule Function和一个Serializer descriptor
+- **WHEN** Environment成功构建
+- **THEN** 两个Registry以readonlyprovider identity和provenance暴露它们，且调用前后Registry内容保持冻结
+
+#### Scenario: 类型拒绝async与mutable context
+- **GIVEN** author尝试声明返回Promise的Rule Function或接收Form/Store writer的Serializer
+- **WHEN** TypeScript检查provider contract
+- **THEN** 定义因不属于同步readonly边界而失败
+
+### Requirement: contribution key与provider name必须一致
+Environment build必须（MUST）校验`ruleFunctions`和`serializers`中每个Registry key与descriptor name完全一致，并继续对重复key应用既有精确override策略。不匹配、缺失或非法provider shape必须（MUST）阻止Environment发布并产生`source: "plugin"`的稳定Diagnostic，不得返回partial callable Registry。
+
+#### Scenario: 接受一致的key与name
+- **GIVEN** Plugin在`ruleFunctions["company.tax"]`注册name同为`company.tax`的descriptor
+- **WHEN** 构建Environment
+- **THEN** Registry按该唯一key提供确定lookup和provenance
+
+#### Scenario: 拒绝key/name不一致
+- **GIVEN** contribution key为`company.tax`但descriptor name为`other.tax`
+- **WHEN** 构建Environment
+- **THEN** `EnvironmentBuildError`包含registry、key、name和Plugin ID，且没有可用partial Environment
+
+### Requirement: defineWidget 是无副作用的 Widget authoring helper
+Core 必须（SHALL）只从 `@form/core/extension` 暴露泛型 `defineWidget()`，并在保留输入对象 identity 与 literal inference 的同时返回同一个 `WidgetDefinition`。该 helper 不得（MUST NOT）安装、复制、冻结或执行 Widget，不得（MUST NOT）读取或修改 global Registry；Widget contribution 的安装、owned snapshot、冻结、显式 override 与 key 冲突必须（MUST）继续只发生在 `createFormEnvironment()` 构建阶段。
+
+#### Scenario: 保留自定义 Widget identity 与 literal
+- **GIVEN** 扩展作者传入一个包含 literal name、value contract、interaction contract 与 matcher 的普通对象
+- **WHEN** 调用 `defineWidget()`
+- **THEN** 返回值与输入对象 identity 相同，TypeScript 保留其 literal 信息，且没有创建 Environment 或安装 contribution
+
+#### Scenario: helper 调用不触发 Registry 冲突
+- **GIVEN** 两个独立模块分别用 `defineWidget()` 声明准备注册到同一 Widget key 的 Definition
+- **WHEN** 只执行两个 authoring helper
+- **THEN** 两次调用都不访问共享状态；只有它们经 Plugin contribution 进入同一次 Environment build 时，既有冲突或显式 override 规则才生效
+
+### Requirement: WidgetDefinition 声明框架无关的 semantic interaction contract
+每个 `WidgetDefinition` 必须（MUST）以只读纯数据 contract 声明其支持的逻辑交互能力。首期标准 semantic actions 必须（MUST）覆盖 `setValue`、`touch`、`focus` 与 `blur`：`setValue` 只接收符合 `valueContract` 的 Core canonical value，其余 action 不携带 native event；输入 Widget 必须（MUST）声明 `setValue`，其他 action 的支持必须显式且可供 Compiler 与 framework Adapter preflight 检查。九个默认逻辑 Widget 必须（MUST）声明全部四项。该 contract 不得（MUST NOT）包含可执行 Runtime handler、DOM/native event、framework component、UI library 类型、`FormInstance`、Store、Transaction 或 state writer。
+
+#### Scenario: 默认 Widget 提供完整 semantic action capability
+- **GIVEN** 调用者检查默认 Environment 中的 text、textarea、number、select、multi-select、checkbox、switch、date 与 datetime Definition
+- **WHEN** 读取它们的 interaction contract
+- **THEN** 每个 Definition 都以冻结纯数据声明 `setValue`、`touch`、`focus` 与 `blur`，且不包含任何 native handler 或 Runtime object
+
+#### Scenario: 自定义 Widget 只声明逻辑能力
+- **GIVEN** 扩展作者使用 `defineWidget()` 声明一个 canonical object value 的 atomic Widget
+- **WHEN** 该 Widget 经 Plugin 安装并由 Compiler/Adapter 检查
+- **THEN** 检查只依据标准 semantic action key 与 value contract，Vue/React event shape、component ref 和 UI library props 均不进入 Core Definition
+
+#### Scenario: 拒绝非法 interaction descriptor
+- **GIVEN** Widget interaction contract 缺少必需的 `setValue`、包含未知 action，或尝试携带 function、native event、`FormInstance`/Store writer
+- **WHEN** Environment 构建或 Compiler 检查该 contribution
+- **THEN** 以 `source: "plugin"` 或 `source: "compiler"` 的稳定结构化 Diagnostic 失败，且不发布部分 Environment 或部分 `CompiledFormModel`
+
+#### Scenario: Adapter capability 不足时不得静默降级
+- **GIVEN** 已解析 Widget 声明某项 semantic action，而选定 framework Widget binding 无法提供该 action
+- **WHEN** RendererEnvironment 对 binding 执行 capability preflight
+- **THEN** 产生归 Adapter owner 的结构化 capability Diagnostic，且不得用 native event、直接 values 写入或省略动作来冒充兼容

@@ -1,3 +1,4 @@
+import type { JsonValue } from "../definition/json-value.js";
 import type { CompiledFormModel } from "../model/compiled-form-model.js";
 import type { FormDefinition } from "../definition/form-definition.js";
 import type { CompileResult } from "../model/compile-result.js";
@@ -7,12 +8,19 @@ import type { RegistryOverride } from "../extension/registry.js";
 import type { ArrayItemId, ViewNodeId } from "../identity/index.js";
 import type { InstancePath, InstancePathLike, ModelPathLike } from "../path/types.js";
 
-export type JsonPrimitive = null | boolean | number | string;
+export type { JsonPrimitive, JsonValue } from "../definition/json-value.js";
 
-export type JsonValue =
-  | JsonPrimitive
-  | readonly JsonValue[]
-  | { readonly [key: string]: JsonValue };
+export interface EffectiveState {
+  readonly active: boolean;
+  readonly visible: boolean;
+  readonly disabled: boolean;
+  readonly readonly: boolean;
+}
+
+export interface SerializeOptions {
+  readonly includeInactive?: boolean;
+  readonly serializer?: string;
+}
 
 export interface ArrayIdentityResolverConfig {
   readonly path: ModelPathLike;
@@ -35,6 +43,10 @@ export interface FormSnapshot {
   readonly dirty: boolean;
   readonly touched: boolean;
   readonly version: number;
+  readonly active: boolean;
+  readonly visible: boolean;
+  readonly disabled: boolean;
+  readonly readonly: boolean;
 }
 
 export interface FieldSnapshot {
@@ -42,11 +54,19 @@ export interface FieldSnapshot {
   readonly value: JsonValue | undefined;
   readonly dirty: boolean;
   readonly touched: boolean;
+  readonly active: boolean;
+  readonly visible: boolean;
+  readonly disabled: boolean;
+  readonly readonly: boolean;
 }
 
 export interface ViewSnapshot {
   readonly id: ViewNodeId;
   readonly focused: boolean;
+  readonly active: boolean;
+  readonly visible: boolean;
+  readonly disabled: boolean;
+  readonly readonly: boolean;
 }
 
 export interface ArrayItemSnapshot {
@@ -103,6 +123,7 @@ export interface FormInstance {
   reset(): void;
   array(path: InstancePathLike): ArrayInstance;
   scope(path: InstancePathLike): ScopedFormInstance;
+  serialize(options?: SerializeOptions): JsonValue;
 }
 
 export interface FormEngine {

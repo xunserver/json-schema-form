@@ -5,6 +5,7 @@ import type {
 } from "../src/model/data.js";
 import type {
   FieldDescriptor,
+  FieldRequirementPresentation,
   FieldView,
   GroupView,
   ObjectView,
@@ -24,11 +25,17 @@ type FieldKeys = keyof FieldDescriptor;
 type RuntimeKeys = "values" | "touched" | "errors" | "transaction" | "component" | "onClick" | "focused";
 
 type AssertDataClean = Extract<DataKeys, RuntimeKeys> extends never ? true : never;
-type AssertFieldClean = Extract<FieldKeys, RuntimeKeys> extends never ? true : never;
+type AssertFieldClean = Extract<FieldKeys, RuntimeKeys | "required" | "effectiveRequired"> extends never
+  ? true
+  : never;
 const dataClean: AssertDataClean = true;
 const fieldClean: AssertFieldClean = true;
 void dataClean;
 void fieldClean;
+
+type AssertHasRequirement = "requirement" extends FieldKeys ? true : never;
+const hasRequirement: AssertHasRequirement = true;
+void hasRequirement;
 
 declare const objectNode: ObjectDataNode;
 declare const scalarNode: ScalarDataNode;
@@ -64,3 +71,13 @@ field.component = {};
 
 // @ts-expect-error DataNode does not include runtime values
 data.values = {};
+
+declare const requirement: FieldRequirementPresentation;
+const status: "required" | "optional" | "conditional" = requirement.status;
+void status;
+
+// @ts-expect-error requirement presentation is readonly
+requirement.status = "optional";
+
+// @ts-expect-error requirement presentation is not an instance boolean
+requirement.required = true;

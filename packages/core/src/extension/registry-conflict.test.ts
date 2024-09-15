@@ -14,11 +14,11 @@ function contribution(kind: RegistryKind, key: string): FormPlugin["contributes"
     case "schemaExtensions":
       return { schemaExtensions: { [key]: { keyword: key } } };
     case "ruleFunctions":
-      return { ruleFunctions: { [key]: { name: key } } };
+      return { ruleFunctions: { [key]: { name: key, evaluate: (args) => args[0] ?? null } } };
     case "validators":
       return { validators: { [key]: { name: key } } };
     case "serializers":
-      return { serializers: { [key]: { name: key } } };
+      return { serializers: { [key]: { name: key, serialize: (value) => value } } };
     case "valueInitializers":
       return { valueInitializers: { [key]: { name: key } } };
     case "instrumentation":

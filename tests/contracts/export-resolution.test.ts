@@ -43,10 +43,14 @@ describe("runtime export resolution", () => {
     expect(typeof core.createForm).toBe("function");
     expect(typeof core.createFormEngine).toBe("function");
     expect("definePlugin" in core).toBe(false);
+    expect("defineWidget" in core).toBe(false);
     expect("createFormEnvironment" in core).toBe(false);
+    expect("defineRuleFunction" in core).toBe(false);
     expect("valueSelector" in core).toBe(false);
     expect(typeof extension.definePlugin).toBe("function");
+    expect(typeof extension.defineWidget).toBe("function");
     expect(typeof extension.createFormEnvironment).toBe("function");
+    expect(typeof extension.defineRuleFunction).toBe("function");
     expect(extension.CORE_EXTENSION_PROTOCOL).toEqual({ major: 1, minor: 0 });
   });
 

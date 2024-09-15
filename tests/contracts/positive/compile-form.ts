@@ -1,5 +1,5 @@
 import { compileForm, defineForm } from "@form/core";
-import { createFormEnvironment, definePlugin } from "@form/core/extension";
+import { createFormEnvironment, definePlugin, defineWidget } from "@form/core/extension";
 
 export const defaultCompiled = compileForm(
   defineForm({
@@ -17,10 +17,11 @@ const plugin = definePlugin({
   dependsOn: ["core"],
   contributes: {
     widgets: {
-      sku: {
+      sku: defineWidget({
         name: "sku",
         valueContract: { jsonTypes: ["string"], canonical: "json-scalar" },
-      },
+        interaction: { setValue: true },
+      }),
     },
   },
 });

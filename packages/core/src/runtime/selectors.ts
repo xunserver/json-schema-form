@@ -80,7 +80,7 @@ export function valueSelector(path: InstancePathLike): RuntimeSelector<JsonValue
 export function fieldSelector(path: InstancePathLike): RuntimeSelector<FieldSnapshot> {
   const canonical = requireCanonicalPath(path, "field");
   return makeSelector({
-    deps: Object.freeze([`value:${canonical}`, `field:${canonical}`]),
+    deps: Object.freeze([`value:${canonical}`, `field:${canonical}`, `effective:${canonical}`]),
     project: (host) => host.fieldSnapshot(canonical),
   });
 }
@@ -96,6 +96,30 @@ export function formSelector(): RuntimeSelector<FormSnapshot> {
   return makeSelector({
     deps: Object.freeze(["form"]),
     project: (host) => host.formSnapshot(),
+  });
+}
+
+const EFFECTIVE_FROM_FIELD = new WeakMap<FieldSnapshot, import("./contracts.js").EffectiveState>();
+
+export function effectiveStateSelector(path: InstancePathLike): RuntimeSelector<import("./contracts.js").EffectiveState> {
+  const canonical = requireCanonicalPath(path, "effective");
+  return makeSelector({
+    deps: Object.freeze([`effective:${canonical}`]),
+    project: (host) => {
+      const snapshot = host.fieldSnapshot(canonical);
+      const cached = EFFECTIVE_FROM_FIELD.get(snapshot);
+      if (cached !== undefined) {
+        return cached;
+      }
+      const next = Object.freeze({
+        active: snapshot.active,
+        visible: snapshot.visible,
+        disabled: snapshot.disabled,
+        readonly: snapshot.readonly,
+      });
+      EFFECTIVE_FROM_FIELD.set(snapshot, next);
+      return next;
+    },
   });
 }
 

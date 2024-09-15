@@ -489,6 +489,7 @@ Widget 不是组件别名，而是框架无关的交互协议：
 WidgetDefinition
   |- name
   |- valueContract
+  |- interaction
   |- propsContract
   |- matchers
   |- capabilities

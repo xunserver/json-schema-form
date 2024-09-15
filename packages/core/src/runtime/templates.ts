@@ -1,4 +1,5 @@
 import type { ArrayDataNode, DataNode } from "../model/data.js";
+import { objectPropertyEdges } from "../model/data.js";
 import type { CompiledFormModel } from "../model/compiled-form-model.js";
 import type { DataNodeId } from "../identity/index.js";
 import {
@@ -73,14 +74,7 @@ export function walkModel(
   for (const segment of segments) {
     const concrete = derefNode(node, byId);
     if (segment.kind === "property") {
-      if (concrete.kind !== "object") {
-        return {
-          ok: false,
-          code: RUNTIME_DIAGNOSTIC_CODES.UNKNOWN_PATH,
-          message: "InstancePath is not bound to the compiled model",
-        };
-      }
-      const edge = concrete.properties.find((item) => item.name === segment.name);
+      const edge = objectPropertyEdges(concrete).find((item) => item.name === segment.name);
       if (edge === undefined) {
         return {
           ok: false,

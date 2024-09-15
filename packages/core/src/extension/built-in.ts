@@ -4,6 +4,7 @@ import type {
   WidgetDefinition,
   WidgetValueContract,
 } from "./widget.js";
+import { FULL_WIDGET_INTERACTION } from "./widget.js";
 import { definePlugin } from "./plugin.js";
 
 export const CORE_PLUGIN_ID = "core";
@@ -25,6 +26,7 @@ function textWidget(name: "text" | "textarea", priority: number): WidgetDefiniti
   return {
     name,
     valueContract: scalar(["string"]),
+    interaction: FULL_WIDGET_INTERACTION,
     matchers: [{ schemaTypes: ["string"], priority }],
     capabilities: EDITABLE,
     defaults: { value: "" },
@@ -42,12 +44,14 @@ const builtinWidgets: Readonly<Record<string, WidgetDefinition>> = {
   number: {
     name: "number",
     valueContract: scalar(["number", "integer"]),
+    interaction: FULL_WIDGET_INTERACTION,
     matchers: [{ schemaTypes: ["number", "integer"], priority: 0 }],
     capabilities: EDITABLE,
   },
   select: {
     name: "select",
     valueContract: scalar(["string", "number", "boolean", "integer"]),
+    interaction: FULL_WIDGET_INTERACTION,
     matchers: [{ enum: true, priority: 10 }],
     capabilities: EDITABLE,
   },
@@ -57,6 +61,7 @@ const builtinWidgets: Readonly<Record<string, WidgetDefinition>> = {
       jsonTypes: ["array"],
       canonical: "readonly-collection",
     },
+    interaction: FULL_WIDGET_INTERACTION,
     matchers: [{ schemaTypes: ["array"], priority: 0 }],
     capabilities: {
       readonly: true,
@@ -69,6 +74,7 @@ const builtinWidgets: Readonly<Record<string, WidgetDefinition>> = {
   checkbox: {
     name: "checkbox",
     valueContract: scalar(["boolean"]),
+    interaction: FULL_WIDGET_INTERACTION,
     matchers: [{ schemaTypes: ["boolean"], priority: 0 }],
     capabilities: { disabled: true, inlineLabel: true },
     defaults: { value: false },
@@ -76,6 +82,7 @@ const builtinWidgets: Readonly<Record<string, WidgetDefinition>> = {
   switch: {
     name: "switch",
     valueContract: scalar(["boolean"]),
+    interaction: FULL_WIDGET_INTERACTION,
     matchers: [{ schemaTypes: ["boolean"], priority: 1 }],
     capabilities: { disabled: true, inlineLabel: true },
     defaults: { value: false },
@@ -87,6 +94,7 @@ const builtinWidgets: Readonly<Record<string, WidgetDefinition>> = {
       canonical: "iso-date-string",
       nullable: true,
     },
+    interaction: FULL_WIDGET_INTERACTION,
     matchers: [{ schemaTypes: ["string"], formats: ["date"], priority: 20 }],
     capabilities: EDITABLE,
     defaults: { value: null },
@@ -98,6 +106,7 @@ const builtinWidgets: Readonly<Record<string, WidgetDefinition>> = {
       canonical: "iso-datetime-string",
       nullable: true,
     },
+    interaction: FULL_WIDGET_INTERACTION,
     matchers: [{ schemaTypes: ["string"], formats: ["date-time"], priority: 20 }],
     capabilities: EDITABLE,
     defaults: { value: null },

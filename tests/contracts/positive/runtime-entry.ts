@@ -1,6 +1,7 @@
 import {
   arrayOrderSelector,
   createSelector,
+  effectiveStateSelector,
   formSelector,
   getRuntimeSnapshot,
   observeRuntimeDiagnostics,
@@ -24,6 +25,7 @@ export const unsubscribe = subscribeRuntime(form, formSelector(), () => undefine
 export const composed = createSelector([valueSelector("title")], (title) => title);
 export const stopDiagnostics = observeRuntimeDiagnostics(form, () => undefined);
 export const order = arrayOrderSelector("title");
+export const effective = effectiveStateSelector("title");
 export const resolver: ArrayIdentityResolver = () => undefined;
 
 void snapshot;
@@ -31,4 +33,5 @@ void unsubscribe;
 void composed;
 void stopDiagnostics;
 void order;
+void effective;
 void resolver;

@@ -12,6 +12,8 @@ import type { EnvironmentIdentity } from "../src/extension/index.js";
 import type { ArrayStateStore } from "../src/extension/index.js";
 // @ts-expect-error RuntimeNodeId is not exported from the public extension barrel
 import type { RuntimeNodeId } from "../src/extension/index.js";
+// @ts-expect-error RuleDynamicsEngine is not exported from the public extension barrel
+import type { RuleDynamicsEngine } from "../src/extension/index.js";
 
 declare const transactionManager: TransactionManager;
 declare const changeQueue: ChangeQueue;
@@ -28,3 +30,6 @@ declare const arrayStore: ArrayStateStore;
 declare const runtimeNodeId: RuntimeNodeId;
 void arrayStore;
 void runtimeNodeId;
+
+declare const engine: RuleDynamicsEngine;
+void engine;

@@ -1,6 +1,9 @@
 import { compileForm, createForm, defineForm } from "../src/index.js";
 import {
+  arrayItemSelector,
+  arrayOrderSelector,
   createSelector,
+  effectiveStateSelector,
   fieldSelector,
   formSelector,
   getRuntimeSnapshot,
@@ -23,6 +26,9 @@ const field = fieldSelector("name");
 const view = viewSelector(model.ui.viewTree.id);
 const aggregate = formSelector();
 const composed = createSelector([name, field], (value, snapshot) => ({ value, snapshot }));
+void effectiveStateSelector("name");
+void arrayOrderSelector("name");
+void arrayItemSelector;
 
 void getRuntimeSnapshot(form, composed);
 void subscribeRuntime(form, aggregate, () => undefined);
@@ -52,6 +58,8 @@ import type { TransactionManager } from "../src/runtime/index.js";
 
 // @ts-expect-error RuntimeNodeId is not part of the runtime barrel
 import type { RuntimeNodeId } from "../src/runtime/index.js";
+// @ts-expect-error RuleDynamicsEngine is not part of the runtime barrel
+import type { RuleDynamicsEngine } from "../src/runtime/index.js";
 
 declare const store: ValueStoreImpl;
 declare const manager: TransactionManager;
@@ -59,3 +67,5 @@ declare const runtimeNodeId: RuntimeNodeId;
 void store;
 void manager;
 void runtimeNodeId;
+declare const engine: RuleDynamicsEngine;
+void engine;

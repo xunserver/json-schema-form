@@ -15,6 +15,7 @@ import { viewNodeId } from "./ids.js";
 import { deepFreeze } from "./immutable.js";
 import { DiagnosticBag, compilerError } from "./diagnostics.js";
 import { compileNativeOptions } from "./ui/native.js";
+import { incomingPropertyEdges, projectFieldRequirement } from "./ui/requirement.js";
 import { resolveWidget } from "./ui/widget-resolver.js";
 
 export function compileUIModel(
@@ -86,6 +87,7 @@ function compileFields(
   diagnostics: DiagnosticBag,
 ): UIModel["fields"] {
   const entries: Array<readonly [ModelPath, FieldDescriptor]> = [];
+  const incoming = incomingPropertyEdges(data);
 
   for (const [path, node] of data.nodes) {
     const fieldUI = fieldUIByPath.get(path);
@@ -107,12 +109,14 @@ function compileFields(
       continue;
     }
 
+    rejectRequirementOverrides(fieldUI, path, diagnostics);
     const resolved = resolveWidget(node, fieldUI, environment, diagnostics, path);
     if (resolved === undefined) {
       continue;
     }
 
     const native = compileNativeOptions(fieldUI?.native, path, diagnostics);
+    const requirement = projectFieldRequirement(path, incoming);
     const descriptor: FieldDescriptor = {
       dataNodeId: node.id,
       path,
@@ -121,11 +125,34 @@ function compileFields(
       ...(fieldUI?.props === undefined ? {} : { props: fieldUI.props }),
       ...(fieldUI?.behavior === undefined ? {} : { behavior: fieldUI.behavior }),
       ...(native === undefined || Object.keys(native).length === 0 ? {} : { native }),
+      ...(requirement === undefined ? {} : { requirement }),
     };
-    entries.push([path, descriptor]);
+    entries.push([path, deepFreeze(descriptor)]);
   }
 
   return createReadonlyKeyedCollection(entries);
+}
+
+function rejectRequirementOverrides(fieldUI: FieldUI | undefined, path: ModelPath, diagnostics: DiagnosticBag): void {
+  if (fieldUI === undefined) {
+    return;
+  }
+  if (Object.prototype.hasOwnProperty.call(fieldUI, "required")) {
+    diagnostics.push(
+      compilerError(COMPILER_DIAGNOSTIC_CODES.UI_RESERVED_KEY, "FieldUI must not declare required; requirement comes from the Object property edge", {
+        modelPath: path,
+        metadata: { key: "required", location: "field" },
+      }),
+    );
+  }
+  if (fieldUI.props !== undefined && Object.prototype.hasOwnProperty.call(fieldUI.props, "required")) {
+    diagnostics.push(
+      compilerError(COMPILER_DIAGNOSTIC_CODES.UI_RESERVED_KEY, "Widget props must not declare required; requirement comes from the Object property edge", {
+        modelPath: path,
+        metadata: { key: "required", location: "props" },
+      }),
+    );
+  }
 }
 
 function shouldProjectField(node: DataNode, fieldUI: FieldUI | undefined): boolean {

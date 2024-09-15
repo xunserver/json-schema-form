@@ -45,6 +45,7 @@ const scalarValue: WidgetValueContract = {
 const dateWidget: WidgetDefinition = {
   name: "date",
   valueContract: dateValue,
+  interaction: { setValue: true, touch: true, focus: true, blur: true },
   capabilities: { clearable: true, readonly: true, disabled: true },
   defaults: { value: null },
 };
@@ -52,12 +53,14 @@ const dateWidget: WidgetDefinition = {
 const datetimeWidget: WidgetDefinition = {
   name: "datetime",
   valueContract: datetimeValue,
+  interaction: { setValue: true, touch: true, focus: true, blur: true },
   capabilities: { clearable: true },
 };
 
 const multiSelectWidget: WidgetDefinition = {
   name: "multi-select",
   valueContract: multiSelectValue,
+  interaction: { setValue: true, touch: true, focus: true, blur: true },
   capabilities: { multiple: true },
   defaults: { value: [] },
 };
@@ -65,6 +68,7 @@ const multiSelectWidget: WidgetDefinition = {
 const textWidget: WidgetDefinition = {
   name: "text",
   valueContract: scalarValue,
+  interaction: { setValue: true },
 };
 
 void dateWidget;

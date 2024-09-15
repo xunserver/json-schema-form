@@ -13,10 +13,11 @@ const plugin = definePlugin({
       sku: {
         name: "sku",
         valueContract: { jsonTypes: ["string"], canonical: "json-scalar" },
+        interaction: { setValue: true },
       },
     },
     ruleFunctions: {
-      trim: { name: "trim" },
+      trim: { name: "trim", evaluate: (args) => args[0] ?? "" },
     },
     validators: {
       uniqueSku: { name: "uniqueSku", target: "sku" },
@@ -47,6 +48,7 @@ definePlugin({
 const rejectedWidgetComponent: WidgetDefinition = {
   name: "text",
   valueContract: { jsonTypes: ["string"], canonical: "json-scalar" },
+  interaction: { setValue: true },
   // @ts-expect-error Core Widget contract has no framework component
   component: {},
 };
@@ -55,6 +57,7 @@ void rejectedWidgetComponent;
 const rejectedWidgetEvent: WidgetDefinition = {
   name: "text",
   valueContract: { jsonTypes: ["string"], canonical: "json-scalar" },
+  interaction: { setValue: true },
   // @ts-expect-error Core Widget contract has no DOM event handler
   onClick: () => undefined,
 };
@@ -76,6 +79,10 @@ type ForbiddenWidgetKeys = Extract<
 type AssertNoWidgetHostKeys = ForbiddenWidgetKeys extends never ? true : never;
 const noWidgetHostKeys: AssertNoWidgetHostKeys = true;
 void noWidgetHostKeys;
+
+type AssertHasInteraction = "interaction" extends WidgetKeys ? true : never;
+const hasInteraction: AssertHasInteraction = true;
+void hasInteraction;
 
 type ContributionKeys = keyof PluginContributions;
 type AssertContributionKeys = ContributionKeys extends RegistryKind

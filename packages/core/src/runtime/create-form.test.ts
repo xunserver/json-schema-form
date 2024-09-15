@@ -30,6 +30,7 @@ describe("createForm and FormEngine", () => {
               sku: {
                 name: "sku",
                 valueContract: { jsonTypes: ["string"], canonical: "json-scalar" },
+                interaction: { setValue: true },
               },
             },
           },

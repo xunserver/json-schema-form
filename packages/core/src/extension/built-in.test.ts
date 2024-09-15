@@ -32,6 +32,13 @@ describe("core built-in plugin", () => {
       expect(JSON.stringify(widget)).not.toMatch(FRAMEWORK_PATTERN);
       expect(widget).not.toHaveProperty("component");
       expect(widget).not.toHaveProperty("onClick");
+      expect(Object.isFrozen(widget.interaction)).toBe(true);
+      expect(widget.interaction).toEqual({
+        setValue: true,
+        touch: true,
+        focus: true,
+        blur: true,
+      });
     }
   });
 });

@@ -8,9 +8,11 @@ import type { CompileOptions } from "../model/compile-options.js";
 import type { CompileResult } from "../model/compile-result.js";
 import { CompileError } from "../model/compile-error.js";
 import { compileDataModel } from "./data-model.js";
+import { compileSchemaDynamics } from "./dynamics/compile.js";
 import { DiagnosticBag, compilerError } from "./diagnostics.js";
 import { emptyRuleModel, emptySchemaDynamics, emptyValidationModel } from "./empty-ports.js";
 import { CloneShapeError, clonePlain, deepFreeze, isPlainObject } from "./immutable.js";
+import { compileRuleModel } from "./rule/compile.js";
 import { runSchemaFrontend } from "./schema/frontend.js";
 import { analyzeShapes } from "./shape/analyze.js";
 import { compileUIModel } from "./ui-model.js";
@@ -39,6 +41,8 @@ export function compileForm(definition: FormDefinition, options?: CompileOptions
 
   const data = compileDataModel(shapes.root);
   const ui = compileUIModel(data, snapshot.uiSchema, environment, diagnostics);
+  const ruleResult = compileRuleModel(snapshot.rules, snapshot.config, data, environment, diagnostics);
+  const dynamicsResult = compileSchemaDynamics(frontend.graph, data, diagnostics);
 
   if (diagnostics.hasErrors()) {
     throwFailure(diagnostics);
@@ -48,9 +52,9 @@ export function compileForm(definition: FormDefinition, options?: CompileOptions
   const model = deepFreeze({
     data,
     ui,
-    rule: emptyRuleModel(),
+    rule: ruleResult.model ?? emptyRuleModel(),
     validation: emptyValidationModel(),
-    schemaDynamics: emptySchemaDynamics(),
+    schemaDynamics: dynamicsResult.model ?? emptySchemaDynamics(),
     diagnostics: frozenDiagnostics,
   });
   rememberModelEnvironment(model, rememberEnvironmentIdentity(environment));
@@ -64,7 +68,14 @@ export function compileForm(definition: FormDefinition, options?: CompileOptions
 function snapshotDefinition(
   definition: FormDefinition,
   diagnostics: DiagnosticBag,
-): { readonly schema: JsonSchema; readonly uiSchema: FormDefinition["uiSchema"] } | undefined {
+):
+  | {
+      readonly schema: JsonSchema;
+      readonly uiSchema: FormDefinition["uiSchema"];
+      readonly rules: FormDefinition["rules"];
+      readonly config: FormDefinition["config"];
+    }
+  | undefined {
   if (!isPlainObject(definition) || !("schema" in definition)) {
     diagnostics.push(
       compilerError(COMPILER_DIAGNOSTIC_CODES.INVALID_DEFINITION, "FormDefinition must be a plain object with a schema"),
@@ -75,7 +86,9 @@ function snapshotDefinition(
   try {
     const schema = clonePlain(definition.schema);
     const uiSchema = definition.uiSchema === undefined ? undefined : clonePlain(definition.uiSchema);
-    return { schema, uiSchema };
+    const rules = definition.rules;
+    const config = definition.config === undefined ? undefined : clonePlain(definition.config);
+    return { schema, uiSchema, rules, config };
   } catch (error) {
     const reason = error instanceof CloneShapeError ? error.reason : "non-plain-object";
     diagnostics.push(

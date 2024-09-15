@@ -26,6 +26,9 @@ const PUBLIC_ROOT_CONTRACTS = [
   "CompiledFormModel",
   "CompileResult",
   "CompileError",
+  "EffectiveState",
+  "SerializeOptions",
+  "RuleExpression",
 ];
 
 const PRIVATE_SYMBOLS = [
@@ -37,6 +40,8 @@ const PRIVATE_SYMBOLS = [
   "ChangeQueue",
   "EnvironmentIdentity",
   "ArrayStateStore",
+  "RuleDynamicsEngine",
+  "DependencyScheduler",
 ];
 
 describe("generated Core public surface", () => {
@@ -67,6 +72,7 @@ describe("generated Core public surface", () => {
       "RuntimeSelector",
       "arrayOrderSelector",
       "ArrayIdentityResolver",
+      "effectiveStateSelector",
     ]) {
       expect(runtime, `missing ${name}`).toContain(name);
     }
@@ -84,18 +90,24 @@ describe("generated Core public surface", () => {
 
     for (const name of [
       "definePlugin",
+      "defineWidget",
+      "createFormEnvironment",
       "createFormEnvironment",
       "EnvironmentBuildError",
       "CORE_EXTENSION_PROTOCOL",
       "FormPlugin",
       "FormEnvironment",
       "WidgetDefinition",
+      "WidgetInteractionContract",
       "Registry",
+      "defineRuleFunction",
+      "RuleFunctionDefinition",
+      "SerializerDefinition",
     ]) {
       expect(extension, `missing ${name}`).toContain(name);
     }
 
-    for (const name of ["RuntimeNodeId", "TransactionManager", "CompilerContext", "EffectScheduler", "ValueStoreImpl", "ChangeQueue"]) {
+    for (const name of ["RuntimeNodeId", "TransactionManager", "CompilerContext", "EffectScheduler", "ValueStoreImpl", "ChangeQueue", "RuleDynamicsEngine"]) {
       expect(extension, `leaked ${name}`).not.toContain(name);
     }
 

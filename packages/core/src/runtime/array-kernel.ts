@@ -1,4 +1,5 @@
 import type { ArrayDataNode, DataNode } from "../model/data.js";
+import { objectPropertyEdges } from "../model/data.js";
 import type { CompiledFormModel } from "../model/compiled-form-model.js";
 import type { ArrayItemId, DataNodeId } from "../identity/index.js";
 import {
@@ -85,8 +86,9 @@ export class ArrayKernel {
       path,
     );
     const concrete = derefNode(node, this.byId);
-    if (concrete.kind === "object" && isPlainJsonObject(value)) {
-      for (const edge of concrete.properties) {
+    const properties = objectPropertyEdges(concrete);
+    if (properties.length > 0 && isPlainJsonObject(value)) {
+      for (const edge of properties) {
         const childValue = value[edge.name];
         const childPath = joinInstancePath(path, { kind: "property", name: edge.name });
         const childId = this.internProperty(runtimeId, edge.node);
@@ -161,10 +163,11 @@ export class ArrayKernel {
       this.replaceArrayIdentities(draft, concrete, runtimeId, path, oldItems, next);
       return;
     }
-    if (concrete.kind === "object") {
+    const properties = objectPropertyEdges(concrete);
+    if (properties.length > 0) {
       const oldObject = isPlainJsonObject(previous) ? previous : undefined;
       const nextObject = isPlainJsonObject(next) ? next : undefined;
-      for (const edge of concrete.properties) {
+      for (const edge of properties) {
         const childPath = joinInstancePath(path, { kind: "property", name: edge.name });
         const childId = this.internProperty(runtimeId, edge.node);
         this.syncSubtree(
@@ -490,12 +493,7 @@ export class ArrayKernel {
       const segment = segments[index]!;
       const concrete = derefNode(node, this.byId);
       if (segment.kind === "property") {
-        if (concrete.kind !== "object") {
-          throw fail(RUNTIME_DIAGNOSTIC_CODES.UNKNOWN_PATH, "InstancePath is not bound to the compiled model", {
-            path: formatted,
-          });
-        }
-        const edge = concrete.properties.find((item) => item.name === segment.name);
+        const edge = objectPropertyEdges(concrete).find((item) => item.name === segment.name);
         if (edge === undefined) {
           throw fail(RUNTIME_DIAGNOSTIC_CODES.UNKNOWN_PATH, "InstancePath is not bound to the compiled model", {
             path: formatted,

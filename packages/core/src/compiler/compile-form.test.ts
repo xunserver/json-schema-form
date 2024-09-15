@@ -28,6 +28,7 @@ describe("compileForm", () => {
           sku: {
             name: "sku",
             valueContract: { jsonTypes: ["string"], canonical: "json-scalar" },
+            interaction: { setValue: true },
             matchers: [{ schemaTypes: ["string"], priority: 80 }],
           },
         },

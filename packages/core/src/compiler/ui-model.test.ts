@@ -63,6 +63,7 @@ describe("UIModel compiler", () => {
               "address-picker": {
                 name: "address-picker",
                 valueContract: { jsonTypes: ["object"], canonical: "json-scalar" },
+                interaction: { setValue: true },
               },
             },
           },
@@ -119,6 +120,7 @@ describe("UIModel compiler", () => {
               "string-fallback": {
                 name: "string-fallback",
                 valueContract: { jsonTypes: ["string"], canonical: "json-scalar" },
+                interaction: { setValue: true },
                 matchers: [{ schemaTypes: ["string"], priority: 50 }],
               },
             },
@@ -344,6 +346,159 @@ describe("UIModel compiler", () => {
     expect(groupView.kind).toBe("group");
     expect(groupView).not.toHaveProperty("path");
     expect(JSON.stringify(result.model.ui)).not.toMatch(/focused|collapsed|component|onClick|effectiveVisible/);
+  });
+
+  test("projects required and optional Object property sources onto FieldDescriptors", () => {
+    const result = compileForm({
+      schema: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          nickname: { type: "string" },
+        },
+        required: ["name"],
+      },
+    });
+    const name = result.model.ui.fields.get("name");
+    const nickname = result.model.ui.fields.get("nickname");
+    expect(name?.requirement).toEqual({
+      status: "required",
+      ownerPath: "",
+      property: "name",
+      schemaRefs: ["#/properties/name"],
+    });
+    expect(nickname?.requirement).toEqual({
+      status: "optional",
+      ownerPath: "",
+      property: "nickname",
+      schemaRefs: ["#/properties/nickname"],
+    });
+    expect(name).not.toHaveProperty("required");
+    expect(Object.isFrozen(name?.requirement)).toBe(true);
+    expect(() => {
+      (name?.requirement as { status: string }).status = "optional";
+    }).toThrow();
+  });
+
+  test("keeps conditional required as Dynamics source refs without an instance boolean", () => {
+    const result = compileForm({
+      schema: {
+        type: "object",
+        properties: { kind: { type: "string" } },
+        if: { properties: { kind: { const: "company" } } },
+        then: { properties: { companyName: { type: "string" } }, required: ["companyName"] },
+        else: { properties: { personalName: { type: "string" } } },
+      },
+    });
+    const company = result.model.ui.fields.get("companyName");
+    const personal = result.model.ui.fields.get("personalName");
+    expect(company?.requirement?.status).toBe("conditional");
+    expect(company?.requirement?.activationSources).toEqual(["#/then"]);
+    expect(personal?.requirement?.status).toBe("conditional");
+    expect(personal?.requirement?.activationSources).toEqual(["#/else"]);
+    expect(company?.requirement).not.toHaveProperty("required");
+    expect(JSON.stringify(company)).not.toMatch(/"required":true|"effectiveRequired"/);
+    const thenBranch = result.model.schemaDynamics.plans
+      .find((plan) => plan.kind === "if")
+      ?.branches.find((branch) => branch.schemaPath === "#/then");
+    expect(thenBranch?.schemaPath).toBe(company?.requirement?.activationSources?.[0]);
+  });
+
+  test("does not invent a required source for root or array item Fields", () => {
+    const root = compileForm({ schema: { type: "string" } });
+    expect(root.model.ui.fields.get("")?.requirement).toBeUndefined();
+
+    const list = compileForm({
+      schema: { type: "array", items: { type: "string" } },
+    });
+    expect(list.model.ui.fields.get("[]")?.requirement).toBeUndefined();
+  });
+
+  test("projects requirement for an atomic Object child from its incoming edge", () => {
+    const environment = createFormEnvironment({
+      plugins: [
+        definePlugin({
+          id: "maps",
+          dependsOn: ["core"],
+          contributes: {
+            widgets: {
+              "address-picker": {
+                name: "address-picker",
+                valueContract: { jsonTypes: ["object"], canonical: "json-scalar" },
+                interaction: { setValue: true },
+              },
+            },
+          },
+        }),
+      ],
+    });
+    const result = compileForm(
+      {
+        schema: {
+          type: "object",
+          properties: {
+            address: {
+              type: "object",
+              properties: { street: { type: "string" } },
+            },
+          },
+          required: ["address"],
+        },
+        uiSchema: {
+          fields: {
+            address: { widget: "address-picker" },
+          },
+        },
+      },
+      { environment },
+    );
+    expect(result.model.ui.fields.get("address")?.requirement).toMatchObject({
+      status: "required",
+      ownerPath: "",
+      property: "address",
+    });
+    const tree = result.model.ui.viewTree as ObjectView;
+    expect(tree.children[0]?.kind).toBe("field");
+    expect(JSON.stringify(tree)).not.toContain("address.street");
+  });
+
+  test("rejects FieldUI props and native attempts to override required", () => {
+    try {
+      compileForm({
+        schema: { type: "object", properties: { name: { type: "string" } }, required: ["name"] },
+        uiSchema: {
+          fields: {
+            name: { props: { required: false } },
+          },
+        },
+      });
+      throw new Error("expected CompileError");
+    } catch (error) {
+      expect(error).toBeInstanceOf(CompileError);
+      const diagnostic = (error as CompileError).diagnostics.find(
+        (item) => item.code === COMPILER_DIAGNOSTIC_CODES.UI_RESERVED_KEY,
+      );
+      expect(diagnostic?.modelPath).toBe("name");
+      expect(diagnostic?.metadata).toMatchObject({ key: "required", location: "props" });
+    }
+
+    try {
+      compileForm({
+        schema: { type: "object", properties: { name: { type: "string" } } },
+        uiSchema: {
+          fields: {
+            name: { native: { mui: { required: true } } },
+          },
+        },
+      });
+      throw new Error("expected CompileError");
+    } catch (error) {
+      expect(error).toBeInstanceOf(CompileError);
+      const diagnostic = (error as CompileError).diagnostics.find(
+        (item) => item.code === COMPILER_DIAGNOSTIC_CODES.NATIVE_RESERVED_KEY,
+      );
+      expect(diagnostic?.metadata).toMatchObject({ adapterId: "mui", key: "required" });
+    }
   });
 });
 

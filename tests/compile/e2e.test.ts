@@ -54,6 +54,7 @@ describe("compileForm end-to-end fixtures", () => {
               sku: {
                 name: "sku",
                 valueContract: { jsonTypes: ["string"], canonical: "json-scalar" },
+                interaction: { setValue: true },
               },
             },
           },
