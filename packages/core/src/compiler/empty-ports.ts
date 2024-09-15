@@ -1,6 +1,6 @@
-import type { RuleModel } from "../model/rule.js";
-import type { SchemaDynamics } from "../model/schema-dynamics.js";
-import type { ValidationModel } from "../model/validation.js";
+import type { RuleModel } from "../model/rule/rule.js";
+import type { SchemaDynamics } from "../model/schema-dynamics/schema-dynamics.js";
+import type { ValidationModel } from "../model/validation/validation.js";
 import { createReadonlyKeyedCollection } from "../model/readonly-collection.js";
 import { deepFreeze } from "./immutable.js";
 

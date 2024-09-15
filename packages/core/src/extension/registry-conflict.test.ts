@@ -10,9 +10,25 @@ function contribution(kind: RegistryKind, key: string): FormPlugin["contributes"
     case "widgets":
       return { widgets: { [key]: sampleWidget(key) } };
     case "schemaDialects":
-      return { schemaDialects: { [key]: { id: key } } };
+      return {
+        schemaDialects: {
+          [key]: {
+            name: key,
+            dialects: [`https://example.com/${key}`],
+            convert: (schema) => ({ schema }),
+          },
+        },
+      };
     case "schemaExtensions":
-      return { schemaExtensions: { [key]: { keyword: key } } };
+      return {
+        schemaExtensions: {
+          [key]: {
+            name: key,
+            keyword: `x-${key}`,
+            split: () => ({}),
+          },
+        },
+      };
     case "ruleFunctions":
       return { ruleFunctions: { [key]: { name: key, evaluate: (args) => args[0] ?? null } } };
     case "validators":
@@ -24,7 +40,11 @@ function contribution(kind: RegistryKind, key: string): FormPlugin["contributes"
     case "serializers":
       return { serializers: { [key]: { name: key, serialize: (value) => value } } };
     case "valueInitializers":
-      return { valueInitializers: { [key]: { name: key } } };
+      return {
+        valueInitializers: {
+          [key]: { name: key, initialize: ({ initialValues }) => initialValues ?? {} },
+        },
+      };
     case "instrumentation":
       return { instrumentation: { [key]: { name: key } } };
   }

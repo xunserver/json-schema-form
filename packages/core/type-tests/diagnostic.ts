@@ -1,5 +1,5 @@
 import type { Diagnostic, DiagnosticSeverity, DiagnosticSource } from "../src/diagnostic/index.js";
-import type { ModelPath, SchemaPath } from "../src/path/index.js";
+import type { ModelPath, SchemaPath } from "../src/model/path/index.js";
 
 declare const schemaPath: SchemaPath;
 declare const modelPath: ModelPath;

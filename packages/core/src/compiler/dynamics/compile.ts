@@ -1,12 +1,12 @@
 import type { JsonSchema, JsonSchemaObject } from "../../definition/json-schema.js";
 import { COMPILER_DIAGNOSTIC_CODES } from "../../model/diagnostic-codes.js";
-import type { DataModel, DataNode } from "../../model/data.js";
+import type { DataModel, DataNode } from "../../model/data/data.js";
 import type {
   ActivationBranch,
   ActivationPlan,
   SchemaActivation,
   SchemaDynamics,
-} from "../../model/schema-dynamics.js";
+} from "../../model/schema-dynamics/schema-dynamics.js";
 import { createReadonlyKeyedCollection } from "../../model/readonly-collection.js";
 import {
   ROOT_MODEL_PATH,
@@ -14,11 +14,11 @@ import {
   joinModelPath,
   type ModelPath,
   type SchemaPath,
-} from "../../path/index.js";
+} from "../../model/path/index.js";
 import { DiagnosticBag, compilerError } from "../diagnostics.js";
 import { deepFreeze } from "../immutable.js";
 import type { CanonicalSchemaGraph, CanonicalSchemaNode } from "../schema/frontend.js";
-import { isJsonSchema, isJsonSchemaObject } from "../schema/keywords.js";
+import { isJsonSchema, isJsonSchemaObject } from "../../schema/keywords.js";
 import {
   collectPredicateDependencies,
   compileActivationPredicate,
@@ -383,7 +383,7 @@ function pushPredicateError(
   result: PredicateCompileResult,
   diagnostics: DiagnosticBag,
   ownerPath: ModelPath,
-): result is { ok: true; predicate: import("../../model/schema-dynamics.js").ActivationPredicate; dependencies: readonly ModelPath[] } {
+): result is { ok: true; predicate: import("../../model/schema-dynamics/schema-dynamics.js").ActivationPredicate; dependencies: readonly ModelPath[] } {
   if (result.ok) {
     return true;
   }
@@ -424,7 +424,7 @@ function uniqueSchemaRefs(node: DataNode): SchemaPath[] {
   return unique([node.schemaRef, ...node.schemaRefs]);
 }
 
-function isDiscriminatingPredicate(predicate: import("../../model/schema-dynamics.js").ActivationPredicate): boolean {
+function isDiscriminatingPredicate(predicate: import("../../model/schema-dynamics/schema-dynamics.js").ActivationPredicate): boolean {
   return predicate.type !== "true" && predicate.type !== "false";
 }
 

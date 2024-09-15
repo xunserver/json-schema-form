@@ -1,5 +1,5 @@
-import type { ModelPath } from "../../path/index.js";
-import { formatModelPath, parseModelPath, type ModelPathSegment } from "../../path/model-path.js";
+import type { ModelPath } from "../../model/path/index.js";
+import { formatModelPath, parseModelPath, type ModelPathSegment } from "../../model/path/model-path.js";
 
 export function arrayScopeChain(path: ModelPath): readonly ModelPath[] {
   const segments = parseModelPath(path) ?? [];

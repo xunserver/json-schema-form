@@ -307,6 +307,41 @@ describe("Rule compiler", () => {
       ),
     );
     expect(missing.diagnostics[0]?.code).toBe(COMPILER_DIAGNOSTIC_CODES.SERIALIZER_MISSING);
+
+    const withInitializer = compileForm(
+      defineForm({
+        schema: productSchema,
+        config: { valueInitializer: "company.defaults" },
+      }),
+      {
+        environment: createFormEnvironment({
+          plugins: [
+            definePlugin({
+              id: "company",
+              dependsOn: ["core"],
+              contributes: {
+                valueInitializers: {
+                  "company.defaults": {
+                    name: "company.defaults",
+                    initialize: ({ initialValues }) => initialValues ?? {},
+                  },
+                },
+              },
+            }),
+          ],
+        }),
+      },
+    );
+    expect(withInitializer.model.rule.serialization.valueInitializer).toBe("company.defaults");
+    const missingInitializer = expectCompileError(() =>
+      compileForm(
+        defineForm({
+          schema: productSchema,
+          config: { valueInitializer: "missing" },
+        }),
+      ),
+    );
+    expect(missingInitializer.diagnostics[0]?.code).toBe(COMPILER_DIAGNOSTIC_CODES.INITIALIZER_MISSING);
   });
 
   test("rejects effect callbacks and keeps validation metadata serializable", () => {

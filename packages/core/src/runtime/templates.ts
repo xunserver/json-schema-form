@@ -1,7 +1,7 @@
-import type { ArrayDataNode, DataNode } from "../model/data.js";
-import { objectPropertyEdges } from "../model/data.js";
+import type { ArrayDataNode, DataNode } from "../model/data/data.js";
+import { objectPropertyEdges } from "../model/data/data.js";
 import type { CompiledFormModel } from "../model/compiled-form-model.js";
-import type { DataNodeId } from "../identity/index.js";
+import type { DataNodeId } from "../model/identity/index.js";
 import {
   formatModelPath,
   joinModelPath,
@@ -9,8 +9,8 @@ import {
   ROOT_MODEL_PATH,
   type ModelPath,
   type ModelPathSegment,
-} from "../path/index.js";
-import type { InstancePathSegment } from "../path/index.js";
+} from "../model/path/index.js";
+import type { InstancePathSegment } from "../model/path/index.js";
 import { RUNTIME_DIAGNOSTIC_CODES, type RuntimeDiagnosticCode } from "./diagnostic-codes.js";
 
 export function indexDataNodes(model: CompiledFormModel): ReadonlyMap<DataNodeId, DataNode> {

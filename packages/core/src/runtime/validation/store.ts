@@ -1,5 +1,5 @@
 import type { ValidationError } from "../../validation/error.js";
-import type { RuntimeNodeId } from "../runtime-node-id.js";
+import type { RuntimeNodeId } from "../form/runtime-node-id.js";
 import { EMPTY_ERRORS, sortErrors } from "./errors.js";
 
 export interface OwnerEntry {

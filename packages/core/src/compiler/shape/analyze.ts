@@ -1,7 +1,7 @@
 import type { JsonSchemaObject, JsonSchemaType } from "../../definition/json-schema.js";
-import type { PropertyOrigin, PropertyRequiredStatus } from "../../model/data.js";
+import type { PropertyOrigin, PropertyRequiredStatus } from "../../model/data/data.js";
 import { SCHEMA_DIAGNOSTIC_CODES } from "../../model/diagnostic-codes.js";
-import { childSchemaPath, type SchemaPath } from "../../path/index.js";
+import { childSchemaPath, type SchemaPath } from "../../model/path/index.js";
 import { DiagnosticBag, schemaError, schemaWarning } from "../diagnostics.js";
 import {
   type CanonicalSchemaGraph,
@@ -14,7 +14,7 @@ import {
   STRUCTURAL_ARRAY_KEYWORDS,
   STRUCTURAL_OBJECT_KEYWORDS,
   hasOwn,
-} from "../schema/keywords.js";
+} from "../../schema/keywords.js";
 import {
   type ArrayShape,
   type DataShape,

@@ -1,12 +1,12 @@
 import type { JsonPrimitive, JsonValue } from "../../definition/json-value.js";
-import { RULE_OPERATOR_KEYS } from "../../definition/rule-expression.js";
-import type { NormalizedRuleExpression } from "../../model/rule.js";
+import { RULE_OPERATOR_KEYS } from "../../rule/expression.js";
+import type { NormalizedRuleExpression } from "../../model/rule/rule.js";
 import {
   ROOT_MODEL_PATH,
   isValidModelPath,
   toModelPath,
   type ModelPath,
-} from "../../path/index.js";
+} from "../../model/path/index.js";
 import { CloneShapeError, clonePlain, deepFreeze, isPlainObject } from "../immutable.js";
 
 export type RuleParseFailureReason =

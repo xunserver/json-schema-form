@@ -2,10 +2,10 @@ import type { Diagnostic } from "../../diagnostic/index.js";
 import type { JsonValue } from "../../definition/json-value.js";
 import type { FormEnvironment } from "../../extension/environment.js";
 import type { CompiledFormModel } from "../../model/compiled-form-model.js";
-import type { InstancePath } from "../../path/index.js";
-import type { BindingIndex } from "../binding-index.js";
-import type { SerializeOptions } from "../contracts.js";
-import type { TransactionDraft } from "../commands.js";
+import type { InstancePath } from "../../model/path/index.js";
+import type { BindingIndex } from "../dependency/binding-index.js";
+import type { SerializeOptions } from "../form/contracts.js";
+import type { TransactionDraft } from "../transaction/commands.js";
 
 export interface ValidationHost {
   readonly model: CompiledFormModel;

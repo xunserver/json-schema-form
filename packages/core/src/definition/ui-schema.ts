@@ -1,4 +1,4 @@
-import type { ModelPathLike } from "../path/index.js";
+import type { ModelPathLike } from "../model/path/index.js";
 
 export type WidgetName = string;
 export type AdapterId = string;

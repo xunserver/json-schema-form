@@ -2,7 +2,7 @@ export type {
   RuntimeDiagnosticEvent,
   RuntimeSelector,
   Unsubscribe,
-} from "./selectors.js";
+} from "./subscription/selectors.js";
 export {
   arrayItemSelector,
   arrayOrderSelector,
@@ -16,9 +16,9 @@ export {
   presentableErrorSelector,
   valueSelector,
   viewSelector,
-} from "./selectors.js";
+} from "./subscription/selectors.js";
 
-export type { ArrayIdentityResolver, ArrayIdentityResolverBinding } from "./identity-resolver.js";
+export type { ArrayIdentityResolver, ArrayIdentityResolverBinding } from "./array/identity-resolver.js";
 export type {
   ArrayItemSnapshot,
   CurrentBindingSnapshot,
@@ -28,12 +28,12 @@ export type {
   InstanceBinding,
   JsonValue,
   RenderScope,
-} from "./contracts.js";
+} from "./form/contracts.js";
 
-import type { FormInstance } from "./contracts.js";
-import { resolveFormRuntime } from "./handle.js";
-import type { RuntimeDiagnosticEvent, RuntimeSelector, Unsubscribe } from "./selectors.js";
-export { getRenderScope } from "./render-scope.js";
+import type { FormInstance } from "./form/contracts.js";
+import { resolveFormRuntime } from "./form/handle.js";
+import type { RuntimeDiagnosticEvent, RuntimeSelector, Unsubscribe } from "./subscription/selectors.js";
+export { getRenderScope } from "./scope/render-scope.js";
 
 export function getRuntimeSnapshot<T>(form: FormInstance, selector: RuntimeSelector<T>): T {
   return resolveFormRuntime(form).getRuntimeSnapshot(selector);

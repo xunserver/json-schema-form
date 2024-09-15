@@ -1,6 +1,6 @@
 import { defineForm } from "../src/definition/define-form.js";
 import type { FormDefinition } from "../src/definition/form-definition.js";
-import type { ModelPathLike } from "../src/path/index.js";
+import type { ModelPathLike } from "../src/model/path/index.js";
 
 const minimal = defineForm({
   schema: {

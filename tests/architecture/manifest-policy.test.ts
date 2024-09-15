@@ -1,8 +1,8 @@
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { checkArchitecture } from "../../tools/architecture-check/check.ts";
-import { REQUIRED_PEERS } from "../../tools/architecture-check/policy.ts";
-import { REPO_ROOT, readJson } from "../lib/fs.ts";
+import { checkArchitecture } from "../../tools/architecture-check/check.js";
+import { REQUIRED_PEERS } from "../../tools/architecture-check/policy.js";
+import { REPO_ROOT, readJson } from "../lib/fs.js";
 
 describe("manifest policy", () => {
   test("places host frameworks only as peerDependencies on integration packages", () => {

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { REPO_ROOT } from "../lib/fs.ts";
+import { REPO_ROOT } from "../lib/fs.js";
 
 const SCENARIOS: readonly { spec: string; scenario: string; files: readonly string[] }[] = [
   {
@@ -131,12 +131,12 @@ const SCENARIOS: readonly { spec: string; scenario: string; files: readonly stri
   {
     spec: "rules-and-schema-dynamics",
     scenario: "按名称调用纯函数",
-    files: ["packages/core/src/runtime/rule/evaluator.test.ts", "tests/runtime/rules-e2e.test.ts"],
+    files: ["packages/core/src/rule/evaluator.test.ts", "tests/runtime/rules-e2e.test.ts"],
   },
   {
     spec: "rules-and-schema-dynamics",
     scenario: "Function失败不发布中间态",
-    files: ["packages/core/src/runtime/rule/evaluator.test.ts", "packages/core/src/runtime/activation-serialize.test.ts"],
+    files: ["packages/core/src/rule/evaluator.test.ts", "packages/core/src/runtime/activation-serialize.test.ts"],
   },
   {
     spec: "rules-and-schema-dynamics",

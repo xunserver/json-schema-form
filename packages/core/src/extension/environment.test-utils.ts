@@ -2,8 +2,8 @@ import { expect } from "vitest";
 import { EnvironmentBuildError } from "./environment-build-error.js";
 import { definePlugin } from "./plugin.js";
 import type { FormPlugin } from "./plugin.js";
-import type { WidgetDefinition } from "./widget.js";
-import { FULL_WIDGET_INTERACTION } from "./widget.js";
+import type { WidgetDefinition } from "../widget/widget.js";
+import { FULL_WIDGET_INTERACTION } from "../widget/widget.js";
 
 export function sampleWidget(name: string): WidgetDefinition {
   return {

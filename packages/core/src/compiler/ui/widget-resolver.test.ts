@@ -1,9 +1,9 @@
 import { describe, expect, test } from "vitest";
 import type { FormEnvironment } from "../../extension/environment.js";
 import { createRegistry } from "../../extension/registry.js";
-import type { WidgetDefinition } from "../../extension/widget.js";
+import type { WidgetDefinition } from "../../widget/widget.js";
 import { COMPILER_DIAGNOSTIC_CODES } from "../../model/diagnostic-codes.js";
-import { asModelPath } from "../../path/index.js";
+import { asModelPath } from "../../model/path/index.js";
 import { DiagnosticBag } from "../diagnostics.js";
 import { resolveWidget } from "./widget-resolver.js";
 

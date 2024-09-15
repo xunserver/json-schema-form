@@ -6,11 +6,11 @@ import {
   ROOT_INSTANCE_PATH,
   type InstancePath,
   type InstancePathSegment,
-} from "../../path/index.js";
-import { objectPropertyEdges } from "../../model/data.js";
-import type { BindingIndex, BindingRecord } from "../binding-index.js";
+} from "../../model/path/index.js";
+import { objectPropertyEdges } from "../../model/data/data.js";
+import type { BindingIndex, BindingRecord } from "../dependency/binding-index.js";
 import { derefNode, indexDataNodes } from "../templates.js";
-import type { RuntimeNodeId } from "../runtime-node-id.js";
+import type { RuntimeNodeId } from "../form/runtime-node-id.js";
 import type { CompiledFormModel } from "../../model/compiled-form-model.js";
 
 export interface PointerBinding {

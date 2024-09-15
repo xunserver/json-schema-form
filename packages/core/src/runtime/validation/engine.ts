@@ -9,7 +9,7 @@ import type {
   SyncValidatorDefinition,
   ValidatorAbortSignal,
 } from "../../extension/contributions.js";
-import type { NamedValidationPlan, ValidationRulePlan } from "../../model/validation.js";
+import type { NamedValidationPlan, ValidationRulePlan } from "../../model/validation/validation.js";
 import {
   ROOT_INSTANCE_PATH,
   asInstancePath,
@@ -19,8 +19,8 @@ import {
   toInstancePath,
   type InstancePath,
   type ModelPath,
-} from "../../path/index.js";
-import { bindTemplatePath } from "../../path/bind-path.js";
+} from "../../model/path/index.js";
+import { bindTemplatePath } from "../../model/path/bind-path.js";
 import type {
   ApplyErrorsOptions,
   ServerErrorInput,
@@ -28,16 +28,16 @@ import type {
   ValidationError,
   ValidationResult,
 } from "../../validation/error.js";
-import type { TransactionDraft } from "../commands.js";
+import type { TransactionDraft } from "../transaction/commands.js";
 import { RUNTIME_DIAGNOSTIC_CODES } from "../diagnostic-codes.js";
 import { runtimeDiagnostic } from "../diagnostics.js";
 import { FormRuntimeError } from "../error.js";
-import { cloneJsonValue, getJsonAt, JsonCloneError } from "../json-value.js";
-import type { NormalizedChangeSet } from "../phases.js";
-import type { RuntimeNodeId } from "../runtime-node-id.js";
-import type { RuntimeSubtreeOwner, SubtreeCleanupPlan, SubtreeDescriptor } from "../subtree-lifecycle.js";
+import { cloneJsonValue, getJsonAt, JsonCloneError } from "../value/json-value.js";
+import type { NormalizedChangeSet } from "../transaction/phases.js";
+import type { RuntimeNodeId } from "../form/runtime-node-id.js";
+import type { RuntimeSubtreeOwner, SubtreeCleanupPlan, SubtreeDescriptor } from "../form/subtree-lifecycle.js";
 import type { AffectedValidationRulePlan } from "../rule/engine.js";
-import { evaluateRuleExpression } from "../rule/evaluator.js";
+import { evaluateRuleExpression } from "../../rule/evaluator.js";
 import {
   asOptionalSchemaPath,
   cloneIssueParams,

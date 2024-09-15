@@ -1,9 +1,9 @@
 import type { JsonValue } from "../../definition/json-value.js";
-import type { ActivationPredicate } from "../../model/schema-dynamics.js";
-import { bindTemplatePath } from "../../path/bind-path.js";
-import { parseInstancePath } from "../../path/instance-path.js";
-import type { InstancePath, ModelPath } from "../../path/types.js";
-import { getJsonAt, isPlainJsonObject, jsonEqual } from "../json-value.js";
+import type { ActivationPredicate } from "../../model/schema-dynamics/schema-dynamics.js";
+import { bindTemplatePath } from "../../model/path/bind-path.js";
+import { parseInstancePath } from "../../model/path/instance-path.js";
+import type { InstancePath, ModelPath } from "../../model/path/types.js";
+import { getJsonAt, isPlainJsonObject, jsonEqual } from "../value/json-value.js";
 
 export function evaluateActivationPredicate(
   predicate: ActivationPredicate,

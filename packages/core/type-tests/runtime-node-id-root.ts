@@ -1,4 +1,4 @@
-import type { RuntimeNodeId as InternalRuntimeNodeId } from "../src/runtime/runtime-node-id.js";
+import type { RuntimeNodeId as InternalRuntimeNodeId } from "../src/runtime/form/runtime-node-id.js";
 
 declare const internalId: InternalRuntimeNodeId;
 void internalId;

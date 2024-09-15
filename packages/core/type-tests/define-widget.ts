@@ -1,5 +1,5 @@
-import { defineWidget } from "../src/extension/define-widget.js";
-import type { WidgetDefinition, WidgetInteractionContract } from "../src/extension/widget.js";
+import { defineWidget } from "../src/widget/define-widget.js";
+import type { WidgetDefinition, WidgetInteractionContract } from "../src/widget/widget.js";
 
 const authored = defineWidget({
   name: "sku",

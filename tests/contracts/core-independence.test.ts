@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { REPO_ROOT } from "../lib/fs.ts";
-import { formatDiagnostics, loadTsconfig, typecheckFiles, typecheckProject } from "../lib/typecheck.ts";
+import { REPO_ROOT } from "../lib/fs.js";
+import { formatDiagnostics, loadTsconfig, typecheckFiles, typecheckProject } from "../lib/typecheck.js";
 
 describe("Core independence", () => {
   test("typechecks Core production sources without DOM or test globals", () => {

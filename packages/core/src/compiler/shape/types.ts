@@ -1,6 +1,6 @@
 import type { JsonSchemaType } from "../../definition/json-schema.js";
-import type { PropertyOrigin, PropertyRequiredStatus, ScalarValueType } from "../../model/data.js";
-import type { SchemaPath } from "../../path/index.js";
+import type { PropertyOrigin, PropertyRequiredStatus, ScalarValueType } from "../../model/data/data.js";
+import type { SchemaPath } from "../../model/path/index.js";
 
 export type DataShapeKind =
   | "scalar"

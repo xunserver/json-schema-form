@@ -95,6 +95,18 @@ function cloneUnknown(
   return Object.freeze(copy);
 }
 
+export function isThenable(value: unknown): boolean {
+  return (
+    (typeof value === "object" &&
+      value !== null &&
+      "then" in value &&
+      typeof (value as { then?: unknown }).then === "function") ||
+    (typeof value === "function" &&
+      "then" in value &&
+      typeof (value as { then?: unknown }).then === "function")
+  );
+}
+
 function hasAccessors(value: object): boolean {
   for (const key of Object.getOwnPropertyNames(value)) {
     const descriptor = Object.getOwnPropertyDescriptor(value, key);

@@ -1,6 +1,6 @@
 import type { Diagnostic } from "../diagnostic/index.js";
-import { rememberEnvironmentIdentity } from "../lifecycle/environment-identity.js";
-import { coreBuiltInPlugin } from "./built-in.js";
+import { rememberEnvironmentIdentity } from "../engine/environment-identity.js";
+import { coreBuiltInPlugin } from "../widget/built-in.js";
 import { cloneAndFreezeOwned, isPlainObject } from "./clone-freeze.js";
 import { resolvePluginGraph } from "./dependency-graph.js";
 import {
@@ -20,8 +20,8 @@ import type {
   ValidatorDefinition,
   ValueInitializerDefinition,
 } from "./contributions.js";
-import type { WidgetDefinition } from "./widget.js";
-import { inspectWidgetInteraction, widgetDescriptorHasRuntimeHandler } from "./widget.js";
+import type { WidgetDefinition } from "../widget/widget.js";
+import { inspectWidgetInteraction, widgetDescriptorHasRuntimeHandler } from "../widget/widget.js";
 import {
   CORE_EXTENSION_PROTOCOL,
   isProtocolCompatible,
@@ -199,6 +199,9 @@ export function createFormEnvironment(options?: CreateFormEnvironmentOptions): F
     }
     collectContributions(snapshot, stores, overrides, tracked);
   }
+
+  validateUniqueDialectUris(stores, unique, tracked);
+  validateUniqueExtensionKeywords(stores, unique, tracked);
 
   const errors = tracked.filter((item) => item.diagnostic.severity === "error");
   if (errors.length > 0) {
@@ -483,7 +486,14 @@ function validateNamedProvider(
   value: unknown,
   tracked: TrackedDiagnostic[],
 ): boolean {
-  if (kind !== "ruleFunctions" && kind !== "serializers" && kind !== "validators") {
+  if (
+    kind !== "ruleFunctions" &&
+    kind !== "serializers" &&
+    kind !== "validators" &&
+    kind !== "schemaDialects" &&
+    kind !== "schemaExtensions" &&
+    kind !== "valueInitializers"
+  ) {
     return true;
   }
   if (!isPlainObject(value)) {
@@ -565,7 +575,218 @@ function validateNamedProvider(
   if (kind === "validators" && !validateValidatorDescriptor(snapshot, key, name, value, tracked)) {
     return false;
   }
+  if (kind === "schemaDialects" && !validateDialectDescriptor(snapshot, key, name, value, tracked)) {
+    return false;
+  }
+  if (kind === "schemaExtensions" && !validateExtensionDescriptor(snapshot, key, name, value, tracked)) {
+    return false;
+  }
+  if (kind === "valueInitializers" && typeof value.initialize !== "function") {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" valueInitializers descriptor "${key}" must provide a synchronous initialize() provider`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: kind,
+        key,
+        metadata: { registry: kind, key, name, reason: "invalid-initialize" },
+      }),
+    );
+    return false;
+  }
   return true;
+}
+
+function validateDialectDescriptor(
+  snapshot: PluginSnapshot,
+  key: string,
+  name: string,
+  value: Record<string, unknown>,
+  tracked: TrackedDiagnostic[],
+): boolean {
+  const dialects = value.dialects;
+  if (
+    !Array.isArray(dialects) ||
+    dialects.length === 0 ||
+    dialects.some((uri) => typeof uri !== "string" || uri.length === 0)
+  ) {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" schemaDialects descriptor "${key}" must declare a non-empty $schema URI collection`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: "schemaDialects",
+        key,
+        metadata: { registry: "schemaDialects", key, name, reason: "empty-dialects" },
+      }),
+    );
+    return false;
+  }
+  if (typeof value.convert !== "function") {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" schemaDialects descriptor "${key}" must provide a synchronous convert() provider`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: "schemaDialects",
+        key,
+        metadata: { registry: "schemaDialects", key, name, reason: "invalid-convert" },
+      }),
+    );
+    return false;
+  }
+  return true;
+}
+
+function validateExtensionDescriptor(
+  snapshot: PluginSnapshot,
+  key: string,
+  name: string,
+  value: Record<string, unknown>,
+  tracked: TrackedDiagnostic[],
+): boolean {
+  const keyword = value.keyword;
+  if (typeof keyword !== "string" || !keyword.startsWith("x-") || keyword.length <= 2) {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" schemaExtensions descriptor "${key}" keyword must start with "x-"`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: "schemaExtensions",
+        key,
+        metadata: {
+          registry: "schemaExtensions",
+          key,
+          name,
+          keyword,
+          pluginId: snapshot.id,
+          reason: "invalid-keyword-prefix",
+        },
+      }),
+    );
+    return false;
+  }
+  if (typeof value.split !== "function") {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" schemaExtensions descriptor "${key}" must provide a synchronous split() provider`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: "schemaExtensions",
+        key,
+        metadata: { registry: "schemaExtensions", key, name, reason: "invalid-split" },
+      }),
+    );
+    return false;
+  }
+  return true;
+}
+
+function pluginOrdinal(snapshots: readonly PluginSnapshot[], pluginId: string): number {
+  return snapshots.find((snapshot) => snapshot.id === pluginId)?.ordinal ?? 0;
+}
+
+function validateUniqueDialectUris(
+  stores: RegistryStores,
+  snapshots: readonly PluginSnapshot[],
+  tracked: TrackedDiagnostic[],
+): void {
+  const owners = new Map<string, RegistryEntryInspection<unknown>>();
+  const entries = [...stores.schemaDialects.values()].sort((left, right) => {
+    if (left.pluginId !== right.pluginId) {
+      return left.pluginId < right.pluginId ? -1 : 1;
+    }
+    return left.key < right.key ? -1 : 1;
+  });
+  for (const entry of entries) {
+    const dialects = (entry.value as SchemaDialectDefinition).dialects;
+    if (!Array.isArray(dialects)) {
+      continue;
+    }
+    for (const uri of dialects) {
+      const existing = owners.get(uri);
+      if (existing === undefined) {
+        owners.set(uri, entry);
+        continue;
+      }
+      if (existing.pluginId === entry.pluginId && existing.key === entry.key) {
+        continue;
+      }
+      tracked.push(
+        trackDiagnostic({
+          code: PLUGIN_DIAGNOSTIC_CODES.REGISTRY_CONFLICT,
+          severity: "error",
+          message: `Schema dialect URI "${uri}" is registered by both "${existing.pluginId}" and "${entry.pluginId}"`,
+          pluginId: entry.pluginId,
+          ordinal: pluginOrdinal(snapshots, entry.pluginId),
+          registry: "schemaDialects",
+          key: entry.key,
+          metadata: {
+            registry: "schemaDialects",
+            uri,
+            existingPluginId: existing.pluginId,
+            incomingPluginId: entry.pluginId,
+            existingKey: existing.key,
+            incomingKey: entry.key,
+          },
+        }),
+      );
+    }
+  }
+}
+
+function validateUniqueExtensionKeywords(
+  stores: RegistryStores,
+  snapshots: readonly PluginSnapshot[],
+  tracked: TrackedDiagnostic[],
+): void {
+  const owners = new Map<string, RegistryEntryInspection<unknown>>();
+  const entries = [...stores.schemaExtensions.values()].sort((left, right) => {
+    if (left.pluginId !== right.pluginId) {
+      return left.pluginId < right.pluginId ? -1 : 1;
+    }
+    return left.key < right.key ? -1 : 1;
+  });
+  for (const entry of entries) {
+    const keyword = (entry.value as SchemaExtensionDefinition).keyword;
+    if (typeof keyword !== "string") {
+      continue;
+    }
+    const existing = owners.get(keyword);
+    if (existing === undefined) {
+      owners.set(keyword, entry);
+      continue;
+    }
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.REGISTRY_CONFLICT,
+        severity: "error",
+        message: `Schema extension keyword "${keyword}" is registered by both "${existing.pluginId}" and "${entry.pluginId}"`,
+        pluginId: entry.pluginId,
+        ordinal: pluginOrdinal(snapshots, entry.pluginId),
+        registry: "schemaExtensions",
+        key: entry.key,
+        metadata: {
+          registry: "schemaExtensions",
+          keyword,
+          existingPluginId: existing.pluginId,
+          incomingPluginId: entry.pluginId,
+          existingKey: existing.key,
+          incomingKey: entry.key,
+        },
+      }),
+    );
+  }
 }
 
 function validateValidatorDescriptor(

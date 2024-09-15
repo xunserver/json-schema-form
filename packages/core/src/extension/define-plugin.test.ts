@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { definePlugin } from "./plugin.js";
 import { createFormEnvironment } from "./create-form-environment.js";
-import type { WidgetDefinition } from "./widget.js";
-import { FULL_WIDGET_INTERACTION } from "./widget.js";
+import type { WidgetDefinition } from "../widget/widget.js";
+import { FULL_WIDGET_INTERACTION } from "../widget/widget.js";
 
 function sampleWidget(name: string): WidgetDefinition {
   return {

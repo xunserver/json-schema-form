@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { compileForm, createForm, defineForm } from "../../src/index.js";
+import { compileForm, createForm, defineForm } from "../index.js";
 import { createSelector, fieldSelector, subscribeRuntime, valueSelector } from "./index.js";
 import { peekFormRuntime } from "./test-harness.js";
 

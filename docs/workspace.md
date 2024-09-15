@@ -19,7 +19,7 @@
 
 | Package | 目录 | 职责 | 当前公共表面 |
 |---|---|---|---|
-| `@form/core` | `packages/core` | 框架无关的 authoring、静态编译与事务化 Runtime；提供 Extension Plugin/Environment | Path、ID、Diagnostic、Form Definition、`defineForm()`、`compileForm()`、`createForm()` / `createFormEngine()`、Compiled Model、CompileResult/CompileError、`FormInstance` / `ArrayInstance` / `ScopedFormInstance`、Rule AST / effective state（含 `required`）/ View source state（`focused`/`collapsed`/`activeTab`）/ `blur()` `setCollapsed()` `setActiveTab()` / `serialize()` / `validate()` / `applyErrors()` / `submit()`；`@form/core/runtime` 导出只读 selector/subscription（含 `effectiveStateSelector`、`presentableErrorSelector`、`InstanceBinding`、`RenderScope`、`getRenderScope()`）与 array identity resolver；`@form/core/extension` 导出 Plugin/Environment/Widget/Registry 契约、`defineWidget()`、`defineRuleFunction()`、`defineValidator()` 与 factory |
+| `@form/core` | `packages/core` | 框架无关的 authoring、静态编译与事务化 Runtime；提供 Extension Plugin/Environment | Path、ID、Diagnostic、Form Definition、`defineForm()`、`compileForm()`、`createForm()` / `createFormEngine()`、Compiled Model、CompileResult/CompileError、`FormInstance` / `ArrayInstance` / `ScopedFormInstance`、Rule AST / effective state（含 `required`）/ View source state（`focused`/`collapsed`/`activeTab`）/ `blur()` `setCollapsed()` `setActiveTab()` / `serialize()` / `validate()` / `applyErrors()` / `submit()` / `FormConfig.valueInitializer`；`@form/core/runtime` 导出只读 selector/subscription（含 `effectiveStateSelector`、`presentableErrorSelector`、`InstanceBinding`、`RenderScope`、`getRenderScope()`）与 array identity resolver；`@form/core/extension` 导出 Plugin/Environment/Widget/Registry 契约、`defineWidget()`、`defineRuleFunction()`、`defineValidator()`、`SchemaDialectDefinition` / `SchemaExtensionDefinition` / `ValueInitializerDefinition` 与 factory |
 | `@form/validator-ajv` | `packages/validator-ajv` | Draft 2020-12 Schema Validator Adapter | `createAjvValidator()` / `AJV_VALIDATOR_KEY`；生产依赖 `ajv` 与 `@form/core` |
 | `@form/vue` | `packages/vue` | Vue Renderer 边界 | 空 ESM 入口；peer 为 `vue` |
 | `@form/react` | `packages/react` | React Renderer 边界 | 空 ESM 入口；peer 为 `react` |
@@ -59,9 +59,24 @@
 |---|---|
 | `@form/core` | Application 契约：Path、公共 ID、Diagnostic、FormDefinition、`defineForm()`、`compileForm()` / `CompileOptions`、`createForm()` / `createFormEngine()`、FormInstance/FieldInstance/ArrayInstance/ScopedFormInstance、CompiledFormModel、CompileResult、CompileError、`FormRuntimeError`、RuleExpression、EffectiveState（含 `required`）、View source state（`focused`/`collapsed`/`activeTab`）、`blur()`/`setCollapsed()`/`setActiveTab()`、`serialize()`、`validate()`/`applyErrors()`/`submit()`、`ValidationError` |
 | `@form/core/runtime` | Advanced Runtime API：只读 selector factory（含 array order/item/binding、`effectiveStateSelector`、`presentableErrorSelector`）、`InstanceBinding`、`RenderScope`、`getRenderScope()`、`createSelector()`、snapshot read、subscription、Identity Resolver 类型与 Runtime diagnostic observation |
-| `@form/core/extension` | Extension API：`definePlugin()`、`defineWidget()`、`defineRuleFunction()`、`defineValidator()`、`createFormEnvironment()`、只读 Registry/Widget/Plugin/RuleFunction/Serializer/Validator 与 Widget interaction 契约、protocol constant 与 `EnvironmentBuildError` |
+| `@form/core/extension` | Extension API：`definePlugin()`、`defineWidget()`、`defineRuleFunction()`、`defineValidator()`、`createFormEnvironment()`、只读 Registry/Widget/Plugin/RuleFunction/Serializer/Validator/`SchemaDialectDefinition`/`SchemaExtensionDefinition`/`ValueInitializerDefinition` 与 Widget interaction 契约、protocol constant 与 `EnvironmentBuildError` |
 
-根入口导出的是面向应用的只读契约与基础实例 factory，不导出 `RuntimeNodeId`、TransactionManager、ChangeQueue、CompilerContext、RuleEngine/DependencyScheduler、AST evaluator、可变 Store、ArrayStateStore、View state store、interaction event writer、binding table、Environment identity token、ValidationEngine/ErrorStore 或其他内部实现符号。未写入 `exports` 的 deep path 不是公共 API。`setValues()` 是 root replacement。数组 index 不是身份；结构变化走 `ArrayInstance`，越界 index 不能隐式创建 item。Identity Resolver 必须是纯同步函数，且只从 `@form/core/runtime` 取得类型。`RenderScope` / `InstanceBinding` / `getRenderScope()` 只从 `@form/core/runtime` 导出，根入口不重导出。`reset()` 会重建 array identity 并恢复 `focused`/`collapsed`/`activeTab` 默认值。固定 tuple 不支持 list 结构命令。AJV instance 与 Adapter factory 只从 `@form/validator-ajv` 取得。Renderer 仍由后续 change 交付；Core 不渲染 UI。
+根入口导出的是面向应用的只读契约与基础实例 factory，不导出 `RuntimeNodeId`、TransactionManager、ChangeQueue、CompilerContext、RuleEngine/DependencyScheduler、AST evaluator、可变 Store、ArrayStateStore、View state store、interaction event writer、binding table、Environment identity token、ValidationEngine/ErrorStore 或其他内部实现符号。未写入 `exports` 的 deep path 不是公共 API。`setValues()` 是 root replacement。数组 index 不是身份；结构变化走 `ArrayInstance`，越界 index 不能隐式创建 item。Identity Resolver 必须是纯同步函数，且只从 `@form/core/runtime` 取得类型。`RenderScope` / `InstanceBinding` / `getRenderScope()` 只从 `@form/core/runtime` 导出，根入口不重导出。`reset()` 会重建 array identity 并恢复 `focused`/`collapsed`/`activeTab` 默认值。固定 tuple 不支持 list 结构命令。AJV instance 与 Adapter factory 只从 `@form/validator-ajv` 取得。Renderer 仍由后续 change 交付；Core 不渲染 UI。`SchemaDialectDefinition` / `SchemaExtensionDefinition` / `ValueInitializerDefinition` 只从 `@form/core/extension` 导出；根入口只新增 `FormConfig.valueInitializer` 与 `CreateFormOptions.valueInitializer` 两个 string key。Core 不附带内置 dialect adapter 或 `x-*` 词汇。
+
+## Core 内部目录
+
+`packages/core/src/` 按架构第 18 节的生命周期领域组织，由 `pnpm check:boundaries` 的 `core-layout` 规则强制：
+
+```text
+definition/   schema/   compiler/{schema,shape,data,ui,rule,validation}
+model/{data,ui,rule,validation,schema-dynamics}
+runtime/{form,value,state,transaction,array,dependency,subscription,scope}
+widget/   rule/   validation/   extension/   diagnostic/   engine/   index.ts
+```
+
+顶层不得出现 `types/`、`services/`、`utils/`。`path` / `identity` 编入 `model/`，Engine/Environment 生命周期编入 `engine/`，内置 Widget 编入 `widget/`。领域内可有内部 `index.ts` 与局部 helper；package 公共表面仍只由三个 `exports` 入口决定。
+
+Schema Frontend 消费点：`compiler/schema` 在 dialect detection 调用 `convert()`，在 Data Model 实例化后按 `SchemaPath -> ModelPath[]` 调用 `split()`，再把片段合并进 compiler 私有 effective authoring input（显式 UI Schema / Rules / Config 优先，重叠 key 只 warning）。Value Initializer 消费点：`compiler/rule` 校验 `FormConfig.valueInitializer` key，`runtime/form` 的 `createForm()` 在 identity materialization 之前执行 `initialize()`。
 
 ## 提出未来公共 export 的规则
 
@@ -80,4 +95,4 @@
 - `RuntimeNodeId` 以及可变 Store、Scheduler、Compiler Context 不得进入任何公共入口。
 - `defineWidget()` 与 `WidgetDefinition` interaction contract 只从 `@form/core/extension` 导出；根入口不重导出。
 - Field `requirement` presentation source 由静态编译投影；effective `required`、`blur()`、`setCollapsed()` / `setActiveTab()` 与 `RenderScope` / `InstanceBinding` / `getRenderScope()` 由 Core Runtime 在本切片交付。Validation 的 `blur` trigger 与 Vue/React Renderer 仍由后续 owner 消费这些公开端口，不要把它们当成已经实现。
-- 已声明 `x-*` 拆分与非 canonical dialect adapter 由 `align-core-contributions-and-layout` 承接。
+- 不要把 Plugin 可注册的 dialect adapter / `x-*` extension / value initializer 写成 Core 内置能力；也不要把本切片理解成 Validation pipeline 的实现来源。

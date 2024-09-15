@@ -1,6 +1,6 @@
 import type { Diagnostic, DiagnosticSeverity } from "../diagnostic/index.js";
 import { freezeDiagnostic, freezeDiagnostics } from "../diagnostic/freeze.js";
-import type { ModelPath } from "../path/types.js";
+import type { ModelPath } from "../model/path/types.js";
 import {
   RUNTIME_DIAGNOSTIC_CODE_RANK,
   type RuntimeDiagnosticCode,

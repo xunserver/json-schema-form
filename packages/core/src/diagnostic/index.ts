@@ -1,4 +1,4 @@
-import type { ModelPath, SchemaPath } from "../path/index.js";
+import type { ModelPath, SchemaPath } from "../model/path/index.js";
 
 export { freezeDiagnostic, freezeDiagnostics } from "./freeze.js";
 

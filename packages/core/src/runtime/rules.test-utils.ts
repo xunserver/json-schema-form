@@ -6,7 +6,7 @@ import { definePlugin } from "../extension/plugin.js";
 import { defineRuleFunction } from "../extension/define-rule-function.js";
 import type { FormEnvironment } from "../extension/environment.js";
 import type { CompiledFormModel } from "../model/compiled-form-model.js";
-import type { JsonValue } from "./contracts.js";
+import type { JsonValue } from "./form/contracts.js";
 
 export const RULE_SCHEMA = {
   type: "object" as const,

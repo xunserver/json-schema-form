@@ -1,9 +1,9 @@
 import type { Diagnostic } from "../../diagnostic/index.js";
 import type { CompiledFormModel } from "../../model/compiled-form-model.js";
-import type { CompiledRule } from "../../model/rule.js";
+import type { CompiledRule } from "../../model/rule/rule.js";
 import type { StateRuleAspect } from "../../definition/rule-definition.js";
 import type { FormEnvironment } from "../../extension/environment.js";
-import { bindTemplatePath, modelPathListCount } from "../../path/bind-path.js";
+import { bindTemplatePath, modelPathListCount } from "../../model/path/bind-path.js";
 import {
   ROOT_INSTANCE_PATH,
   ROOT_MODEL_PATH,
@@ -12,20 +12,20 @@ import {
   parseInstancePath,
   type InstancePath,
   type ModelPath,
-} from "../../path/index.js";
-import type { RuntimeCommand } from "../commands.js";
-import type { TransactionDraft } from "../commands.js";
-import type { EffectiveState, JsonValue, SerializeOptions } from "../contracts.js";
+} from "../../model/path/index.js";
+import type { RuntimeCommand } from "../transaction/commands.js";
+import type { TransactionDraft } from "../transaction/commands.js";
+import type { EffectiveState, JsonValue, SerializeOptions } from "../form/contracts.js";
 import { RUNTIME_DIAGNOSTIC_CODES } from "../diagnostic-codes.js";
 import { runtimeDiagnostic, sortRuntimeDiagnostics } from "../diagnostics.js";
 import { FormRuntimeError } from "../error.js";
-import { combineEffectiveState, DEFAULT_EFFECTIVE } from "../effective.js";
-import { cloneJsonValue, getJsonAt, jsonEqual, JsonCloneError } from "../json-value.js";
-import type { RuntimeNodeId } from "../runtime-node-id.js";
-import { pruneInactiveValues } from "../serialize.js";
-import type { RuntimeSubtreeOwner, SubtreeCleanupPlan, SubtreeDescriptor } from "../subtree-lifecycle.js";
+import { combineEffectiveState, DEFAULT_EFFECTIVE } from "../state/effective.js";
+import { cloneJsonValue, getJsonAt, jsonEqual, JsonCloneError } from "../value/json-value.js";
+import type { RuntimeNodeId } from "../form/runtime-node-id.js";
+import { pruneInactiveValues } from "../value/serialize.js";
+import type { RuntimeSubtreeOwner, SubtreeCleanupPlan, SubtreeDescriptor } from "../form/subtree-lifecycle.js";
 import { evaluateActivationPredicate } from "../dynamics/activation.js";
-import { evaluateRuleExpression } from "./evaluator.js";
+import { evaluateRuleExpression } from "../../rule/evaluator.js";
 
 export interface AffectedValidationRuleBinding {
   readonly ruleId: string;
@@ -389,7 +389,7 @@ export class RuleDynamicsEngine implements RuntimeSubtreeOwner {
     state: RuleDraftState,
     fieldPath: InstancePath,
     fieldModel: ModelPath,
-    source: import("../../path/index.js").SchemaPath,
+    source: import("../../model/path/index.js").SchemaPath,
     ownerPath: ModelPath,
   ): boolean {
     const ownerInstance = bindTemplatePath(ownerPath, fieldModel, fieldPath);

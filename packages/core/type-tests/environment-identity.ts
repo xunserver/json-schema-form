@@ -1,6 +1,6 @@
 import { compileForm, createForm, defineForm } from "../src/index.js";
 import { createFormEnvironment } from "../src/extension/index.js";
-import { peekEnvironmentIdentity } from "../src/lifecycle/environment-identity.js";
+import { peekEnvironmentIdentity } from "../src/engine/environment-identity.js";
 
 const environment = createFormEnvironment();
 const identity = peekEnvironmentIdentity(environment);

@@ -1,9 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { RULE } from "../../tools/architecture-check/policy.ts";
-import { REPO_ROOT, copyWorkspacePackages, makeTempDir, readJson, writeJson, writeText } from "../lib/fs.ts";
-import { runBoundaryCheck, runTsc } from "../lib/process.ts";
+import { RULE } from "../../tools/architecture-check/policy.js";
+import { REPO_ROOT, copyWorkspacePackages, makeTempDir, readJson, writeJson, writeText } from "../lib/fs.js";
+import { runBoundaryCheck, runTsc } from "../lib/process.js";
 
 type Manifest = {
   name: string;
@@ -106,5 +106,26 @@ describe("fault injection commands", () => {
     const result = runTsc(path.join(REPO_ROOT, "tests/contracts/negative/deep-import.tsconfig.json"));
     expect(result.status).not.toBe(0);
     expect(`${result.stdout}\n${result.stderr}`).toMatch(/Cannot find module|has no exported member|TS2307|TS2305/);
+  });
+
+  test("unexpected Core directory fails the boundary command", () => {
+    const root = copyRepoPackages();
+    fs.mkdirSync(path.join(root, "packages", "core", "src", "utils"));
+    writeText(path.join(root, "packages", "core", "src", "utils", "helper.ts"), "export const n = 1;\n");
+
+    const result = runBoundaryCheck(root);
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain("utils");
+    expect(result.stderr).toContain(RULE.coreLayout);
+  });
+
+  test("missing Core domain directory fails the boundary command", () => {
+    const root = copyRepoPackages();
+    fs.rmSync(path.join(root, "packages", "core", "src", "engine"), { recursive: true, force: true });
+
+    const result = runBoundaryCheck(root);
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain("engine");
+    expect(result.stderr).toContain(RULE.coreLayout);
   });
 });

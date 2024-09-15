@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { REPO_ROOT } from "../lib/fs.ts";
+import { REPO_ROOT } from "../lib/fs.js";
 
 const RENDERER_PACKAGES = ["vue", "react", "element-plus", "mui"] as const;
 const FORBIDDEN = [

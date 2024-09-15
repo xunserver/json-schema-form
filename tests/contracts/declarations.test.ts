@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { REPO_ROOT } from "../lib/fs.ts";
+import { REPO_ROOT } from "../lib/fs.js";
 
 const PUBLIC_ROOT_CONTRACTS = [
   "SchemaPath",
@@ -61,6 +61,15 @@ describe("generated Core public surface", () => {
     for (const name of PRIVATE_SYMBOLS) {
       expect(declaration, `leaked ${name}`).not.toContain(name);
     }
+
+    for (const name of [
+      "SchemaDialectDefinition",
+      "SchemaExtensionDefinition",
+      "ValueInitializerDefinition",
+      "DialectConvertResult",
+    ]) {
+      expect(declaration, `leaked ${name}`).not.toContain(name);
+    }
   });
 
   test("runtime entry exposes advanced selector contracts without internals", () => {
@@ -116,6 +125,10 @@ describe("generated Core public surface", () => {
       "ValidatorDefinition",
       "SchemaAdapterDefinition",
       "SerializerDefinition",
+      "SchemaDialectDefinition",
+      "SchemaExtensionDefinition",
+      "ValueInitializerDefinition",
+      "DialectConvertResult",
     ]) {
       expect(extension, `missing ${name}`).toContain(name);
     }

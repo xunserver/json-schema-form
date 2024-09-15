@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { compileActivationPredicate } from "./predicate.js";
 import type { CanonicalSchemaGraph } from "../schema/frontend.js";
-import { ROOT_MODEL_PATH } from "../../path/index.js";
+import { ROOT_MODEL_PATH } from "../../model/path/index.js";
 
 const emptyGraph = {
   nodes: new Map(),

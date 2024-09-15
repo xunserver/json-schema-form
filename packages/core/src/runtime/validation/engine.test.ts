@@ -2,7 +2,7 @@ import { describe, expect, test, vi } from "vitest";
 import { compileForm, createForm, defineForm, FormRuntimeError } from "../../index.js";
 import { createFormEnvironment, definePlugin, defineValidator } from "../../extension/index.js";
 import { RUNTIME_DIAGNOSTIC_CODES } from "../diagnostic-codes.js";
-import type { FieldView, ViewNode } from "../../model/ui.js";
+import type { FieldView, ViewNode } from "../../model/ui/ui.js";
 import {
   fieldSelector,
   formSelector,

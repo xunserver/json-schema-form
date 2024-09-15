@@ -34,8 +34,8 @@ export type {
   RuleOperatorExpression,
   RuleOperatorKey,
   RuleScalar,
-} from "./rule-expression.js";
-export { RULE_OPERATOR_KEYS } from "./rule-expression.js";
+} from "../rule/expression.js";
+export { RULE_OPERATOR_KEYS } from "../rule/expression.js";
 export type {
   ComputedRuleAction,
   ComputedRuleDefinition,

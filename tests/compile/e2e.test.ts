@@ -3,7 +3,7 @@ import { compileForm } from "../../packages/core/src/compiler/compile-form.js";
 import { CompileError } from "../../packages/core/src/model/compile-error.js";
 import { createFormEnvironment } from "../../packages/core/src/extension/create-form-environment.js";
 import { definePlugin } from "../../packages/core/src/extension/plugin.js";
-import type { ObjectView } from "../../packages/core/src/model/ui.js";
+import type { ObjectView } from "../../packages/core/src/model/ui/ui.js";
 
 describe("compileForm end-to-end fixtures", () => {
   test("compiles nested Draft 2020-12 object/array/scalar with default layout", () => {

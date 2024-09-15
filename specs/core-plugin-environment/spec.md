@@ -154,20 +154,25 @@ Core必须（SHALL）从`@form/core/extension`暴露`defineRuleFunction()`，保
 - **THEN** 两个descriptor保持独立，冲突只在它们实际进入同一Environment Registry时按既有策略诊断
 
 ### Requirement: Rule Function 与Serializer provider是纯同步只读边界
-`RuleFunctionDefinition`必须（MUST）包含只接收readonly JSON-compatible args并同步返回JSON-compatible结果的provider；`SerializerDefinition`必须（MUST）包含只接收readonly JSON-compatible value与readonly serialization context并同步返回JSON-compatible结果的provider。公共provider contract不得（MUST NOT）包含FormInstance、mutable Store、Transaction Manager、DependencyScheduler、RuntimeNodeId、fetch/remote source或command capability，也不得返回Promise/thenable。
+`RuleFunctionDefinition`必须（MUST）包含只接收readonly JSON-compatible args并同步返回JSON-compatible结果的provider；`SerializerDefinition`必须（MUST）包含只接收readonly JSON-compatible value与readonly serialization context并同步返回JSON-compatible结果的provider；`SchemaDialectDefinition`必须（MUST）声明其负责的非空`$schema` URI集合与只接收readonly原始Schema并同步返回Draft 2020-12 JSON Schema及readonly diagnostics的`convert()`；`SchemaExtensionDefinition`必须（MUST）声明一个以`x-`开头的keyword与只接收readonly keyword值、`SchemaPath`、`ModelPath`并同步返回可选`FieldUI`、Rule Definition与Form Config片段的`split()`；`ValueInitializerDefinition`必须（MUST）包含只接收readonly提供的initial values与只读`CompiledFormModel`并同步返回JSON-compatible完整values的`initialize()`。所有公共provider contract不得（MUST NOT）包含FormInstance、mutable Store、Transaction Manager、DependencyScheduler、RuntimeNodeId、fetch/remote source或command capability，也不得返回Promise/thenable。
 
 #### Scenario: Plugin注册可调用providers
 - **GIVEN** Plugin contributions包含由helper创建的Rule Function和一个Serializer descriptor
 - **WHEN** Environment成功构建
 - **THEN** 两个Registry以readonlyprovider identity和provenance暴露它们，且调用前后Registry内容保持冻结
 
+#### Scenario: Plugin注册dialect、extension与initializer providers
+- **GIVEN** Plugin contributions包含声明`https://json-schema.org/draft-07/schema`的dialect adapter、声明`x-ui`的schema extension与一个value initializer
+- **WHEN** Environment成功构建
+- **THEN** 三个Registry以readonly descriptor identity、URI/keyword元数据和provenance暴露它们，Environment不执行任何provider
+
 #### Scenario: 类型拒绝async与mutable context
-- **GIVEN** author尝试声明返回Promise的Rule Function或接收Form/Store writer的Serializer
+- **GIVEN** author尝试声明返回Promise的Rule Function、接收Form/Store writer的Serializer、返回Promise的dialect `convert()`或接收FormInstance的value initializer
 - **WHEN** TypeScript检查provider contract
 - **THEN** 定义因不属于同步readonly边界而失败
 
 ### Requirement: contribution key与provider name必须一致
-Environment build必须（MUST）校验`ruleFunctions`和`serializers`中每个Registry key与descriptor name完全一致，并继续对重复key应用既有精确override策略。不匹配、缺失或非法provider shape必须（MUST）阻止Environment发布并产生`source: "plugin"`的稳定Diagnostic，不得返回partial callable Registry。
+Environment build必须（MUST）校验`ruleFunctions`、`serializers`、`schemaDialects`、`schemaExtensions`与`valueInitializers`中每个Registry key与descriptor name完全一致，并继续对重复key应用既有精确override策略。此外，`schemaDialects`中任一`$schema` URI与`schemaExtensions`中任一keyword必须（MUST）在整个Environment内唯一；非`x-`前缀的extension keyword、空URI集合、不匹配、缺失或非法provider shape必须（MUST）阻止Environment发布并产生`source: "plugin"`的稳定Diagnostic，不得返回partial callable Registry。
 
 #### Scenario: 接受一致的key与name
 - **GIVEN** Plugin在`ruleFunctions["company.tax"]`注册name同为`company.tax`的descriptor
@@ -178,6 +183,16 @@ Environment build必须（MUST）校验`ruleFunctions`和`serializers`中每个R
 - **GIVEN** contribution key为`company.tax`但descriptor name为`other.tax`
 - **WHEN** 构建Environment
 - **THEN** `EnvironmentBuildError`包含registry、key、name和Plugin ID，且没有可用partial Environment
+
+#### Scenario: 拒绝重复的dialect URI或extension keyword
+- **GIVEN** 两个不同Plugin分别以不同key注册声明同一`$schema` URI的dialect adapter，或声明同一`x-ui` keyword的extension
+- **WHEN** 构建Environment且没有显式override批准
+- **THEN** build以`source: "plugin"` Diagnostic失败，metadata包含冲突URI/keyword与两个Plugin ID，不存在last-write-wins
+
+#### Scenario: 拒绝非法extension keyword
+- **GIVEN** schema extension声明keyword为`ui`或`properties`而非`x-`前缀
+- **WHEN** 构建Environment
+- **THEN** build以稳定Diagnostic失败并指出keyword与Plugin ID，Registry不发布该contribution
 
 ### Requirement: defineWidget 是无副作用的 Widget authoring helper
 Core 必须（SHALL）只从 `@form/core/extension` 暴露泛型 `defineWidget()`，并在保留输入对象 identity 与 literal inference 的同时返回同一个 `WidgetDefinition`。该 helper 不得（MUST NOT）安装、复制、冻结或执行 Widget，不得（MUST NOT）读取或修改 global Registry；Widget contribution 的安装、owned snapshot、冻结、显式 override 与 key 冲突必须（MUST）继续只发生在 `createFormEnvironment()` 构建阶段。

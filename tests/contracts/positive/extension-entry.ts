@@ -8,11 +8,33 @@ import {
   EnvironmentBuildError,
 } from "@form/core/extension";
 import type {
+  DialectConvertResult,
   FormEnvironment,
   FormPlugin,
+  SchemaDialectDefinition,
+  SchemaExtensionDefinition,
+  SchemaExtensionSplitResult,
+  ValueInitializerDefinition,
   WidgetDefinition,
   WidgetInteractionContract,
 } from "@form/core/extension";
+
+export const dialect: SchemaDialectDefinition = {
+  name: "draft-07",
+  dialects: ["http://json-schema.org/draft-07/schema#"],
+  convert: (schema): DialectConvertResult => ({ schema }),
+};
+
+export const extension: SchemaExtensionDefinition = {
+  name: "x-ui",
+  keyword: "x-ui",
+  split: (): SchemaExtensionSplitResult => ({}),
+};
+
+export const initializer: ValueInitializerDefinition = {
+  name: "sample.defaults",
+  initialize: ({ initialValues }) => initialValues ?? {},
+};
 
 export const sku = defineWidget({
   name: "sku",

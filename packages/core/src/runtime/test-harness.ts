@@ -1,8 +1,8 @@
 import type { CompiledFormModel } from "../model/compiled-form-model.js";
-import type { CreateFormOptions, FormInstance } from "./contracts.js";
-import { instantiateForm, type CreateFormInternals } from "./create-form.js";
-import { resolveFormRuntime } from "./handle.js";
-import type { FormRuntime } from "./form-runtime.js";
+import type { CreateFormOptions, FormInstance } from "./form/contracts.js";
+import { instantiateForm, type CreateFormInternals } from "./form/create-form.js";
+import { resolveFormRuntime } from "./form/handle.js";
+import type { FormRuntime } from "./form/form-runtime.js";
 
 export function createFormWithTestHooks(
   model: CompiledFormModel,
@@ -16,5 +16,5 @@ export function peekFormRuntime(form: FormInstance): FormRuntime {
   return resolveFormRuntime(form);
 }
 
-export type { CreateFormInternals } from "./create-form.js";
-export type { PhaseSet, TransactionPhaseContext } from "./phases.js";
+export type { CreateFormInternals } from "./form/create-form.js";
+export type { PhaseSet, TransactionPhaseContext } from "./transaction/phases.js";

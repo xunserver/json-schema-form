@@ -24,6 +24,39 @@ Core 必须（SHALL）支持从不可变 `CompiledFormModel` 创建 `FormInstanc
 - **WHEN** 通过该 Engine 重复 compile Definition 并从其 Model 创建实例
 - **THEN** Engine 始终复用其 frozen Environment，且不保存任何具体实例的 values 或交互状态
 
+### Requirement: named Value Initializer 在实例化前产出 Runtime-owned initial values
+`createForm()` 与 `engine.create()` 必须（SHALL）按以下优先级决定 Value Initializer：create option 显式 key、否则 Compiled Model 记录的 `FormConfig.valueInitializer`、否则不使用 initializer。选定的 initializer 必须（MUST）来自与 Compiled Model 一致的冻结 Environment，在 array identity materialization、Computed/Effect/activation 稳定与任何 snapshot 发布之前同步运行一次；它只接收调用者提供的 readonly initial values 与只读 `CompiledFormModel`，返回值经 JSON-compatible 校验后成为 Runtime-owned initial snapshot，`reset()` 恢复该结果而非调用者原始输入。initializer 不得（MUST NOT）取得 Store、Transaction、Scheduler 或任何 command；其 throw、返回 thenable、返回非 JSON 或未注册 key 必须（MUST）以 `source: "runtime"` 的稳定 Diagnostic 阻断创建，不产生 partial instance，也不泄漏原始异常。
+
+#### Scenario: 默认 initializer 填充初始值
+- **GIVEN** Compiled Model 记录 `valueInitializer: "company.defaults"`，该 initializer 为缺失的 `country` 填入 `"CN"`
+- **WHEN** 调用 `createForm(model, { environment, initialValues: { name: "Ada" } })`
+- **THEN** 实例的 initial snapshot 为 `{ name: "Ada", country: "CN" }`，`version` 为 0，dirty 为 false，调用者传入的对象未被修改
+
+#### Scenario: create option 覆盖默认 initializer
+- **GIVEN** Compiled Model 记录默认 initializer，调用者在 create option 中指定另一个已注册 key
+- **WHEN** 创建实例
+- **THEN** 只运行 option 指定的 initializer，Compiled Model 与 Definition 均不变化
+
+#### Scenario: reset 恢复 initializer 结果
+- **GIVEN** initializer 产出的 initial snapshot 已被多次 `setValue()` 修改
+- **WHEN** 调用 `reset()`
+- **THEN** values 恢复为 initializer 产出的 snapshot，而不是调用者原始 `initialValues`，且 initializer 不再次执行
+
+#### Scenario: initializer 在 identity 与 Rule 稳定之前运行
+- **GIVEN** initializer 向 `products` 追加两个 item，且存在依赖 `products[].price` 的 Computed Rule
+- **WHEN** 创建实例
+- **THEN** 两个 item 各获得稳定 `ArrayItemId`，Computed 结果基于 initializer 输出稳定，整个过程不对外发布中间态
+
+#### Scenario: initializer 失败阻断创建
+- **GIVEN** 选定的 initializer throw、返回 Promise 或返回含 function 的对象
+- **WHEN** 调用 `createForm()`
+- **THEN** 以稳定 `source: "runtime"` Diagnostic（含 initializer name）抛出 `FormRuntimeError`，没有可用 partial instance，diagnostic 不包含原始异常
+
+#### Scenario: 拒绝未注册或跨 Environment 的 initializer
+- **GIVEN** create option 指定的 key 未在与 Compiled Model 一致的 Environment 中注册
+- **WHEN** 创建实例
+- **THEN** 创建在任何实例状态建立前以结构化 Diagnostic 失败，且不会回退到默认 initializer 或原始 values
+
 ### Requirement: 多个 FormInstance 的 Runtime state 完全隔离
 从同一个 `CompiledFormModel` 创建的每个 `FormInstance` 必须（MUST）拥有独立的 current/initial values 与 Node、Field、View、Form source state。创建、mutation、reset 或订阅任一实例不得（MUST NOT）改变 Model、Environment 或其他实例。
 

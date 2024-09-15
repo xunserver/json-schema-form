@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { BUILTIN_WIDGET_KEYS } from "./widget.js";
-import { CORE_PLUGIN_ID } from "./built-in.js";
+import { BUILTIN_WIDGET_KEYS } from "../widget/widget.js";
+import { CORE_PLUGIN_ID } from "../widget/built-in.js";
 import { PLUGIN_DIAGNOSTIC_CODES } from "./diagnostic-codes.js";
 import { createFormEnvironment } from "./create-form-environment.js";
 import { CORE_EXTENSION_PROTOCOL } from "./protocol.js";

@@ -5,9 +5,9 @@ export type {
   ModelPathLike,
   SchemaPath,
   SchemaPathLike,
-} from "./path/index.js";
+} from "./model/path/index.js";
 
-export type { ArrayItemId, DataNodeId, ViewNodeId } from "./identity/index.js";
+export type { ArrayItemId, DataNodeId, ViewNodeId } from "./model/identity/index.js";
 
 export type {
   Diagnostic,
@@ -98,8 +98,8 @@ export {
   SCHEMA_DIAGNOSTIC_CODES,
 } from "./model/index.js";
 
-export { createForm } from "./runtime/create-form.js";
-export { createFormEngine } from "./runtime/create-engine.js";
+export { createForm } from "./runtime/form/create-form.js";
+export { createFormEngine } from "./engine/create-engine.js";
 export { FormRuntimeError } from "./runtime/error.js";
 export { RUNTIME_DIAGNOSTIC_CODES } from "./runtime/diagnostic-codes.js";
 export type { RuntimeDiagnosticCode } from "./runtime/diagnostic-codes.js";
@@ -129,4 +129,4 @@ export type {
   ValidationErrorSource,
   ValidationResult,
   ViewSnapshot,
-} from "./runtime/contracts.js";
+} from "./runtime/form/contracts.js";

@@ -1,10 +1,10 @@
 import type { JsonValue } from "../../definition/json-value.js";
-import type { SchemaPath } from "../../path/index.js";
-import { asSchemaPath } from "../../path/index.js";
+import type { SchemaPath } from "../../model/path/index.js";
+import { asSchemaPath } from "../../model/path/index.js";
 import type { ValidationError, ValidationErrorSource } from "../../validation/error.js";
 import type { CustomValidatorIssue, SchemaAdapterIssue } from "../../validation/protocol.js";
-import { cloneJsonValue, JsonCloneError } from "../json-value.js";
-import type { InstancePath, ModelPath } from "../../path/index.js";
+import { cloneJsonValue, JsonCloneError } from "../value/json-value.js";
+import type { InstancePath, ModelPath } from "../../model/path/index.js";
 
 export const EMPTY_ERRORS: readonly ValidationError[] = Object.freeze([]);
 

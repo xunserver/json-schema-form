@@ -1,6 +1,6 @@
 import type { AdapterId, NativeFieldOptions } from "../../definition/ui-schema.js";
 import { COMPILER_DIAGNOSTIC_CODES } from "../../model/diagnostic-codes.js";
-import type { ModelPath } from "../../path/index.js";
+import type { ModelPath } from "../../model/path/index.js";
 import { CloneShapeError, clonePlain } from "../immutable.js";
 import { DiagnosticBag, compilerError } from "../diagnostics.js";
 

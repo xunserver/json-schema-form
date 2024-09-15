@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { compileForm } from "../compile-form.js";
 import { SCHEMA_DIAGNOSTIC_CODES } from "../../model/diagnostic-codes.js";
-import type { ObjectDataNode, ScalarDataNode, UnionDataNode } from "../../model/data.js";
+import type { ObjectDataNode, ScalarDataNode, UnionDataNode } from "../../model/data/data.js";
 
 describe("Shape Analyzer", () => {
   test("infers an object from properties and emits schema.shape-inferred", () => {

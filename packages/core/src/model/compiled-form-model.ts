@@ -1,9 +1,9 @@
 import type { Diagnostic } from "../diagnostic/index.js";
-import type { DataModel } from "./data.js";
-import type { RuleModel } from "./rule.js";
-import type { SchemaDynamics } from "./schema-dynamics.js";
-import type { UIModel } from "./ui.js";
-import type { ValidationModel } from "./validation.js";
+import type { DataModel } from "./data/data.js";
+import type { RuleModel } from "./rule/rule.js";
+import type { SchemaDynamics } from "./schema-dynamics/schema-dynamics.js";
+import type { UIModel } from "./ui/ui.js";
+import type { ValidationModel } from "./validation/validation.js";
 
 export interface CompiledFormModel {
   readonly data: DataModel;

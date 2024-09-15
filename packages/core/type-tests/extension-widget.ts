@@ -2,8 +2,8 @@ import type {
   BuiltinWidgetKey,
   WidgetDefinition,
   WidgetValueContract,
-} from "../src/extension/widget.js";
-import { BUILTIN_WIDGET_KEYS } from "../src/extension/widget.js";
+} from "../src/widget/widget.js";
+import { BUILTIN_WIDGET_KEYS } from "../src/widget/widget.js";
 
 const keys: Record<BuiltinWidgetKey, true> = {
   text: true,

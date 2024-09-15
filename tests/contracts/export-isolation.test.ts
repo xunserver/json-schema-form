@@ -1,7 +1,7 @@
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { REPO_ROOT } from "../lib/fs.ts";
-import { formatDiagnostics, loadTsconfig, typecheckFiles, typecheckProject } from "../lib/typecheck.ts";
+import { REPO_ROOT } from "../lib/fs.js";
+import { formatDiagnostics, loadTsconfig, typecheckFiles, typecheckProject } from "../lib/typecheck.js";
 
 const consumerOptions = loadTsconfig(
   path.join(REPO_ROOT, "tests/contracts/positive/tsconfig.json"),
@@ -45,6 +45,17 @@ describe("consumer export isolation", () => {
       /Cannot find module '@form\/core\/src\/runtime\/form-runtime\.js'/,
     );
   });
+  test("rejects contribution contracts from the runtime entry", () => {
+    const diagnostics = typecheckFiles(
+      [path.join(REPO_ROOT, "tests/contracts/negative/runtime-contributions.ts")],
+      consumerOptions,
+    );
+    expect(diagnostics.length).toBeGreaterThan(0);
+    expect(formatDiagnostics(diagnostics)).toMatch(
+      /has no exported member 'SchemaDialectDefinition'|has no exported member 'SchemaExtensionDefinition'|has no exported member 'ValueInitializerDefinition'/,
+    );
+  });
+
   test("rejects Extension-only symbols from the public root", () => {
     const diagnostics = typecheckFiles(
       [path.join(REPO_ROOT, "tests/contracts/negative/extension-from-root.ts")],
@@ -52,7 +63,7 @@ describe("consumer export isolation", () => {
     );
     expect(diagnostics.length).toBeGreaterThan(0);
     expect(formatDiagnostics(diagnostics)).toMatch(
-      /has no exported member 'definePlugin'|has no exported member 'defineWidget'|has no exported member 'createFormEnvironment'|has no exported member 'defineValidator'/,
+      /has no exported member 'definePlugin'|has no exported member 'defineWidget'|has no exported member 'createFormEnvironment'|has no exported member 'defineValidator'|has no exported member 'SchemaDialectDefinition'|has no exported member 'SchemaExtensionDefinition'|has no exported member 'ValueInitializerDefinition'/,
     );
   });
 

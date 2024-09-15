@@ -1,6 +1,6 @@
 import type { JsonSchema } from "../definition/json-schema.js";
 import type { JsonValue } from "../definition/json-value.js";
-import type { InstancePath, ModelPath } from "../path/index.js";
+import type { InstancePath, ModelPath } from "../model/path/index.js";
 
 export interface ValidatorAbortSignal {
   readonly aborted: boolean;

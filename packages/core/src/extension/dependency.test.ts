@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { PLUGIN_DIAGNOSTIC_CODES } from "./diagnostic-codes.js";
 import { createFormEnvironment } from "./create-form-environment.js";
-import { CORE_PLUGIN_ID } from "./built-in.js";
+import { CORE_PLUGIN_ID } from "../widget/built-in.js";
 import { resolvePluginGraph } from "./dependency-graph.js";
 import { codesOf, expectBuildError, widgetPlugin } from "./environment.test-utils.js";
 

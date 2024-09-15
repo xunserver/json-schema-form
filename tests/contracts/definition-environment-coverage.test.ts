@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { REPO_ROOT } from "../lib/fs.ts";
+import { REPO_ROOT } from "../lib/fs.js";
 
 const SCENARIOS: readonly { spec: string; scenario: string; files: readonly string[] }[] = [
   {
@@ -60,7 +60,7 @@ const SCENARIOS: readonly { spec: string; scenario: string; files: readonly stri
     scenario: "拒绝 framework binding",
     files: [
       "packages/core/type-tests/extension-plugin.ts",
-      "packages/core/src/extension/built-in.test.ts",
+      "packages/core/src/widget/built-in.test.ts",
     ],
   },
   {
@@ -73,7 +73,7 @@ const SCENARIOS: readonly { spec: string; scenario: string; files: readonly stri
     scenario: "获取默认 Environment",
     files: [
       "packages/core/src/extension/create-form-environment.test.ts",
-      "packages/core/src/extension/built-in.test.ts",
+      "packages/core/src/widget/built-in.test.ts",
     ],
   },
   {
@@ -84,13 +84,13 @@ const SCENARIOS: readonly { spec: string; scenario: string; files: readonly stri
   {
     spec: "core-plugin-environment",
     scenario: "解析默认 text Widget",
-    files: ["packages/core/src/extension/built-in.test.ts"],
+    files: ["packages/core/src/widget/built-in.test.ts"],
   },
   {
     spec: "core-plugin-environment",
     scenario: "默认 Widget 不绑定 UI library",
     files: [
-      "packages/core/src/extension/built-in.test.ts",
+      "packages/core/src/widget/built-in.test.ts",
       "packages/core/type-tests/extension-widget.ts",
     ],
   },

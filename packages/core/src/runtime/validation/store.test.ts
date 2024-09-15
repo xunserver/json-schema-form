@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { ErrorStore } from "./store.js";
 import { toValidationError } from "./errors.js";
-import { asInstancePath } from "../../path/index.js";
-import type { RuntimeNodeId } from "../runtime-node-id.js";
+import { asInstancePath } from "../../model/path/index.js";
+import type { RuntimeNodeId } from "../form/runtime-node-id.js";
 
 function error(source: "schema" | "custom" | "async" | "server", ownerKey: string, runtimeId: RuntimeNodeId, code: string) {
   return {

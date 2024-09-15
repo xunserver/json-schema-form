@@ -6,6 +6,11 @@ import {
   FIRST_PARTY_PACKAGES,
   REQUIRED_PEERS,
   RULE,
+  CORE_COMPILER_SUBDIRS,
+  CORE_FORBIDDEN_TOP_LEVEL_DIRS,
+  CORE_MODEL_SUBDIRS,
+  CORE_RUNTIME_SUBDIRS,
+  CORE_TOP_LEVEL_DIRS,
   frameworkFamily,
   isAllowedEdge,
   isCoreForbiddenPackage,
@@ -33,6 +38,9 @@ export function checkArchitecture(workspaceRoot: string): ArchitectureDiagnostic
 
     diagnostics.push(...checkManifestPolicy(pkg));
     diagnostics.push(...checkSourceImports(pkg, packages, packagesByName));
+    if (pkg.name === "@form/core") {
+      diagnostics.push(...checkCoreLayout(pkg));
+    }
   }
 
   return diagnostics;
@@ -42,6 +50,86 @@ export function formatArchitectureDiagnostic(diagnostic: ArchitectureDiagnostic)
   const location = diagnostic.file ? ` ${diagnostic.file}` : "";
   const specifier = diagnostic.specifier ? ` imported "${diagnostic.specifier}"` : "";
   return `${diagnostic.sourcePackage} -> ${diagnostic.targetPackage} [${diagnostic.rule}]${location}${specifier} ${diagnostic.message}`;
+}
+
+function checkCoreLayout(pkg: DiscoveredPackage): ArchitectureDiagnostic[] {
+  const srcRoot = path.join(pkg.directory, "src");
+  const diagnostics: ArchitectureDiagnostic[] = [];
+  if (!fs.existsSync(srcRoot)) {
+    diagnostics.push(
+      layoutDiagnostic(pkg.name, srcRoot, `Core source root is missing: ${path.relative(pkg.directory, srcRoot)}`),
+    );
+    return diagnostics;
+  }
+
+  const entries = fs.readdirSync(srcRoot, { withFileTypes: true });
+  const dirs = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
+  const files = entries.filter((entry) => entry.isFile()).map((entry) => entry.name);
+  const required = new Set<string>(CORE_TOP_LEVEL_DIRS);
+  const forbidden = new Set<string>(CORE_FORBIDDEN_TOP_LEVEL_DIRS);
+
+  if (!files.includes("index.ts")) {
+    diagnostics.push(layoutDiagnostic(pkg.name, path.join(srcRoot, "index.ts"), "Missing Core entry file index.ts"));
+  }
+
+  for (const extra of files.filter((name) => name !== "index.ts")) {
+    diagnostics.push(
+      layoutDiagnostic(pkg.name, path.join(srcRoot, extra), `Unexpected Core top-level file ${extra}`),
+    );
+  }
+
+  for (const dir of dirs) {
+    if (forbidden.has(dir) || !required.has(dir)) {
+      diagnostics.push(
+        layoutDiagnostic(pkg.name, path.join(srcRoot, dir), `Directory ${dir} is not in the Core architecture set`),
+      );
+    }
+  }
+
+  for (const dir of CORE_TOP_LEVEL_DIRS) {
+    if (!dirs.includes(dir)) {
+      diagnostics.push(layoutDiagnostic(pkg.name, path.join(srcRoot, dir), `Missing Core domain directory ${dir}`));
+    }
+  }
+
+  diagnostics.push(
+    ...checkRequiredSubdirs(pkg.name, path.join(srcRoot, "compiler"), CORE_COMPILER_SUBDIRS),
+    ...checkRequiredSubdirs(pkg.name, path.join(srcRoot, "model"), CORE_MODEL_SUBDIRS),
+    ...checkRequiredSubdirs(pkg.name, path.join(srcRoot, "runtime"), CORE_RUNTIME_SUBDIRS),
+  );
+
+  return diagnostics;
+}
+
+function checkRequiredSubdirs(
+  sourcePackage: string,
+  parent: string,
+  required: readonly string[],
+): ArchitectureDiagnostic[] {
+  const diagnostics: ArchitectureDiagnostic[] = [];
+  if (!fs.existsSync(parent)) {
+    return diagnostics;
+  }
+  const dirs = fs
+    .readdirSync(parent, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name);
+  for (const dir of required) {
+    if (!dirs.includes(dir)) {
+      diagnostics.push(layoutDiagnostic(sourcePackage, path.join(parent, dir), `Missing Core subdomain directory ${dir}`));
+    }
+  }
+  return diagnostics;
+}
+
+function layoutDiagnostic(sourcePackage: string, file: string, message: string): ArchitectureDiagnostic {
+  return {
+    sourcePackage,
+    targetPackage: sourcePackage,
+    rule: RULE.coreLayout,
+    message,
+    file,
+  };
 }
 
 function discoverPackages(workspaceRoot: string): DiscoveredPackage[] {

@@ -1,4 +1,9 @@
 import { createFormEnvironment, definePlugin, defineValidator, defineWidget } from "@form/core";
+import type {
+  SchemaDialectDefinition,
+  SchemaExtensionDefinition,
+  ValueInitializerDefinition,
+} from "@form/core";
 
 export const leakedPlugin = definePlugin({ id: "leaked" });
 export const leakedWidget = defineWidget({
@@ -12,3 +17,6 @@ export const leakedValidator = defineValidator({
   kind: "sync",
   validate: () => [],
 });
+export type LeakedDialect = SchemaDialectDefinition;
+export type LeakedExtension = SchemaExtensionDefinition;
+export type LeakedInitializer = ValueInitializerDefinition;

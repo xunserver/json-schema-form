@@ -86,3 +86,59 @@ Shape Analyzer 必须（SHALL）在不执行 instance validation 且不读取 UI
 - **WHEN** 分析静态 shape
 - **THEN** 所有候选位置进入 static superset，并保留分支来源供后续 Schema Dynamics 编译，当前阶段不计算 Runtime `active`
 
+### Requirement: 非 canonical dialect 通过冻结 Registry 的 Dialect Adapter 转换
+当根 Schema 声明非 Draft 2020-12 的 `$schema` 时，Schema Frontend 必须（SHALL）在冻结 `FormEnvironment` 的 `schemaDialects` Registry 中查找声明该 URI 的唯一 adapter：命中时以 readonly 输入调用其同步 `convert()`，把返回的 Draft 2020-12 Schema 作为后续 meta-validation、reference resolution 与 shape 分析的输入，并在 model diagnostics 中记录 dialect provenance（原 URI、adapter name、Plugin ID）；adapter 返回的 warning 以 `source: "schema"` 并附 `pluginId` 进入 `CompileResult.diagnostics`。未命中时必须（MUST）保留既有 `schema.invalid-dialect` 阻断；adapter throw、返回 thenable、返回非 JSON 或仍声明非 canonical dialect 的结果必须（MUST）以阻断 `CompileError` 报告，且不泄漏原始异常或 partial model。转换不得（MUST NOT）修改调用者的 Definition 对象，也不得访问 global state。子 Schema 内嵌的其他 dialect `$schema` 必须（MUST）产生 unsupported diagnostic 而不是静默按 canonical 解释。
+
+#### Scenario: 通过 adapter 编译 draft-07 Schema
+- **GIVEN** Environment 安装了声明 `http://json-schema.org/draft-07/schema#` 的 dialect adapter，Definition 根 Schema 声明该 URI
+- **WHEN** 调用 `compileForm(definition, { environment })`
+- **THEN** adapter 输出按 Draft 2020-12 完成编译，`model` 存在，diagnostics 含 dialect provenance，输入 Definition 未被修改
+
+#### Scenario: 无 adapter 时保持阻断
+- **GIVEN** 默认 Environment 没有任何 dialect adapter，根 Schema 声明 draft-07
+- **WHEN** 执行编译
+- **THEN** 抛出带 `schema.invalid-dialect` 与 dialect URI 的 `CompileError`，行为与不存在 Registry 时一致
+
+#### Scenario: adapter 失败不产生 partial model
+- **GIVEN** 命中的 adapter 在 `convert()` 中 throw，或返回仍带 draft-07 `$schema` 的结果
+- **WHEN** 执行编译
+- **THEN** 以稳定 code、`SchemaPath` `#`、adapter name 与 Plugin ID 的 `CompileError` 失败，diagnostic message 不包含原始异常对象或 stack
+
+#### Scenario: 相同输入重复转换结果等价
+- **GIVEN** 同一 Definition 与同一 Environment
+- **WHEN** 连续两次编译
+- **THEN** 两次 `CompiledFormModel` 的结构、ID、diagnostics 顺序与 provenance 语义相同，adapter 每次都只接收 readonly 输入
+
+### Requirement: 已声明的 x-* keyword 在编译前拆分为标准输入
+Schema Frontend 必须（SHALL）在 normalization 阶段识别冻结 `schemaExtensions` Registry 中已声明的 `x-*` keyword：对每个出现位置，以 readonly keyword 值、`SchemaPath` 与该位置实例化后的 `ModelPath` 调用同步 `split()`，把返回的 `FieldUI`、Rule Definition 与 Form Config 片段合并进本次编译的 UI Schema、Rules 与 Form Config 输入，并从 canonical Schema 中移除该 keyword 且记录 derived provenance。显式 `uiSchema.fields[modelPath]`、`rules` 与 `config` 必须（MUST）保持 authoritative：与片段重叠的键以 warning diagnostic 报告并忽略片段值。合并后的片段必须（MUST）经过与手写输入相同的 UI/Rule/Config 校验与 diagnostics。位于无法映射到 `ModelPath` 的 Schema 位置（例如 `if` 谓词、`$defs` 未被引用的节点）的已声明 keyword 必须（MUST）产生 unsupported diagnostic 而不被应用；未声明的 `x-*` 必须（MUST）继续按既有 warning 处理且不进入任何内部协议；`split()` throw、返回 thenable 或非法片段形状必须（MUST）以阻断 `CompileError` 报告。
+
+#### Scenario: x-ui 拆分为 FieldUI
+- **GIVEN** Environment 安装了声明 `x-ui` 的 extension，其 `split()` 把 `{ widget: "textarea", label: "Bio" }` 映射为 `FieldUI` 片段；Schema 在 `#/properties/bio` 上声明该 keyword 且 `uiSchema` 未配置 `bio`
+- **WHEN** 编译
+- **THEN** `model.ui.fields.get("bio")` 解析为 `textarea` Widget 并带 label，canonical Schema 中不再含 `x-ui`，diagnostics 记录该 Field 的 derived provenance
+
+#### Scenario: 显式 UI Schema 覆盖扩展片段
+- **GIVEN** 同一位置的 `x-ui` 片段声明 `widget: "textarea"`，而 `uiSchema.fields.bio.widget` 显式为 `text`
+- **WHEN** 编译
+- **THEN** 最终 Widget 为 `text`，产生说明重叠键、`ModelPath` 与 extension name 的 warning，且 `model` 正常发布
+
+#### Scenario: 数组模板位置按 ModelPath 拆分
+- **GIVEN** `x-ui` 出现在 `#/properties/products/items/properties/name`
+- **WHEN** 编译
+- **THEN** 片段应用到 `ModelPath` `products[].name`，不产生任何 `products[0]` 形式的 InstancePath，也不修改 DataModel 结构
+
+#### Scenario: 不可映射位置产生 unsupported diagnostic
+- **GIVEN** 已声明的 `x-ui` 出现在 `if` 谓词子 Schema 内
+- **WHEN** 编译
+- **THEN** 产生带 `SchemaPath` 的 unsupported diagnostic，该片段不被应用，编译是否阻断遵循该 diagnostic 的 severity 且不猜测目标 Field
+
+#### Scenario: 未声明 x-* 仍只警告
+- **GIVEN** Schema 含 Environment 未声明的 `x-legacy`
+- **WHEN** 编译
+- **THEN** 行为与本能力引入前一致：产生既有 warning、keyword 不进入 UIModel/RuleModel/Config，也不阻断编译
+
+#### Scenario: split 失败阻断编译
+- **GIVEN** extension 的 `split()` throw 或返回带 function 成员的片段
+- **WHEN** 编译
+- **THEN** 抛出带 `SchemaPath`、extension name 与 Plugin ID 的 `CompileError`，不发布 partial model，不泄漏原始异常
+

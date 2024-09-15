@@ -1,5 +1,5 @@
-import type { InstancePath, ModelPath } from "../src/path/index.js";
-import { parseModelPath, toModelPath } from "../src/path/model-path.js";
+import type { InstancePath, ModelPath } from "../src/model/path/index.js";
+import { parseModelPath, toModelPath } from "../src/model/path/model-path.js";
 
 const staticPath = toModelPath("products[].name");
 const parsed = parseModelPath("coords[#0]");

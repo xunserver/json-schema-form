@@ -92,12 +92,27 @@ Core 必须（SHALL）从 `@form/core` 根入口暴露 `defineForm()`。该 help
 - **THEN** 这些action不属于受支持union，只有静态target的声明式`setValue`可接受
 
 ### Requirement: Form Config 可声明默认serialization policy
-`FormConfig`可以（MAY）以`serializeInactive`声明默认是否包含inactive值，并以named serializer key声明默认Serializer；两者必须（MUST）保持readonly、框架无关且不包含provider function。Runtime调用option可以覆盖这些默认值，但不改变Definition或Compiled Model。
+`FormConfig`可以（MAY）以`serializeInactive`声明默认是否包含inactive值，以named serializer key声明默认Serializer，并以named `valueInitializer` key声明实例化时的默认Value Initializer；三者必须（MUST）保持readonly、框架无关且不包含provider function。Runtime调用option可以覆盖这些默认值，但不改变Definition或Compiled Model。Compiler必须（MUST）校验声明的serializer与valueInitializer key已在编译所用Environment注册，缺失时以阻断`CompileError`报告。
 
 #### Scenario: 声明active-only named serialization
 - **GIVEN** author配置`serializeInactive: false`和serializer key`company.payload`
 - **WHEN** 使用`defineForm()`创建Definition
 - **THEN** 两个literal配置被保留供Compiler校验，不执行serializer或创建Runtime
+
+#### Scenario: 声明named value initializer
+- **GIVEN** author配置`valueInitializer: "company.defaults"`
+- **WHEN** 使用`defineForm()`创建Definition并以注册了该key的Environment编译
+- **THEN** Definition保留该literal key，Compiled Model记录默认initializer key，`defineForm()`与`compileForm()`均不执行initializer
+
+#### Scenario: 拒绝未注册的initializer key
+- **GIVEN** `valueInitializer`指向Environment中不存在的key，或其值不是非空字符串
+- **WHEN** 执行编译
+- **THEN** 以稳定compiler diagnostic code与该key的`CompileError`失败，不发布partial model
+
+#### Scenario: 类型拒绝内嵌provider
+- **GIVEN** author尝试把function直接赋给`FormConfig.valueInitializer`或`FormConfig.serializer`
+- **WHEN** TypeScript检查Definition
+- **THEN** 公共contract只接受string key，定义失败
 
 ### Requirement: Form Config 以名称和ModelPath声明validation计划
 `FormConfig`可以（MAY）声明`schemaValidator` Registry key，并可以（MAY）声明readonly named validator uses；每个use必须（MUST）包含validator key、target `ModelPathLike`、显式dependencies与可选automatic triggers，provider的sync/async/schema类别由冻结Registry descriptor决定。Definition只能（MUST）保存名称、Path、trigger与JSON-compatible options，不得（MUST NOT）内嵌provider function、AJV实例、Runtime binding、`InstancePath`、run token或mutable state。

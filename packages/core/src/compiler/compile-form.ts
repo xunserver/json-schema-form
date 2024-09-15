@@ -1,22 +1,23 @@
 import type { FormDefinition } from "../definition/form-definition.js";
 import type { JsonSchema } from "../definition/json-schema.js";
-import { getSharedDefaultEnvironment } from "../lifecycle/default-environment.js";
-import { rememberEnvironmentIdentity } from "../lifecycle/environment-identity.js";
-import { rememberModelEnvironment } from "../lifecycle/model-provenance.js";
+import { getSharedDefaultEnvironment } from "../engine/default-environment.js";
+import { rememberEnvironmentIdentity } from "../engine/environment-identity.js";
+import { rememberModelEnvironment } from "../engine/model-provenance.js";
 import { COMPILER_DIAGNOSTIC_CODES } from "../model/diagnostic-codes.js";
 import type { CompileOptions } from "../model/compile-options.js";
 import type { CompileResult } from "../model/compile-result.js";
 import { CompileError } from "../model/compile-error.js";
-import { compileDataModel } from "./data-model.js";
+import { compileDataModel } from "./data/data-model.js";
 import { compileSchemaDynamics } from "./dynamics/compile.js";
 import { DiagnosticBag, compilerError } from "./diagnostics.js";
 import { emptyRuleModel, emptySchemaDynamics, emptyValidationModel } from "./empty-ports.js";
 import { CloneShapeError, clonePlain, deepFreeze, isPlainObject } from "./immutable.js";
 import { compileRuleModel } from "./rule/compile.js";
 import { compileValidationModel } from "./validation/compile.js";
+import { applyDeclaredExtensions } from "./schema/extensions.js";
 import { runSchemaFrontend } from "./schema/frontend.js";
 import { analyzeShapes } from "./shape/analyze.js";
-import { compileUIModel } from "./ui-model.js";
+import { compileUIModel } from "./ui/ui-model.js";
 
 export function compileForm(definition: FormDefinition, options?: CompileOptions): CompileResult {
   const diagnostics = new DiagnosticBag();
@@ -28,7 +29,7 @@ export function compileForm(definition: FormDefinition, options?: CompileOptions
   const environment = options?.environment ?? getSharedDefaultEnvironment();
   diagnostics.append(environment.diagnostics);
 
-  const frontend = runSchemaFrontend(snapshot.schema);
+  const frontend = runSchemaFrontend(snapshot.schema, environment);
   diagnostics.append(frontend.diagnostics.snapshot());
 
   if (frontend.graph === undefined || diagnostics.hasErrors()) {
@@ -41,12 +42,21 @@ export function compileForm(definition: FormDefinition, options?: CompileOptions
   }
 
   const data = compileDataModel(shapes.root);
-  const ui = compileUIModel(data, snapshot.uiSchema, environment, diagnostics);
-  const ruleResult = compileRuleModel(snapshot.rules, snapshot.config, data, environment, diagnostics);
-  const dynamicsResult = compileSchemaDynamics(frontend.graph, data, diagnostics);
+  const authoring = applyDeclaredExtensions({
+    graph: frontend.graph,
+    occurrences: frontend.declaredExtensions,
+    data,
+    uiSchema: snapshot.uiSchema,
+    rules: snapshot.rules,
+    config: snapshot.config,
+    diagnostics,
+  });
+  const ui = compileUIModel(data, authoring.uiSchema, environment, diagnostics);
+  const ruleResult = compileRuleModel(authoring.rules, authoring.config, data, environment, diagnostics);
+  const dynamicsResult = compileSchemaDynamics(authoring.graph, data, diagnostics);
   const validationResult = compileValidationModel(
-    snapshot.schema,
-    snapshot.config,
+    authoring.schema,
+    authoring.config,
     data,
     ruleResult.model ?? emptyRuleModel(),
     environment,

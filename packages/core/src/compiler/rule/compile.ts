@@ -8,21 +8,21 @@ import type {
 } from "../../definition/rule-definition.js";
 import type { FormEnvironment } from "../../extension/environment.js";
 import { COMPILER_DIAGNOSTIC_CODES } from "../../model/diagnostic-codes.js";
-import type { DataModel } from "../../model/data.js";
+import type { DataModel } from "../../model/data/data.js";
 import type {
   CompiledRule,
   CompiledRuleAction,
   NormalizedRuleExpression,
   RuleModel,
   SerializationPlan,
-} from "../../model/rule.js";
+} from "../../model/rule/rule.js";
 import { createReadonlyKeyedCollection } from "../../model/readonly-collection.js";
 import {
   ROOT_MODEL_PATH,
   isValidModelPath,
   toModelPath,
   type ModelPath,
-} from "../../path/index.js";
+} from "../../model/path/index.js";
 import { DiagnosticBag, compilerError } from "../diagnostics.js";
 import { CloneShapeError, clonePlain, deepFreeze, isPlainObject } from "../immutable.js";
 import {
@@ -454,6 +454,7 @@ function compileSerialization(
 ): SerializationPlan {
   let serializeInactive = false;
   let serializer: string | undefined;
+  let valueInitializer: string | undefined;
   if (config === undefined) {
     return deepFreeze({ serializeInactive });
   }
@@ -488,9 +489,33 @@ function compileSerialization(
       }
     }
   }
+  if (config.valueInitializer !== undefined) {
+    if (typeof config.valueInitializer !== "string" || config.valueInitializer.length === 0) {
+      diagnostics.push(
+        compilerError(
+          COMPILER_DIAGNOSTIC_CODES.INITIALIZER_MISSING,
+          "valueInitializer key must be a non-empty string",
+        ),
+      );
+    } else {
+      valueInitializer = config.valueInitializer;
+      if (!environment.valueInitializers.has(valueInitializer)) {
+        diagnostics.push(
+          compilerError(
+            COMPILER_DIAGNOSTIC_CODES.INITIALIZER_MISSING,
+            "Configured value initializer is not registered",
+            {
+              metadata: { valueInitializer },
+            },
+          ),
+        );
+      }
+    }
+  }
   return deepFreeze({
     serializeInactive,
     ...(serializer === undefined ? {} : { serializer }),
+    ...(valueInitializer === undefined ? {} : { valueInitializer }),
   });
 }
 

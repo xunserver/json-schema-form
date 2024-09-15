@@ -1,6 +1,6 @@
 import type { Diagnostic, DiagnosticSource } from "../diagnostic/index.js";
 import { freezeDiagnostic } from "../diagnostic/freeze.js";
-import type { ModelPath, SchemaPath } from "../path/index.js";
+import type { ModelPath, SchemaPath } from "../model/path/index.js";
 import {
   COMPILER_DIAGNOSTIC_CODES,
   DIAGNOSTIC_CODE_RANK,
@@ -104,6 +104,7 @@ export function schemaError(
   message: string,
   schemaPath: SchemaPath,
   metadata?: Readonly<Record<string, unknown>>,
+  pluginId?: string,
 ): DiagnosticInput {
   return {
     code,
@@ -111,6 +112,7 @@ export function schemaError(
     message,
     source: "schema",
     schemaPath,
+    ...(pluginId === undefined ? {} : { pluginId }),
     ...(metadata === undefined ? {} : { metadata }),
   };
 }
@@ -120,6 +122,7 @@ export function schemaWarning(
   message: string,
   schemaPath: SchemaPath,
   metadata?: Readonly<Record<string, unknown>>,
+  pluginId?: string,
 ): DiagnosticInput {
   return {
     code,
@@ -127,6 +130,25 @@ export function schemaWarning(
     message,
     source: "schema",
     schemaPath,
+    ...(pluginId === undefined ? {} : { pluginId }),
+    ...(metadata === undefined ? {} : { metadata }),
+  };
+}
+
+export function schemaInfo(
+  code: (typeof SCHEMA_DIAGNOSTIC_CODES)[keyof typeof SCHEMA_DIAGNOSTIC_CODES],
+  message: string,
+  schemaPath: SchemaPath,
+  metadata?: Readonly<Record<string, unknown>>,
+  pluginId?: string,
+): DiagnosticInput {
+  return {
+    code,
+    severity: "info",
+    message,
+    source: "schema",
+    schemaPath,
+    ...(pluginId === undefined ? {} : { pluginId }),
     ...(metadata === undefined ? {} : { metadata }),
   };
 }
@@ -137,6 +159,7 @@ export function compilerError(
   options?: {
     readonly schemaPath?: SchemaPath;
     readonly modelPath?: ModelPath;
+    readonly pluginId?: string;
     readonly metadata?: Readonly<Record<string, unknown>>;
   },
 ): DiagnosticInput {
@@ -147,6 +170,7 @@ export function compilerError(
     source: "compiler",
     ...(options?.schemaPath === undefined ? {} : { schemaPath: options.schemaPath }),
     ...(options?.modelPath === undefined ? {} : { modelPath: options.modelPath }),
+    ...(options?.pluginId === undefined ? {} : { pluginId: options.pluginId }),
     ...(options?.metadata === undefined ? {} : { metadata: options.metadata }),
   };
 }
@@ -157,6 +181,7 @@ export function compilerWarning(
   options?: {
     readonly schemaPath?: SchemaPath;
     readonly modelPath?: ModelPath;
+    readonly pluginId?: string;
     readonly metadata?: Readonly<Record<string, unknown>>;
   },
 ): DiagnosticInput {
@@ -167,6 +192,7 @@ export function compilerWarning(
     source: "compiler",
     ...(options?.schemaPath === undefined ? {} : { schemaPath: options.schemaPath }),
     ...(options?.modelPath === undefined ? {} : { modelPath: options.modelPath }),
+    ...(options?.pluginId === undefined ? {} : { pluginId: options.pluginId }),
     ...(options?.metadata === undefined ? {} : { metadata: options.metadata }),
   };
 }

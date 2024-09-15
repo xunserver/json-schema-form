@@ -1,12 +1,12 @@
-import type { DataModel, PropertyEdge, PropertyOrigin } from "../../model/data.js";
-import { objectPropertyEdges } from "../../model/data.js";
-import type { FieldRequirementPresentation } from "../../model/ui.js";
+import type { DataModel, PropertyEdge, PropertyOrigin } from "../../model/data/data.js";
+import { objectPropertyEdges } from "../../model/data/data.js";
+import type { FieldRequirementPresentation } from "../../model/ui/ui.js";
 import {
   formatSchemaPath,
   parseSchemaPath,
   type ModelPath,
   type SchemaPath,
-} from "../../path/index.js";
+} from "../../model/path/index.js";
 
 interface IncomingPropertyEdge {
   readonly ownerPath: ModelPath;

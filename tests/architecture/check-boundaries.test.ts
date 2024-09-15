@@ -1,9 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { checkArchitecture } from "../../tools/architecture-check/check.ts";
-import { ALLOWED_EDGES, RULE } from "../../tools/architecture-check/policy.ts";
-import { REPO_ROOT, copyWorkspacePackages, makeTempDir, readJson, writeText } from "../lib/fs.ts";
+import { checkArchitecture } from "../../tools/architecture-check/check.js";
+import { ALLOWED_EDGES, RULE } from "../../tools/architecture-check/policy.js";
+import { REPO_ROOT, copyWorkspacePackages, makeTempDir, readJson, writeText } from "../lib/fs.js";
 
 type Manifest = {
   name: string;
@@ -177,6 +177,37 @@ describe("architecture checker", () => {
           diagnostic.rule === RULE.forbiddenCorePackage &&
           diagnostic.sourcePackage === "@form/react" &&
           diagnostic.targetPackage === "ajv",
+      ),
+    ).toBe(true);
+  });
+
+  test("rejects an unexpected Core top-level directory", () => {
+    const root = copyRepoPackages();
+    fs.mkdirSync(path.join(root, "packages", "core", "src", "utils"));
+    writeText(path.join(root, "packages", "core", "src", "utils", "helper.ts"), "export const n = 1;\n");
+
+    const diagnostics = checkArchitecture(root);
+    expect(
+      diagnostics.some(
+        (diagnostic) =>
+          diagnostic.rule === RULE.coreLayout &&
+          diagnostic.file?.includes(`${path.sep}utils`) &&
+          diagnostic.message.includes("utils"),
+      ),
+    ).toBe(true);
+  });
+
+  test("rejects a missing Core domain directory", () => {
+    const root = copyRepoPackages();
+    fs.rmSync(path.join(root, "packages", "core", "src", "widget"), { recursive: true, force: true });
+
+    const diagnostics = checkArchitecture(root);
+    expect(
+      diagnostics.some(
+        (diagnostic) =>
+          diagnostic.rule === RULE.coreLayout &&
+          diagnostic.file?.includes(`${path.sep}widget`) &&
+          diagnostic.message.includes("widget"),
       ),
     ).toBe(true);
   });

@@ -1,7 +1,7 @@
 import { definePlugin } from "../src/extension/plugin.js";
 import type { FormPlugin, PluginContributions } from "../src/extension/plugin.js";
 import type { RegistryKind } from "../src/extension/registry.js";
-import type { WidgetDefinition } from "../src/extension/widget.js";
+import type { WidgetDefinition } from "../src/widget/widget.js";
 import type { InstrumentationDefinition, ValidatorDefinition } from "../src/extension/contributions.js";
 
 const plugin = definePlugin({

@@ -1,4 +1,4 @@
-import { unescapeJsonPointerToken } from "../../path/schema-path.js";
+import { unescapeJsonPointerToken } from "../../model/path/schema-path.js";
 
 export function splitJsonPointer(pointer: string): readonly string[] {
   const normalized = pointer.startsWith("#") ? pointer.slice(1) : pointer;

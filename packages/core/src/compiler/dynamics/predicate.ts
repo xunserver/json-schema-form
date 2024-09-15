@@ -1,16 +1,16 @@
 import type { JsonSchema, JsonSchemaObject } from "../../definition/json-schema.js";
 import type { JsonValue } from "../../definition/json-value.js";
-import type { ActivationPredicate } from "../../model/schema-dynamics.js";
+import type { ActivationPredicate } from "../../model/schema-dynamics/schema-dynamics.js";
 import {
   ROOT_MODEL_PATH,
   childSchemaPath,
   joinModelPath,
   type ModelPath,
   type SchemaPath,
-} from "../../path/index.js";
+} from "../../model/path/index.js";
 import type { CanonicalSchemaGraph, CanonicalSchemaNode } from "../schema/frontend.js";
 import { asObjectSchema } from "../schema/frontend.js";
-import { hasOwn, isJsonSchema, isJsonSchemaObject } from "../schema/keywords.js";
+import { hasOwn, isJsonSchema, isJsonSchemaObject } from "../../schema/keywords.js";
 import { CloneShapeError, clonePlain } from "../immutable.js";
 
 const UNSUPPORTED_KEYWORDS = new Set([

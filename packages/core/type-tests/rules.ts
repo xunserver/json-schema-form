@@ -46,6 +46,7 @@ void effect;
 const config: FormConfig = {
   serializeInactive: false,
   serializer: "company.payload",
+  valueInitializer: "company.defaults",
 };
 void config;
 
@@ -55,6 +56,23 @@ const authored = defineForm({
   config,
 });
 void authored.config?.serializer;
+void authored.config?.valueInitializer;
+
+defineForm({
+  schema: true,
+  config: {
+    // @ts-expect-error valueInitializer cannot be a provider function
+    valueInitializer: () => ({}),
+  },
+});
+
+defineForm({
+  schema: true,
+  config: {
+    // @ts-expect-error serializer cannot be a provider function
+    serializer: () => ({}),
+  },
+});
 
 const badState: StateRuleDefinition = {
   kind: "state",

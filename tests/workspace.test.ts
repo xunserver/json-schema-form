@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { REPO_ROOT, readJson } from "./lib/fs.ts";
+import { REPO_ROOT, readJson } from "./lib/fs.js";
 
 const FIRST_PARTY_PACKAGES = [
   "@form/core",

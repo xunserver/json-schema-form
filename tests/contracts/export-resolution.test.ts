@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { describe, expect, test } from "vitest";
-import { REPO_ROOT } from "../lib/fs.ts";
+import { REPO_ROOT } from "../lib/fs.js";
 
 function resolveWithNode(specifier: string): { status: number; stdout: string; stderr: string } {
   const result = spawnSync(

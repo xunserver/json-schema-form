@@ -1,4 +1,4 @@
-import type { ModelPathLike } from "../path/index.js";
+import type { ModelPathLike } from "../model/path/index.js";
 import type { JsonValue } from "./json-value.js";
 
 export type ValidationTrigger = "change" | "blur" | "submit" | "manual";
@@ -26,4 +26,5 @@ export interface FormConfig {
   readonly preserveServerErrorsOnChange?: boolean;
   readonly serializeInactive?: boolean;
   readonly serializer?: string;
+  readonly valueInitializer?: string;
 }

@@ -1,5 +1,5 @@
 import { spawnSync, type SpawnSyncReturns } from "node:child_process";
-import { REPO_ROOT } from "./fs.ts";
+import { REPO_ROOT } from "./fs.js";
 
 export function runNodeProcess(
   command: string,

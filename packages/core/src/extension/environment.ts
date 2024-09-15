@@ -16,7 +16,7 @@ import type {
   ValidatorDefinition,
   ValueInitializerDefinition,
 } from "./contributions.js";
-import type { WidgetDefinition } from "./widget.js";
+import type { WidgetDefinition } from "../widget/widget.js";
 
 export interface FormEnvironment {
   readonly protocol: ProtocolVersion;

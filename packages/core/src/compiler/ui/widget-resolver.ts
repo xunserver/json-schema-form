@@ -1,10 +1,10 @@
 import type { FormEnvironment } from "../../extension/environment.js";
-import type { WidgetDefinition, WidgetMatcher } from "../../extension/widget.js";
-import { inspectWidgetInteraction } from "../../extension/widget.js";
+import type { WidgetDefinition, WidgetMatcher } from "../../widget/widget.js";
+import { inspectWidgetInteraction } from "../../widget/widget.js";
 import type { FieldUI } from "../../definition/ui-schema.js";
-import type { DataNode } from "../../model/data.js";
+import type { DataNode } from "../../model/data/data.js";
 import { COMPILER_DIAGNOSTIC_CODES } from "../../model/diagnostic-codes.js";
-import type { ModelPath } from "../../path/index.js";
+import type { ModelPath } from "../../model/path/index.js";
 import { DiagnosticBag, compilerError, compilerWarning } from "../diagnostics.js";
 
 const CATEGORY_RANK = {

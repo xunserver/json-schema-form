@@ -2,7 +2,7 @@ import type {
   DataNode,
   ObjectDataNode,
   ScalarDataNode,
-} from "../src/model/data.js";
+} from "../src/model/data/data.js";
 import type {
   FieldDescriptor,
   FieldRequirementPresentation,
@@ -10,7 +10,7 @@ import type {
   GroupView,
   ObjectView,
   ViewNode,
-} from "../src/model/ui.js";
+} from "../src/model/ui/ui.js";
 
 declare const data: DataNode;
 declare const field: FieldDescriptor;

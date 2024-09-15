@@ -1,7 +1,7 @@
 export { definePlugin } from "./plugin.js";
 export type { FormPlugin, PluginContributions } from "./plugin.js";
 
-export { defineWidget } from "./define-widget.js";
+export { defineWidget } from "../widget/define-widget.js";
 export { defineRuleFunction } from "./define-rule-function.js";
 export { defineValidator } from "./define-validator.js";
 
@@ -13,7 +13,7 @@ export type { ProtocolCompatibility, ProtocolVersion } from "./protocol.js";
 export { PLUGIN_DIAGNOSTIC_CODES } from "./diagnostic-codes.js";
 export type { PluginDiagnosticCode } from "./diagnostic-codes.js";
 
-export { BUILTIN_WIDGET_KEYS, FULL_WIDGET_INTERACTION, WIDGET_SEMANTIC_ACTIONS } from "./widget.js";
+export { BUILTIN_WIDGET_KEYS, FULL_WIDGET_INTERACTION, WIDGET_SEMANTIC_ACTIONS } from "../widget/widget.js";
 export type {
   BuiltinWidgetKey,
   JsonValueType,
@@ -29,12 +29,14 @@ export type {
   WidgetPropsContract,
   WidgetSemanticAction,
   WidgetValueContract,
-} from "./widget.js";
+} from "../widget/widget.js";
 
 export type {
   AsyncValidatorDefinition,
   CustomValidatorContext,
   CustomValidatorIssue,
+  DialectConvertResult,
+  DialectDiagnostic,
   InstrumentationDefinition,
   InstrumentationObservation,
   RuleFunctionDefinition,
@@ -43,6 +45,8 @@ export type {
   SchemaAdapterIssue,
   SchemaDialectDefinition,
   SchemaExtensionDefinition,
+  SchemaExtensionSplitInput,
+  SchemaExtensionSplitResult,
   SchemaValidateAffectedInput,
   SchemaValidateAllInput,
   SchemaValidateAtInput,
@@ -53,6 +57,7 @@ export type {
   ValidatorDefinition,
   ValidatorKind,
   ValueInitializerDefinition,
+  ValueInitializerInput,
 } from "./contributions.js";
 
 export { REGISTRY_KINDS } from "./registry.js";

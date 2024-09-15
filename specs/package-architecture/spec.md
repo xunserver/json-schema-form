@@ -63,18 +63,41 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **WHEN** 运行 Core 独立性检查
 - **THEN** 至少一项检查失败，并指出禁止依赖或不可用的 DOM 契约
 
+### Requirement: Core 内部目录按架构生命周期领域组织
+`packages/core/src/` 的顶层目录必须（SHALL）恰好为 `definition/`、`schema/`、`compiler/`、`model/`、`runtime/`、`widget/`、`rule/`、`validation/`、`extension/`、`diagnostic/`、`engine/` 与入口 `index.ts`；`compiler/` 必须（MUST）包含 `schema/`、`shape/`、`data/`、`ui/`、`rule/`、`validation/` 子领域，`model/` 必须（MUST）包含 `data/`、`ui/`、`rule/`、`validation/`、`schema-dynamics/`，`runtime/` 必须（MUST）包含 `form/`、`value/`、`state/`、`transaction/`、`array/`、`dependency/`、`subscription/`、`scope/`。领域内可以（MAY）存在内部 `index.ts` 与局部 helper 文件，测试必须（MUST）与其领域代码 colocate；不得（MUST NOT）建立顶层 `types/`、`services/`、`utils/` 目录。目录调整不得（MUST NOT）改变 package `exports`、公开 declarations 或运行时行为。
+
+#### Scenario: 顶层目录与架构一致
+- **GIVEN** 当前 `packages/core/src` 布局
+- **WHEN** 运行仓库边界检查
+- **THEN** 顶层目录集合与要求的集合完全一致，缺失或多出的目录会以目录名与规则 ID 报告
+
+#### Scenario: 子领域目录存在且承载对应代码
+- **GIVEN** `compiler/`、`model/`、`runtime/` 三个领域
+- **WHEN** 检查其子目录
+- **THEN** 要求的子领域目录全部存在，Validation compiler/model/runtime 代码位于对应 `validation/` 子目录，array identity 与 scope facade 位于 `runtime/array/` 与 `runtime/scope/`
+
+#### Scenario: 目录迁移不改变公共边界
+- **GIVEN** 目录按本要求调整前后的两次构建
+- **WHEN** 比较 package `exports`、生成的 declarations 与 consumer contract fixtures
+- **THEN** 三个 Core 入口的公开符号集合不变，正负 consumer fixtures 结果不变，deep import 仍被拒绝
+
+#### Scenario: 拒绝垃圾桶目录
+- **GIVEN** 有人在 `packages/core/src` 新增顶层 `utils/` 目录
+- **WHEN** 运行仓库边界检查
+- **THEN** 检查以失败状态退出并指出该目录不属于架构领域集合
+
 ### Requirement: 仓库验证包含边界检查
-仓库必须（SHALL）提供可重复运行的验证命令，从干净 checkout 检查 manifest、源码依赖方向、Core 独立性、package 构建、类型正确性和边界契约测试。
+仓库必须（SHALL）提供可重复运行的验证命令，从干净 checkout 检查 manifest、源码依赖方向、Core 独立性、Core 内部目录领域集合、package 构建、类型正确性和边界契约测试。
 
 #### Scenario: 验证未修改的合规工作区
 - **GIVEN** 一个所有 package 均符合声明边界的干净 checkout
 - **WHEN** 运行仓库验证命令
-- **THEN** 所有架构与 package 契约检查均通过，且不要求存在应用示例
+- **THEN** 所有架构、目录与 package 契约检查均通过，且不要求存在应用示例
 
 #### Scenario: 报告可操作的边界错误
-- **GIVEN** 存在 manifest、import 或编译器 library 违规
+- **GIVEN** 存在 manifest、import、目录集合或编译器 library 违规
 - **WHEN** 运行仓库验证
-- **THEN** 命令以失败状态退出，并报告足以定位问题的 package 和规则信息
+- **THEN** 命令以失败状态退出，并报告足以定位问题的 package、路径和规则信息
 
 ### Requirement: AJV具体依赖与实现只属于validator package
 `@form/validator-ajv`必须（SHALL）作为`@form/core` Validator Adapter协议的叶子实现持有AJV生产依赖，并且只能沿既有`@form/validator-ajv -> @form/core`产品依赖边消费公共契约。`@form/core`及Vue、React、Element Plus、MUI package不得（MUST NOT）直接依赖、导入或在公共declaration中引用AJV类型；Core validation行为必须（MUST）在没有AJV package时仍可构建和类型检查。

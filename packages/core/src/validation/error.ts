@@ -1,5 +1,5 @@
 import type { JsonValue } from "../definition/json-value.js";
-import type { InstancePath, ModelPath, SchemaPath } from "../path/index.js";
+import type { InstancePath, ModelPath, SchemaPath } from "../model/path/index.js";
 
 export type ValidationErrorSource = "schema" | "custom" | "async" | "server";
 

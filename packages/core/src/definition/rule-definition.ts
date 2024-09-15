@@ -1,6 +1,6 @@
-import type { ModelPathLike } from "../path/index.js";
+import type { ModelPathLike } from "../model/path/index.js";
 import type { JsonValue } from "./json-value.js";
-import type { RuleAst, RuleExpression } from "./rule-expression.js";
+import type { RuleAst, RuleExpression } from "../rule/expression.js";
 
 export type { RuleAst, RuleExpression };
 

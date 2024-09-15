@@ -1,5 +1,5 @@
-import type { ArrayItemId, DataNodeId, ViewNodeId } from "../src/identity/index.js";
-import type { InstancePath } from "../src/path/index.js";
+import type { ArrayItemId, DataNodeId, ViewNodeId } from "../src/model/identity/index.js";
+import type { InstancePath } from "../src/model/path/index.js";
 
 declare const dataNodeId: DataNodeId;
 declare const viewNodeId: ViewNodeId;

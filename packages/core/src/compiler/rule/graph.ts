@@ -1,5 +1,5 @@
-import type { CompiledRule } from "../../model/rule.js";
-import type { ModelPath } from "../../path/index.js";
+import type { CompiledRule } from "../../model/rule/rule.js";
+import type { ModelPath } from "../../model/path/index.js";
 
 export interface ComputedGraphResult {
   readonly order: readonly string[];

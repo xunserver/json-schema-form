@@ -1,13 +1,18 @@
 import type { JsonSchema, JsonSchemaObject, JsonSchemaType } from "../../definition/json-schema.js";
+import type { JsonValue } from "../../definition/json-value.js";
+import type { FormEnvironment } from "../../extension/environment.js";
 import { SCHEMA_DIAGNOSTIC_CODES } from "../../model/diagnostic-codes.js";
 import {
   ROOT_SCHEMA_PATH,
   asSchemaPath,
   childSchemaPath,
   type SchemaPath,
-} from "../../path/index.js";
+} from "../../model/path/index.js";
 import { DiagnosticBag, schemaError, schemaWarning } from "../diagnostics.js";
-import { isDraft202012Dialect } from "./dialect.js";
+import { clonePlain, deepFreeze } from "../immutable.js";
+import { convertRootDialect } from "./dialect-adapter.js";
+import { buildSchemaExtensionIndex, type DeclaredExtensionOccurrence } from "./extensions.js";
+import { isDraft202012Dialect } from "../../schema/dialect.js";
 import {
   JSON_SCHEMA_TYPES,
   KNOWN_KEYWORDS,
@@ -17,7 +22,7 @@ import {
   isExtensionKeyword,
   isJsonSchema,
   isJsonSchemaObject,
-} from "./keywords.js";
+} from "../../schema/keywords.js";
 import { getAtPointer, isJsonPointerFragment } from "./pointer.js";
 import {
   DEFAULT_SCHEMA_BASE_URI,
@@ -27,37 +32,13 @@ import {
   splitUri,
 } from "./uri.js";
 
-export interface SchemaRefEdge {
-  readonly href: string;
-  readonly targetId?: string;
-  readonly cycle: boolean;
-  readonly external: boolean;
-  readonly unresolved: boolean;
-}
-
-export interface CanonicalSchemaNode {
-  readonly id: string;
-  readonly schemaPath: SchemaPath;
-  readonly resourceUri: string;
-  readonly pointer: string;
-  readonly booleanValue?: boolean;
-  readonly schema: JsonSchema;
-  readonly ref?: SchemaRefEdge;
-  readonly dynamicRef?: string;
-  readonly anchors: readonly string[];
-  readonly childIds: Readonly<Record<string, string | readonly string[]>>;
-  readonly extensionKeys: readonly string[];
-}
-
-export interface CanonicalSchemaGraph {
-  readonly rootId: string;
-  readonly dialect: "draft-2020-12";
-  readonly nodes: ReadonlyMap<string, CanonicalSchemaNode>;
-}
+import type { CanonicalSchemaGraph, CanonicalSchemaNode, SchemaRefEdge } from "./graph.js";
+export type { CanonicalSchemaGraph, CanonicalSchemaNode, SchemaRefEdge };
 
 export interface SchemaFrontendResult {
   readonly graph?: CanonicalSchemaGraph;
   readonly diagnostics: DiagnosticBag;
+  readonly declaredExtensions: readonly DeclaredExtensionOccurrence[];
 }
 
 interface ResourceRecord {
@@ -75,18 +56,28 @@ interface WalkFrame {
   readonly baseUri: string;
 }
 
-export function runSchemaFrontend(schema: JsonSchema): SchemaFrontendResult {
+export function runSchemaFrontend(
+  schema: JsonSchema,
+  environment?: FormEnvironment,
+): SchemaFrontendResult {
   const diagnostics = new DiagnosticBag();
-  if (!checkDialect(schema, diagnostics)) {
-    return { diagnostics };
+  const declaredExtensions: DeclaredExtensionOccurrence[] = [];
+  if (environment === undefined) {
+    if (!checkDialect(schema, diagnostics)) {
+      return { diagnostics, declaredExtensions };
+    }
+  }
+  const working = environment === undefined ? schema : convertRootDialect(schema, environment, diagnostics)?.schema;
+  if (working === undefined) {
+    return { diagnostics, declaredExtensions };
   }
 
-  const resources = collectResources(schema, diagnostics);
+  const resources = collectResources(working, diagnostics);
   const nodes = new Map<string, CanonicalSchemaNode>();
   const visiting = new Set<string>();
   walkSchema(
     {
-      schema,
+      schema: working,
       schemaPath: ROOT_SCHEMA_PATH,
       resourceUri: resources.rootUri,
       pointer: "",
@@ -96,6 +87,8 @@ export function runSchemaFrontend(schema: JsonSchema): SchemaFrontendResult {
     nodes,
     visiting,
     diagnostics,
+    environment,
+    declaredExtensions,
   );
 
   resolveReferences(nodes, resources, diagnostics);
@@ -106,7 +99,7 @@ export function runSchemaFrontend(schema: JsonSchema): SchemaFrontendResult {
     nodes,
   };
 
-  return { graph, diagnostics };
+  return { graph, diagnostics, declaredExtensions };
 }
 
 function checkDialect(schema: JsonSchema, diagnostics: DiagnosticBag): boolean {
@@ -205,6 +198,8 @@ function walkSchema(
   nodes: Map<string, CanonicalSchemaNode>,
   visiting: Set<string>,
   diagnostics: DiagnosticBag,
+  environment: FormEnvironment | undefined,
+  declaredExtensions: DeclaredExtensionOccurrence[],
 ): string {
   let resourceUri = frame.resourceUri;
   let pointer = frame.pointer;
@@ -243,9 +238,23 @@ function walkSchema(
   }
 
   validateKeywords(schema, frame.schemaPath, diagnostics);
+  warnEmbeddedDialect(schema, frame.schemaPath, diagnostics);
 
+  const extensionIndex = environment === undefined ? undefined : buildSchemaExtensionIndex(environment);
   const extensionKeys = Object.keys(schema).filter(isExtensionKeyword);
   for (const key of extensionKeys) {
+    const declared = extensionIndex?.get(key);
+    if (declared !== undefined) {
+      declaredExtensions.push({
+        keyword: declared.extension.keyword,
+        schemaPath: frame.schemaPath,
+        value: deepFreezeValue((schema as Record<string, unknown>)[key]),
+        extension: declared.extension,
+        pluginId: declared.pluginId,
+        key: declared.key,
+      });
+      continue;
+    }
     diagnostics.push(
       schemaWarning(
         SCHEMA_DIAGNOSTIC_CODES.UNSUPPORTED_EXTENSION,
@@ -294,6 +303,8 @@ function walkSchema(
       nodes,
       visiting,
       diagnostics,
+      environment,
+      declaredExtensions,
     );
     const key = tokens.join("/");
     const existing = childIds[key];
@@ -684,6 +695,31 @@ function isBooleanMap(value: unknown): boolean {
 
 function isNonNegativeInteger(value: unknown): boolean {
   return typeof value === "number" && Number.isInteger(value) && value >= 0;
+}
+
+function warnEmbeddedDialect(schema: JsonSchemaObject, schemaPath: SchemaPath, diagnostics: DiagnosticBag): void {
+  if (schemaPath === ROOT_SCHEMA_PATH) {
+    return;
+  }
+  const declared = schema.$schema;
+  if (declared === undefined) {
+    return;
+  }
+  if (typeof declared === "string" && isDraft202012Dialect(declared)) {
+    return;
+  }
+  diagnostics.push(
+    schemaWarning(
+      SCHEMA_DIAGNOSTIC_CODES.EMBEDDED_DIALECT,
+      `Embedded $schema dialect is not converted: ${String(declared)}`,
+      childSchemaPath(schemaPath, "$schema"),
+      { dialect: declared },
+    ),
+  );
+}
+
+function deepFreezeValue(value: unknown): JsonValue {
+  return deepFreeze(clonePlain(value as JsonValue));
 }
 
 export function getChildId(

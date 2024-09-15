@@ -4,7 +4,7 @@ import type {
   ModelPath,
   ModelPathLike,
   SchemaPath,
-} from "../src/path/index.js";
+} from "../src/model/path/index.js";
 
 declare const schemaPath: SchemaPath;
 declare const modelPath: ModelPath;

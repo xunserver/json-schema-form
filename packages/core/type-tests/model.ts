@@ -1,10 +1,10 @@
 import type { CompileResult } from "../src/model/compile-result.js";
 import type { CompiledFormModel } from "../src/model/compiled-form-model.js";
-import type { DataModel } from "../src/model/data.js";
-import type { RuleModel } from "../src/model/rule.js";
-import type { SchemaDynamics } from "../src/model/schema-dynamics.js";
-import type { UIModel } from "../src/model/ui.js";
-import type { ValidationModel } from "../src/model/validation.js";
+import type { DataModel } from "../src/model/data/data.js";
+import type { RuleModel } from "../src/model/rule/rule.js";
+import type { SchemaDynamics } from "../src/model/schema-dynamics/schema-dynamics.js";
+import type { UIModel } from "../src/model/ui/ui.js";
+import type { ValidationModel } from "../src/model/validation/validation.js";
 
 declare const model: CompiledFormModel;
 declare const result: CompileResult;

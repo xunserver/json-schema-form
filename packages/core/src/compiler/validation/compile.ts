@@ -8,21 +8,21 @@ import type {
 import type { JsonValue } from "../../definition/json-value.js";
 import type { FormEnvironment } from "../../extension/environment.js";
 import { COMPILER_DIAGNOSTIC_CODES } from "../../model/diagnostic-codes.js";
-import type { DataModel } from "../../model/data.js";
-import type { CompiledRule, RuleModel } from "../../model/rule.js";
+import type { DataModel } from "../../model/data/data.js";
+import type { CompiledRule, RuleModel } from "../../model/rule/rule.js";
 import { createReadonlyKeyedCollection } from "../../model/readonly-collection.js";
 import type {
   NamedValidationPlan,
   SchemaValidationPlan,
   ValidationModel,
   ValidationRulePlan,
-} from "../../model/validation.js";
+} from "../../model/validation/validation.js";
 import {
   ROOT_MODEL_PATH,
   isValidModelPath,
   toModelPath,
   type ModelPath,
-} from "../../path/index.js";
+} from "../../model/path/index.js";
 import { DiagnosticBag, compilerError, compilerWarning } from "../diagnostics.js";
 import { CloneShapeError, clonePlain, deepFreeze, isPlainObject } from "../immutable.js";
 import { analyzeScopeCompatibility } from "../rule/scope.js";

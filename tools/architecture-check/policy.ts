@@ -49,9 +49,39 @@ export const RULE = {
   forbiddenCorePackage: "forbidden-core-package",
   hostPeerPlacement: "host-peer-placement",
   missingPeer: "missing-peer",
+  coreLayout: "core-layout",
 } as const;
 
 export type RuleId = (typeof RULE)[keyof typeof RULE];
+
+export const CORE_TOP_LEVEL_DIRS = [
+  "definition",
+  "schema",
+  "compiler",
+  "model",
+  "runtime",
+  "widget",
+  "rule",
+  "validation",
+  "extension",
+  "diagnostic",
+  "engine",
+] as const;
+
+export const CORE_COMPILER_SUBDIRS = ["schema", "shape", "data", "ui", "rule", "validation"] as const;
+export const CORE_MODEL_SUBDIRS = ["data", "ui", "rule", "validation", "schema-dynamics"] as const;
+export const CORE_RUNTIME_SUBDIRS = [
+  "form",
+  "value",
+  "state",
+  "transaction",
+  "array",
+  "dependency",
+  "subscription",
+  "scope",
+] as const;
+
+export const CORE_FORBIDDEN_TOP_LEVEL_DIRS = ["types", "services", "utils"] as const;
 
 export function isFirstPartyPackage(name: string): name is FirstPartyPackage {
   return (FIRST_PARTY_PACKAGES as readonly string[]).includes(name);

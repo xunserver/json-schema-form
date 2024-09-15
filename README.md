@@ -2,7 +2,7 @@
 
 以 JSON Schema 为数据契约的表单引擎。当前仓库完成的是 pnpm/TypeScript 工作区、六个首期 package 边界，以及 `@form/core` 的框架无关公共契约：无副作用的 `defineForm()`、可诊断的冻结 `FormEnvironment`、把 Draft 2020-12 Schema / UI Schema / Rule AST / Schema Dynamics 编译为不可变静态模型的 `compileForm()`，事务化的 `createForm()` / `createFormEngine()` Runtime（含 Rule 求值、activation、effective state 与 `serialize()`），以及 Core 拥有的 Validation pipeline（`validate()` / `applyErrors()` / `submit()`，AJV 只存在于 `@form/validator-ajv`）。Renderer 仍由后续垂直切片交付。
 
-架构基线见 [`docs/architecture.md`](docs/architecture.md)。工作区命令、package 职责和公共 export 规则见 [`docs/workspace.md`](docs/workspace.md)。
+架构基线见 [`docs/architecture.md`](docs/architecture.md)。工作区命令、package 职责、公共 export 规则以及 `packages/core/src` 的领域目录见 [`docs/workspace.md`](docs/workspace.md)。
 
 ## 首期 package
 
@@ -46,7 +46,13 @@ pnpm verify
 
 静态 `ModelPath` 使用 `products[].name`、转义 property 的 JSON-string bracket，以及 tuple 的 `[#n]`；`products[0]` 属于 Runtime `InstancePath`，不会出现在 Compiled DataModel。Field Registry 与 ViewTree 分离：检查 Field 用 `model.ui.fields`，检查呈现结构用已解析的 `model.ui.viewTree`。来自 Object property edge 的 Field 带有只读 `requirement` presentation source（`required` / `optional` / `conditional`）；`required` 不是 `FieldUI` 成员。实例级 effective `required` 由 Runtime 在 activation 之后组合进 Field/View snapshot：`required = active && (static required || (conditional && activationSource.active))`。`visible` / `disabled` / `readonly`、Widget props、`native` 与 Validation error 都不参与该组合。Renderer/FieldChrome 只读该 snapshot，不读取 Schema 或 DataModel edge。
 
-自定义逻辑 Widget 使用 `@form/core/extension` 的 `defineWidget()`：它只保留 identity 与 literal inference，不安装 Registry。`WidgetDefinition.interaction` 以纯数据声明 `setValue` / `touch` / `focus` / `blur`；Renderer 通过 Core 公开 command `setValue()` / `touch()` / `focus()` / `blur()` 实现这些动作。`RenderScope` / `InstanceBinding` / `getRenderScope()` 与 effective `required` snapshot 已由 Core Runtime 提供。已声明 `x-*` 拆分与非 Draft 2020-12 dialect adapter 由 `align-core-contributions-and-layout` 承接。
+自定义逻辑 Widget 使用 `@form/core/extension` 的 `defineWidget()`：它只保留 identity 与 literal inference，不安装 Registry。`WidgetDefinition.interaction` 以纯数据声明 `setValue` / `touch` / `focus` / `blur`；Renderer 通过 Core 公开 command `setValue()` / `touch()` / `focus()` / `blur()` 实现这些动作。`RenderScope` / `InstanceBinding` / `getRenderScope()` 与 effective `required` snapshot 已由 Core Runtime 提供。
+
+Plugin 可通过冻结 Registry 贡献三类 Schema/实例化 provider，类型只从 `@form/core/extension` 导出：`SchemaDialectDefinition` 为 `{ name, dialects, convert() }`，`SchemaExtensionDefinition` 为 `{ name, keyword: x-*, split() }`，`ValueInitializerDefinition` 为 `{ name, initialize() }`。它们都是纯同步、只读输入，不得接收 FormInstance/Store/Transaction，也不得返回 Promise。Environment build 校验 key 与 `name` 一致，并保证 `$schema` URI 与 `x-*` keyword 在整个 Environment 内唯一；冲突、空 URI 集合或非 `x-` 前缀以 `source: "plugin"` 阻断，不发布 partial Registry。Core 不内置 draft-07/draft-04 adapter，也不内置任何 `x-*` 词汇，具体转换与拆分由 Plugin 作者注册。
+
+非 Draft 2020-12 的根 `$schema` 只在 dialect detection 阶段查 `schemaDialects`：命中则对只读输入调用一次 `convert()`，校验 JSON、深冻结并要求输出为 canonical 2020-12 后再走既有 meta-validation；未命中保持 `schema.invalid-dialect`。adapter throw / thenable / 非 JSON / 仍非 canonical 以 `source: "schema"` 的阻断 `CompileError` 失败并附 `pluginId`，不泄漏原始异常、不发布 partial model。子 Schema 内嵌的其他 dialect `$schema` 产生 unsupported diagnostic，不会静默按 2020-12 解释。
+
+已声明的 `x-*` 在 normalization 之后、进入 UI/Rule/Config compiler 之前按 `(SchemaPath, ModelPath)` 调用 `split()`。片段合并规则是显式 authoring 优先：`fieldUI` 与 `config` 按 key 合并、`rules` 追加；重叠键产生 warning 并忽略片段值，Rule ID 冲突仍由既有 Rule compiler 诊断。canonical graph 会移除已声明 keyword。未声明的 `x-*` 仍只 warning。无法映射到 `ModelPath` 的位置（如 `if` 谓词、未被引用的 `$defs`）产生 unsupported diagnostic 且不应用片段。
 
 `FormDefinition.rules` 使用 JSON-compatible 的 `RuleExpression` AST（scalar / `{ const }` / `{ field }` / `{ call, args }` / 固定 operator），分为 State、Computed、Validation、Effect 四类。named function 只通过 `@form/core/extension` 的 `defineRuleFunction()` 注册到 Environment，Compiled Model 只保存 function key。数组 Rule 按同一 item 的相对 `ModelPath` 绑定，不接受无法唯一确定的 sibling/descendant collection。`oneOf`/`anyOf`/`if`/`dependentSchemas` 编译为有限 activation plan；无法保真的 predicate 在编译期阻断。
 
@@ -127,6 +133,8 @@ try {
 ## Runtime
 
 `createForm(model, { initialValues })` 使用与 `compileForm(definition)` 相同的默认 Core Environment。显式 Environment 必须在 compile 与 create 之间保持同一 identity，不能靠 Plugin 列表结构相等来匹配。需要长期复用同一套 Plugin 时，使用 `createFormEngine({ plugins })`：`engine.compile()` 与 `engine.create()` 闭包持有同一个冻结 Environment，Engine 本身不保存实例 values 或 version。
+
+`FormConfig.valueInitializer` 与 `FormConfig.serializer` 一样只声明已注册的 string key；Compiler 校验 key 存在后写入 Compiled Model，不执行 provider。`createForm()` / `engine.create()` 的 `valueInitializer` option 可覆盖本次实例的默认 key（option > Compiled default > none），覆盖不修改 Definition 或 Compiled Model。命中后 Runtime 在 array identity materialization 与 Computed/Effect/activation 稳定之前同步运行一次 `initialize()`，结果经 JSON 校验后成为 Runtime-owned initial snapshot：`version` 为 0，dirty 基线与之后的 `reset()` 都恢复该结果，不再次执行 initializer。throw / thenable / 非 JSON / 未注册 key 以 `source: "runtime"` 阻断创建，不建立 store、不回退原始 values、不泄漏原始异常。
 
 公开 snapshot 只读。`setValues(nextValues)` 是一次原子的 root replacement，不是隐式 deep-merge。写入必须经过 command/transaction；effective no-op 不增加 `version`。四个 semantic command 是 `setValue` / `touch` / `focus` / `blur`：`touch()` 以 Field `InstancePath` 为目标，`focus()` / `blur()` / `setCollapsed()` / `setActiveTab()` 以具体 `ViewNodeId` 为目标。`blur()` 只清除该 View 的 focused，不隐式 touch，也不修改 values；Runtime 会把 focus-to-blur 记录进 change set，供 Validation 的 `blur` trigger 使用。View source state 还包括 `collapsed`（默认 `false`）与 `activeTab`（默认 `undefined`）；`reset()` 将它们恢复默认值，数组 item 删除时随 subtree 清理。Core 不解释 tab key 是否存在于 layout，也不实现 Renderer 的 DOM focus 策略。
 

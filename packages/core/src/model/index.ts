@@ -14,7 +14,7 @@ export type {
   ScalarDataNode,
   ScalarValueType,
   UnionDataNode,
-} from "./data.js";
+} from "./data/data.js";
 export type {
   ArrayView,
   FieldDescriptor,
@@ -28,7 +28,7 @@ export type {
   ViewNode,
   ViewNodeBase,
   ViewNodeKind,
-} from "./ui.js";
+} from "./ui/ui.js";
 export type {
   CompiledComputedAction,
   CompiledEffectAction,
@@ -41,7 +41,7 @@ export type {
   NormalizedRuleExpression,
   RuleModel,
   SerializationPlan,
-} from "./rule.js";
+} from "./rule/rule.js";
 export type {
   NamedValidationPlan,
   PresentationPlan,
@@ -49,7 +49,7 @@ export type {
   ServerValidationPlan,
   ValidationModel,
   ValidationRulePlan,
-} from "./validation.js";
+} from "./validation/validation.js";
 export type {
   ActivationBranch,
   ActivationKind,
@@ -57,7 +57,7 @@ export type {
   ActivationPredicate,
   SchemaActivation,
   SchemaDynamics,
-} from "./schema-dynamics.js";
+} from "./schema-dynamics/schema-dynamics.js";
 export type { CompiledFormModel } from "./compiled-form-model.js";
 export type { CompileResult } from "./compile-result.js";
 export type { CompileOptions } from "./compile-options.js";

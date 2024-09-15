@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { createRegistry } from "./registry.js";
-import type { WidgetDefinition } from "./widget.js";
+import type { WidgetDefinition } from "../widget/widget.js";
 
 const text: WidgetDefinition = {
   name: "text",

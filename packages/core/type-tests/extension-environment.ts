@@ -1,6 +1,6 @@
 import type { FormEnvironment } from "../src/extension/environment.js";
 import type { Registry } from "../src/extension/registry.js";
-import type { WidgetDefinition } from "../src/extension/widget.js";
+import type { WidgetDefinition } from "../src/widget/widget.js";
 
 declare const registry: Registry<WidgetDefinition>;
 declare const environment: FormEnvironment;
