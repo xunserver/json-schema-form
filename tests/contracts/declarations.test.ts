@@ -141,3 +141,35 @@ describe("generated Core public surface", () => {
     expect(extension).not.toContain("builder");
   });
 });
+
+describe("generated Vue and Element Plus public surface", () => {
+  test("Vue root declarations expose renderer contracts without internals or other frameworks", () => {
+    const declaration = fs.readFileSync(path.join(REPO_ROOT, "packages/vue/dist/index.d.ts"), "utf8");
+    for (const name of [
+      "FormRenderer",
+      "ViewRenderer",
+      "FieldRenderer",
+      "defineVueUIAdapter",
+      "createVueRendererEnvironment",
+      "useRuntimeSelector",
+      "useFieldSnapshot",
+      "RendererEnvironmentBuildError",
+      "VueUIAdapter",
+    ]) {
+      expect(declaration, `missing ${name}`).toContain(name);
+    }
+    for (const name of ["ReactUIAdapter", "MuiAdapter", "TransactionManager", "RuntimeNodeId", "ValueStoreImpl"]) {
+      expect(declaration, `leaked ${name}`).not.toContain(name);
+    }
+  });
+
+  test("Element Plus root declarations expose the standard adapter without private mapper types", () => {
+    const declaration = fs.readFileSync(path.join(REPO_ROOT, "packages/element-plus/dist/index.d.ts"), "utf8");
+    expect(declaration).toContain("elementPlusAdapter");
+    expect(declaration).toContain("createElementPlusAdapter");
+    expect(declaration).toContain("extendElementPlusAdapter");
+    expect(declaration).not.toContain("ReactUIAdapter");
+    expect(declaration).not.toContain("mapElementPlusProps");
+    expect(declaration).not.toContain("TransactionManager");
+  });
+});

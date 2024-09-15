@@ -108,6 +108,15 @@ describe("fault injection commands", () => {
     expect(`${result.stdout}\n${result.stderr}`).toMatch(/Cannot find module|has no exported member|TS2307|TS2305/);
   });
 
+  test("Vue and Element Plus deep imports fail consumer typecheck", () => {
+    const vue = runTsc(path.join(REPO_ROOT, "tests/contracts/negative/vue-deep-import.tsconfig.json"));
+    expect(vue.status).not.toBe(0);
+    expect(`${vue.stdout}\n${vue.stderr}`).toMatch(/Cannot find module|TS2307/);
+    const plus = runTsc(path.join(REPO_ROOT, "tests/contracts/negative/element-plus-deep-import.tsconfig.json"));
+    expect(plus.status).not.toBe(0);
+    expect(`${plus.stdout}\n${plus.stderr}`).toMatch(/Cannot find module|TS2307/);
+  });
+
   test("unexpected Core directory fails the boundary command", () => {
     const root = copyRepoPackages();
     fs.mkdirSync(path.join(root, "packages", "core", "src", "utils"));

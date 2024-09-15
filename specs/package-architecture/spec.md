@@ -111,3 +111,29 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **GIVEN** Core或任一framework/UI package直接import AJV或在公共类型中暴露AJV `ErrorObject`
 - **WHEN** 运行Core independence、declaration和architecture checks
 - **THEN** 检查失败并指出违规package、import或declaration边界
+
+### Requirement: Vue 与 Element Plus 只暴露受支持 Renderer 入口
+`@form/vue` 根入口必须（SHALL）暴露 Vue Renderer components、readonly composables、VueUIAdapter/RendererEnvironment authoring与diagnostic contracts；`@form/element-plus` 根入口必须（SHALL）暴露标准 Element Plus adapter及显式组合/扩展入口。两包的 export map必须（MUST）拒绝未声明 deep import，并不得（MUST NOT）从公共 declarations 泄漏 Core mutable internals、Element Plus private types、React/MUI协议或 Universal Renderer抽象。
+
+#### Scenario: 应用从根入口组合 Renderer
+- **GIVEN** consumer从 `@form/vue` 导入 `FormRenderer` 和 Vue adapter contracts，并从 `@form/element-plus` 导入标准 adapter
+- **WHEN** 使用 `<FormRenderer :form="form" :adapter="elementPlusAdapter" />` 类型检查
+- **THEN** import与组件props成立且不需要Core/internal或package deep path
+
+#### Scenario: deep import 与跨框架类型被拒绝
+- **GIVEN** consumer尝试导入 Vue内部subscription/store writer、Element Plus内部mapper，或从两包取得React/MUI binding
+- **WHEN** 按package exports与declarations解析
+- **THEN** import失败，批准的根入口仍可独立使用
+
+### Requirement: Vue/Element Plus 依赖与集成验收可重复验证
+`@form/vue` 必须（MUST）只沿产品边依赖 `@form/core` 并把 Vue列为peer；`@form/element-plus` 必须（MUST）只沿产品边依赖 `@form/vue`/`@form/core` 并把 Vue与Element Plus列为peer。仓库验证必须（MUST）包含不依赖具体UI library的headless Vue Renderer contract tests、Element Plus adapter integration tests，以及使用同一Definition/Plugin/Compiled Model的 Vue + Element Plus example；这些验收不得（MUST NOT）要求或导入React/MUI实现。
+
+#### Scenario: headless adapter验证 Renderer契约
+- **GIVEN** 测试提供一个记录调用的最小VueUIAdapter和事务Runtime
+- **WHEN** 覆盖View遍历、精确订阅、hidden卸载、array move、cleanup与SSR
+- **THEN** 测试无需Element Plus即可证明Renderer边界，且没有Schema/Rule/Validation解释或直接value写入
+
+#### Scenario: Element Plus example完成端到端交互
+- **GIVEN** example编译并实例化含嵌套object/array、动态visible、validation与九类Widget的Definition
+- **WHEN** Vue + Element Plus renderer执行输入、blur、array move与submit流程
+- **THEN** UI只通过semantic commands更新Core，identity/presentable errors/ARIA正确，workspace build/typecheck/test/boundary checks均通过

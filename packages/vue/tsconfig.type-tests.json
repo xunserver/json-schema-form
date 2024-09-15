@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "lib": ["ES2022", "DOM"],
+    "types": [],
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false
+  },
+  "include": ["type-tests/**/*.ts", "src/**/*.ts"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test-utils.ts", "src/test-utils/**"]
+}

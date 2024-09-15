@@ -412,7 +412,7 @@ function collectSourceFiles(root: string): string[] {
   const files: string[] = [];
   const entries = fs.readdirSync(root, { withFileTypes: true });
   for (const entry of entries) {
-    if (entry.name === "node_modules" || entry.name === "dist" || entry.name === "type-tests") {
+    if (entry.name === "node_modules" || entry.name === "dist" || entry.name === "type-tests" || entry.name === "test-utils") {
       continue;
     }
 

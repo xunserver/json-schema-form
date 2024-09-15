@@ -1,0 +1,30 @@
+import { createSSRApp, h } from "vue";
+import { renderToString } from "vue/server-renderer";
+import { describe, expect, test } from "vitest";
+import { FormRenderer } from "@form/vue";
+import { createDemoForm } from "../../examples/vue-element-plus/src/definition.ts";
+import { createDemoRendererEnvironment } from "../../examples/vue-element-plus/src/renderer.ts";
+import { subscribeRuntime, valueSelector } from "@form/core/runtime";
+
+describe("vue + element-plus SSR", () => {
+  test("server render is deterministic and does not leak listeners", async () => {
+    const form = createDemoForm();
+    const environment = createDemoRendererEnvironment();
+    const html = await renderToString(
+      createSSRApp({
+        setup() {
+          return () => h(FormRenderer, { form, environment, adapterId: "element-plus" });
+        },
+      }),
+    );
+    expect(html).toContain("Name");
+    expect(html).toContain("aria-labelledby");
+    expect(html).toContain('value="USD"');
+    const leaked: unknown[] = [];
+    subscribeRuntime(form, valueSelector("name"), (value) => {
+      leaked.push(value);
+    });
+    form.setValue("name", "Grace");
+    expect(leaked).toEqual(["Grace"]);
+  });
+});

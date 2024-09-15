@@ -7,7 +7,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
     "types": [],
     "noEmit": true,
     "skipLibCheck": true

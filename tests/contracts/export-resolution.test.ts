@@ -69,4 +69,15 @@ describe("runtime export resolution", () => {
       /Package subpath|ERR_PACKAGE_PATH_NOT_EXPORTED/,
     );
   });
+
+  test("resolves Vue and Element Plus root entries and rejects deep paths", () => {
+    expect(resolveWithNode("@form/vue").stdout.trim()).toMatch(/packages\/vue\/dist\/index\.js$/);
+    expect(resolveWithNode("@form/element-plus").stdout.trim()).toMatch(
+      /packages\/element-plus\/dist\/index\.js$/,
+    );
+    const vueDeep = resolveWithNode("@form/vue/src/renderer/FormRenderer.js");
+    expect(vueDeep.status).not.toBe(0);
+    const plusDeep = resolveWithNode("@form/element-plus/src/widgets/mapper.js");
+    expect(plusDeep.status).not.toBe(0);
+  });
 });

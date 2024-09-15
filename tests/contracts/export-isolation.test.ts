@@ -119,4 +119,33 @@ describe("consumer export isolation", () => {
       true,
     );
   });
+
+  test("rejects Vue internal deep imports", () => {
+    const diagnostics = typecheckFiles(
+      [path.join(REPO_ROOT, "tests/contracts/negative/vue-deep-import.ts")],
+      consumerOptions,
+    );
+    expect(diagnostics.length).toBeGreaterThan(0);
+    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@form\/vue\/src\/renderer\/FormRenderer\.js'/);
+  });
+
+  test("rejects Element Plus internal deep imports", () => {
+    const diagnostics = typecheckFiles(
+      [path.join(REPO_ROOT, "tests/contracts/negative/element-plus-deep-import.ts")],
+      consumerOptions,
+    );
+    expect(diagnostics.length).toBeGreaterThan(0);
+    expect(formatDiagnostics(diagnostics)).toMatch(
+      /Cannot find module '@form\/element-plus\/src\/widgets\/mapper\.js'/,
+    );
+  });
+
+  test("rejects React/MUI types from Vue packages", () => {
+    const diagnostics = typecheckFiles(
+      [path.join(REPO_ROOT, "tests/contracts/negative/vue-cross-framework.ts")],
+      consumerOptions,
+    );
+    expect(diagnostics.length).toBeGreaterThan(0);
+    expect(formatDiagnostics(diagnostics)).toMatch(/has no exported member 'ReactUIAdapter'/);
+  });
 });

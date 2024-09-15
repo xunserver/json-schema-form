@@ -9,10 +9,11 @@
   },
   "scripts": {
     "build": "tsc -b --pretty false",
-    "typecheck": "tsc -b --pretty false && tsc --noEmit -p packages/core/tsconfig.type-tests.json --pretty false && tsc --noEmit -p tests/contracts/positive/tsconfig.json --pretty false",
+    "typecheck": "tsc -b --pretty false && tsc --noEmit -p packages/core/tsconfig.type-tests.json --pretty false && tsc --noEmit -p packages/vue/tsconfig.type-tests.json --pretty false && tsc --noEmit -p tests/contracts/positive/tsconfig.json --pretty false",
     "test": "vitest run",
     "check:boundaries": "tsx tools/architecture-check/cli.ts",
-    "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm check:boundaries"
+    "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm check:boundaries && pnpm example:vue",
+    "example:vue": "pnpm --filter @form/example-vue-element-plus typecheck && tsx examples/vue-element-plus/src/smoke.ts"
   },
   "devDependencies": {
     "@form/core": "workspace:*",
@@ -22,6 +23,10 @@
     "@form/validator-ajv": "workspace:*",
     "@form/vue": "workspace:*",
     "@types/node": "^24.3.1",
+    "@vue/test-utils": "^2.4.6",
+    "element-plus": "^2.8.0",
+    "jsdom": "^26.1.0",
+    "vue": "^3.5.0",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"

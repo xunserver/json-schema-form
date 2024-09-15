@@ -21,12 +21,12 @@
 |---|---|---|---|
 | `@form/core` | `packages/core` | 框架无关的 authoring、静态编译与事务化 Runtime；提供 Extension Plugin/Environment | Path、ID、Diagnostic、Form Definition、`defineForm()`、`compileForm()`、`createForm()` / `createFormEngine()`、Compiled Model、CompileResult/CompileError、`FormInstance` / `ArrayInstance` / `ScopedFormInstance`、Rule AST / effective state（含 `required`）/ View source state（`focused`/`collapsed`/`activeTab`）/ `blur()` `setCollapsed()` `setActiveTab()` / `serialize()` / `validate()` / `applyErrors()` / `submit()` / `FormConfig.valueInitializer`；`@form/core/runtime` 导出只读 selector/subscription（含 `effectiveStateSelector`、`presentableErrorSelector`、`InstanceBinding`、`RenderScope`、`getRenderScope()`）与 array identity resolver；`@form/core/extension` 导出 Plugin/Environment/Widget/Registry 契约、`defineWidget()`、`defineRuleFunction()`、`defineValidator()`、`SchemaDialectDefinition` / `SchemaExtensionDefinition` / `ValueInitializerDefinition` 与 factory |
 | `@form/validator-ajv` | `packages/validator-ajv` | Draft 2020-12 Schema Validator Adapter | `createAjvValidator()` / `AJV_VALIDATOR_KEY`；生产依赖 `ajv` 与 `@form/core` |
-| `@form/vue` | `packages/vue` | Vue Renderer 边界 | 空 ESM 入口；peer 为 `vue` |
+| `@form/vue` | `packages/vue` | Vue Renderer 边界 | `FormRenderer` / `ViewRenderer` / `FieldRenderer`、readonly composables、`defineVueUIAdapter()` / `createVueRendererEnvironment()` 与 adapter diagnostics；peer 为 `vue` |
 | `@form/react` | `packages/react` | React Renderer 边界 | 空 ESM 入口；peer 为 `react` |
-| `@form/element-plus` | `packages/element-plus` | Element Plus Adapter 边界 | 空 ESM 入口；依赖 `@form/vue` 与 `@form/core`，peer 为 `vue` 与 `element-plus` |
+| `@form/element-plus` | `packages/element-plus` | Element Plus Adapter 边界 | `elementPlusAdapter` / `createElementPlusAdapter()` / `extendElementPlusAdapter()`；依赖 `@form/vue` 与 `@form/core`，peer 为 `vue` 与 `element-plus` |
 | `@form/mui` | `packages/mui` | MUI Adapter 边界 | 空 ESM 入口；依赖 `@form/react` 与 `@form/core`，peer 为 `react` 与 `@mui/material` |
 
-叶子 package 中 Renderer/UI Adapter 仍是可构建的空边界。`@form/core` 已提供 `defineForm()`、`compileForm()` 静态编译（含 Rule AST 与 Schema Dynamics）、事务 Runtime、array identity / `array()` / `scope()`、`blur()` / `setCollapsed()` / `setActiveTab()`、`RenderScope` / `InstanceBinding`、effective state（含 `required`）、`serialize()` 以及 Validation owner（`validate()` / `applyErrors()` / `submit()`）。AJV 只允许出现在 `@form/validator-ajv`。
+叶子 package 中 `@form/vue` 与 `@form/element-plus` 已提供 Vue Renderer 与 Element Plus Adapter。`@form/react` / `@form/mui` 仍是可构建的空边界。`@form/core` 已提供 `defineForm()`、`compileForm()` 静态编译（含 Rule AST 与 Schema Dynamics）、事务 Runtime、array identity / `array()` / `scope()`、`blur()` / `setCollapsed()` / `setActiveTab()`、`RenderScope` / `InstanceBinding`、effective state（含 `required`）、`serialize()` 以及 Validation owner（`validate()` / `applyErrors()` / `submit()`）。AJV 只允许出现在 `@form/validator-ajv`。Renderer 用法见 [`vue-element-plus.md`](./vue-element-plus.md)。
 
 ## 允许的依赖图
 
@@ -94,5 +94,5 @@ Schema Frontend 消费点：`compiler/schema` 在 dialect detection 调用 `conv
 - Compiled Model 必须保持只读，不得混入 FormInstance values 或可变 Runtime 状态。
 - `RuntimeNodeId` 以及可变 Store、Scheduler、Compiler Context 不得进入任何公共入口。
 - `defineWidget()` 与 `WidgetDefinition` interaction contract 只从 `@form/core/extension` 导出；根入口不重导出。
-- Field `requirement` presentation source 由静态编译投影；effective `required`、`blur()`、`setCollapsed()` / `setActiveTab()` 与 `RenderScope` / `InstanceBinding` / `getRenderScope()` 由 Core Runtime 在本切片交付。Validation 的 `blur` trigger 与 Vue/React Renderer 仍由后续 owner 消费这些公开端口，不要把它们当成已经实现。
+- Field `requirement` presentation source 由静态编译投影；effective `required`、`blur()`、`setCollapsed()` / `setActiveTab()` 与 `RenderScope` / `InstanceBinding` / `getRenderScope()` 由 Core Runtime 交付。Vue Renderer 消费这些公开端口；React/MUI Renderer 仍待后续 change。
 - 不要把 Plugin 可注册的 dialect adapter / `x-*` extension / value initializer 写成 Core 内置能力；也不要把本切片理解成 Validation pipeline 的实现来源。
