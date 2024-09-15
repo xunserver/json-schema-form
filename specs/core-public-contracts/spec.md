@@ -144,17 +144,17 @@ Core 必须（SHALL）暴露 `CompileResult`，其中 `CompiledFormModel` 始终
 - **THEN** 抛出的 `CompileError` 按确定顺序包含两条 error diagnostics，且调用者得不到部分 `CompiledFormModel`
 
 ### Requirement: 受支持的 export 隔离内部模块
-`@form/core`必须（SHALL）从package根入口暴露面向应用的authoring、compile、instantiate与实例facade契约，包括`defineForm`、`compileForm`、`CompileResult`/`CompileError`、只读`CompiledFormModel`及其Data/UI/Rule/Validation/Schema Dynamics model view、`createForm`、`createFormEngine`、`FormEngine`、基础`FormInstance`/`FieldInstance`、`ArrayInstance`、`ScopedFormInstance`、`ArrayItemId`、effective state、`serialize()`及其readonly options/result和结构化Runtime failure。只读selector、subscription、snapshot、array binding、effective-state selector、Identity Resolver与Runtime diagnostic observation必须（MUST）从显式支持的`@form/core/runtime`子路径获得；`definePlugin`、`defineWidget`、`createFormEnvironment`、`defineRuleFunction`、`WidgetDefinition`及Rule Function/Serializer provider契约继续从`@form/core/extension`获得。Package export map必须（SHALL）拒绝未声明的deep import，并将可变Store、Environment identity token、Compiler Context、Schema Frontend/Shape Analyzer implementation、Dependency Graph/Scheduler、Transaction Manager、Change Queue、phase/RuleEngine/AST evaluator、activation writer、serializer execution context、array binding/cleanup writer、ID generator和`RuntimeNodeId` generation保持私有。
+`@form/core`必须（SHALL）从package根入口暴露面向应用的authoring、compile、instantiate与实例facade契约，包括`defineForm`、`compileForm`、`CompileResult`/`CompileError`、只读`CompiledFormModel`及其Data/UI/Rule/Validation/Schema Dynamics model view、`createForm`、`createFormEngine`、`FormEngine`、基础`FormInstance`/`FieldInstance`、`ArrayInstance`、`ScopedFormInstance`、`ArrayItemId`、effective state（含`required`）、View source state（`focused`、`collapsed`、`activeTab`）、`blur()`/`setCollapsed()`/`setActiveTab()`命令签名、`serialize()`及其readonly options/result和结构化Runtime failure。只读selector、subscription、snapshot、array binding、`InstanceBinding`、`RenderScope`、`getRenderScope()`、effective-state selector、Identity Resolver与Runtime diagnostic observation必须（MUST）从显式支持的`@form/core/runtime`子路径获得；`definePlugin`、`defineWidget`、`createFormEnvironment`、`defineRuleFunction`、`WidgetDefinition`及Rule Function/Serializer provider契约继续从`@form/core/extension`获得。Package export map必须（SHALL）拒绝未声明的deep import，并将可变Store、View state store、interaction event writer、Environment identity token、Compiler Context、Schema Frontend/Shape Analyzer implementation、Dependency Graph/Scheduler、Transaction Manager、Change Queue、phase/RuleEngine/AST evaluator、activation writer、serializer execution context、array binding/cleanup writer、binding table、ID generator和`RuntimeNodeId` generation保持私有。
 
 #### Scenario: 导入根入口公共契约
 - **GIVEN** 外部消费者从`@form/core`导入`compileForm`、`CompileResult`、create/instance/array/scope契约、Rule/Dynamics readonly Model、effective snapshot或serialization options
 - **WHEN** 通过package exports解析fixture并执行类型检查
-- **THEN** Application API可与`defineForm`、`compileForm`及readonly Model共同使用，并可调用`array()`、`scope()`与`serialize()`
+- **THEN** Application API可与`defineForm`、`compileForm`及readonly Model共同使用，并可调用`array()`、`scope()`、`blur()`、`setCollapsed()`、`setActiveTab()`与`serialize()`
 
 #### Scenario: 导入受支持的子路径
-- **GIVEN** Framework binding或高级消费者从`@form/core/runtime`导入readonly selector、subscription、array binding、effective-state selector、Identity Resolver或Runtime diagnostic observation
+- **GIVEN** Framework binding或高级消费者从`@form/core/runtime`导入readonly selector、subscription、array binding、`InstanceBinding`、`RenderScope`、`getRenderScope`、effective-state selector、Identity Resolver或Runtime diagnostic observation
 - **WHEN** 解析fixture并执行类型检查
-- **THEN** import仅通过该显式子路径成功，且返回契约不含mutation Store、Scheduler writer、Rule evaluator或activation writer
+- **THEN** import仅通过该显式子路径成功，且返回契约不含mutation Store、Scheduler writer、Rule evaluator、activation writer或binding writer
 
 #### Scenario: 导入受支持的extension子路径
 - **GIVEN** extension author从`@form/core/extension`导入`defineRuleFunction`、Rule Function与Serializer provider contract
@@ -167,21 +167,21 @@ Core 必须（SHALL）暴露 `CompileResult`，其中 `CompiledFormModel` 始终
 - **THEN** identity-preserving Widget authoring与只读Extension类型可从该子路径使用，且不要求导入任何internal compiler/runtime文件
 
 #### Scenario: 根入口不重导出 Advanced 或 Extension factory
-- **GIVEN** 消费者尝试从`@form/core`导入selector factory、Identity Resolver、`definePlugin`、`defineWidget`、`createFormEnvironment`或`defineRuleFunction`
+- **GIVEN** 消费者尝试从`@form/core`导入selector factory、`RenderScope`、`InstanceBinding`、`getRenderScope`、Identity Resolver、`definePlugin`、`defineWidget`、`createFormEnvironment`或`defineRuleFunction`
 - **WHEN** 对consumer fixture执行类型检查
 - **THEN** import因角色级export不属于根入口而失败
 
 #### Scenario: 拒绝内部 deep import
-- **GIVEN** 外部消费者导入未声明的Core compiler、schema frontend、rule、dynamics、scheduler、runtime、transaction、store、array binding或engine implementation路径
+- **GIVEN** 外部消费者导入未声明的Core compiler、schema frontend、rule、dynamics、scheduler、runtime、transaction、store、array binding、view state或engine implementation路径
 - **WHEN** 使用package exports解析fixture
 - **THEN** 即使内部源文件存在，解析仍然失败
 
 #### Scenario: 根导出不包含内部符号
-- **GIVEN** 外部消费者尝试从`@form/core`导入`RuntimeNodeId`、Compiler Context、`ArrayStateStore`、`RuleEngine`、`DependencyScheduler`、AST evaluator、activation writer、`TransactionManager`、`ChangeQueue`、mutable Store、phase implementation、Scheduler、subtree cleanup writer、array binding table、identity generator或Environment identity token
+- **GIVEN** 外部消费者尝试从`@form/core`导入`RuntimeNodeId`、Compiler Context、`ArrayStateStore`、View state store、interaction event writer、`RuleEngine`、`DependencyScheduler`、AST evaluator、activation writer、`TransactionManager`、`ChangeQueue`、mutable Store、phase implementation、Scheduler、subtree cleanup writer、array binding table、identity generator或Environment identity token
 - **WHEN** 对consumer fixture执行类型检查
 - **THEN** import因这些符号不属于根公共表面而失败
 
 #### Scenario: 所有公共入口均不泄漏 Runtime internals
-- **GIVEN** 外部消费者尝试从root、runtime或extension入口取得Rule/activation/serialization writer、mutable dependency graph、Compiler Context、RuntimeNodeId或其他等价escape hatch
+- **GIVEN** 外部消费者尝试从root、runtime或extension入口取得Rule/activation/serialization writer、mutable dependency graph、binding table、Compiler Context、RuntimeNodeId或其他等价escape hatch
 - **WHEN** 对fixtures和生成declaration执行检查
 - **THEN** 所有内部import均失败，公开interface只能author、inspect、select、subscribe或调用受控Application command

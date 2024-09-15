@@ -26,7 +26,7 @@ export function combineEffectiveState(input: EffectiveInputs): EffectiveState {
   const disabled = parentDisabled || input.uiDisabled || input.ruleDisabled;
   const readonly =
     parentReadonly || input.uiReadonly || input.computedTarget || input.ruleReadonly;
-  return { active, visible, disabled, readonly };
+  return { active, visible, disabled, readonly, required: false };
 }
 
 export const DEFAULT_EFFECTIVE: EffectiveState = Object.freeze({
@@ -34,4 +34,5 @@ export const DEFAULT_EFFECTIVE: EffectiveState = Object.freeze({
   visible: true,
   disabled: false,
   readonly: false,
+  required: false,
 });

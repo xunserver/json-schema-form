@@ -16,6 +16,10 @@ import type { RuntimeNodeId } from "../src/index.js";
 import type { RuleDynamicsEngine } from "../src/index.js";
 // @ts-expect-error DependencyScheduler is not part of the public root barrel
 import type { DependencyScheduler } from "../src/index.js";
+// @ts-expect-error View state store is not part of the public root barrel
+import type { ViewStateStore } from "../src/index.js";
+// @ts-expect-error Change set types are not part of the public root barrel
+import type { NormalizedChangeSet } from "../src/index.js";
 // @ts-expect-error evaluateRuleExpression is not part of the public root barrel
 import { evaluateRuleExpression } from "../src/index.js";
 
@@ -40,3 +44,8 @@ declare const dependencyScheduler: DependencyScheduler;
 void engine;
 void dependencyScheduler;
 void evaluateRuleExpression;
+
+declare const viewStore: ViewStateStore;
+declare const changeSet: NormalizedChangeSet;
+void viewStore;
+void changeSet;

@@ -30,6 +30,10 @@ form.setValue("name", "Grace");
 form.setValues({ name: "Linus" });
 form.touch("name");
 form.focus(model.ui.viewTree.id);
+form.blur(model.ui.viewTree.id);
+form.setCollapsed(model.ui.viewTree.id, true);
+form.setActiveTab(model.ui.viewTree.id, "advanced");
+form.setActiveTab(model.ui.viewTree.id, null);
 form.reset();
 field.setValue("Ada");
 field.touch();
@@ -73,15 +77,49 @@ void snapshot.visible;
 void snapshot.disabled;
 void snapshot.readonly;
 
+const fieldValues = field.getState();
+void fieldValues.required;
+// @ts-expect-error field snapshot is readonly
+fieldValues.touched = true;
+// @ts-expect-error required is readonly
+fieldValues.required = false;
+
+type EffectiveKeys = keyof import("../src/index.js").EffectiveState;
+type AllowedEffective = "active" | "visible" | "disabled" | "readonly" | "required";
+type AssertEffective =
+  EffectiveKeys extends AllowedEffective ? (AllowedEffective extends EffectiveKeys ? true : never) : never;
+const exhaustiveEffective: AssertEffective = true;
+void exhaustiveEffective;
+
+type ViewKeys = keyof import("../src/index.js").ViewSnapshot;
+type AssertViewCollapsed = "collapsed" extends ViewKeys ? true : never;
+type AssertViewTab = "activeTab" extends ViewKeys ? true : never;
+type AssertViewRequired = "required" extends ViewKeys ? true : never;
+const viewFields: AssertViewCollapsed & AssertViewTab & AssertViewRequired = true;
+void viewFields;
+
+declare const viewSnapshot: import("../src/index.js").ViewSnapshot;
+void viewSnapshot.collapsed;
+void viewSnapshot.activeTab;
+void viewSnapshot.required;
+// @ts-expect-error view snapshot collapsed is readonly
+viewSnapshot.collapsed = true;
+// @ts-expect-error view snapshot activeTab is readonly
+viewSnapshot.activeTab = "x";
+// @ts-expect-error view snapshot required is readonly
+viewSnapshot.required = true;
+// @ts-expect-error view commands do not accept InstancePath
+form.blur("name");
+// @ts-expect-error view commands do not accept index
+form.setCollapsed(0, true);
+// @ts-expect-error view snapshots have no writers
+viewSnapshot.setCollapsed = true;
+
 const rootValues = form.getValues();
 if (typeof rootValues === "object" && rootValues !== null && !Array.isArray(rootValues)) {
   // @ts-expect-error public values snapshot is readonly
   rootValues.name = "mutated";
 }
-
-const fieldValues = field.getState();
-// @ts-expect-error field snapshot is readonly
-fieldValues.touched = true;
 
 // @ts-expect-error baseline snapshots do not claim valid
 const valid = snapshot.valid;

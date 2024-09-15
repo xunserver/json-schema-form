@@ -1,14 +1,16 @@
 import {
   arrayOrderSelector,
   createSelector,
+  currentBindingSelector,
   effectiveStateSelector,
   formSelector,
+  getRenderScope,
   getRuntimeSnapshot,
   observeRuntimeDiagnostics,
   subscribeRuntime,
   valueSelector,
 } from "@form/core/runtime";
-import type { ArrayIdentityResolver } from "@form/core/runtime";
+import type { ArrayIdentityResolver, InstanceBinding, RenderScope } from "@form/core/runtime";
 import { compileForm, createForm, defineForm } from "@form/core";
 
 const form = createForm(
@@ -27,6 +29,9 @@ export const stopDiagnostics = observeRuntimeDiagnostics(form, () => undefined);
 export const order = arrayOrderSelector("title");
 export const effective = effectiveStateSelector("title");
 export const resolver: ArrayIdentityResolver = () => undefined;
+export const scope: RenderScope = getRenderScope(form);
+export const binding: InstanceBinding = scope.binding;
+void currentBindingSelector("title");
 
 void snapshot;
 void unsubscribe;

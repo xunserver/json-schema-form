@@ -166,17 +166,50 @@ Advanced Runtime 配置必须（SHALL）允许按 array `ModelPath` 提供 `Arra
 - **THEN** Runtime 返回 stale-scope Diagnostic，且该 facade 不会绑定到后来位于相同 index 的新 item
 
 ### Requirement: 数组 selector 精确发布 readonly identity 与 binding snapshot
-Advanced Runtime API 必须（SHALL）提供 readonly array order/item/current-binding selector，使 Framework binding 和高级消费者可用 `ArrayItemId` 作为稳定 key。未受 transaction 影响的 array 或 item selector 必须（MUST）保持引用稳定且不重新求值；任何公开 snapshot 不得（MUST NOT）暴露可变 order、Store、内部 binding key 或 `RuntimeNodeId`。
+Advanced Runtime API 必须（SHALL）提供 readonly array order/item/current-binding selector，使 Framework binding 和高级消费者可用 `ArrayItemId` 作为稳定 key。current-binding selector 发布的 snapshot 必须（MUST）是公开命名契约 `InstanceBinding`：包含静态 `DataNodeId` 与 `ModelPath`、按祖先顺序排列的稳定 `ArrayItemId` chain、当前 `InstancePath`、最近一层 item 的 `itemId` 以及 `stale` 状态。未受 transaction 影响的 array 或 item selector 必须（MUST）保持引用稳定且不重新求值；任何公开 snapshot 不得（MUST NOT）暴露可变 order、Store、内部 binding key 或 `RuntimeNodeId`。
 
 #### Scenario: sibling array mutation 不通知目标 selector
 - **GIVEN** 分别订阅两个 sibling array 的 order selector
 - **WHEN** 只 append 第一个 array
 - **THEN** 第一个 selector 发布新的 readonly order，第二个 selector 不重新求值也不通知
 
+#### Scenario: current-binding snapshot 是完整 InstanceBinding
+- **GIVEN** 调用者订阅嵌套数组 `orders[].lines[].sku` 中某个 line 的 current-binding selector
+- **WHEN** 读取 snapshot
+- **THEN** 它以 `InstanceBinding` 类型报告 `DataNodeId`、`ModelPath` `orders[].lines[].sku`、两层 `ArrayItemId` chain、当前 `InstancePath` 与 `stale: false`，且不含 `RuntimeNodeId`
+
 #### Scenario: snapshot 不能绕过 Array API
-- **GIVEN** 调用者取得 array order 和 item binding snapshot
-- **WHEN** 尝试改写 order、ID 或当前 path
+- **GIVEN** 调用者取得 array order 和 `InstanceBinding` snapshot
+- **WHEN** 尝试改写 order、ID、chain 或当前 path
 - **THEN** 公共类型与运行时只读边界拒绝该修改，Form values、identity 和 version 均不变化
+
+### Requirement: RenderScope 是公开只读的实例定位契约
+Advanced Runtime API 必须（SHALL）从 `@form/core/runtime` 公开只读 `RenderScope` 契约与 `getRenderScope()`：可从 `FormInstance`（root scope）、`FormInstance.scope()` 及 `ArrayInstance.item()` 返回的 `ScopedFormInstance` 取得。`RenderScope` 必须（MUST）暴露自身 `InstanceBinding`、把相对或绝对 `ModelPathLike` 解析为当前 `InstancePath` 的只读解析能力，以及按当前 index 或 `ArrayItemId` 派生 array item scope 的能力；它不得（MUST NOT）暴露 values writer、command、Store、`RuntimeNodeId` 或可变 binding table。Root scope 的 binding 必须（MUST）以 root `InstancePath` 与空 `ArrayItemId` chain 表示且永不 stale。
+
+#### Scenario: 在 item scope 中解析模板 ModelPath
+- **GIVEN** 通过 `form.array("products").item({ id })` 取得 `RenderScope`
+- **WHEN** 解析 `products[].name` 与相对路径 `name`
+- **THEN** 两者都解析为该 item 当前的 `InstancePath`（例如 `products[2].name`），且不会创建 values、binding 或第二个 Runtime
+
+#### Scenario: move 后 scope 实体不变而地址更新
+- **GIVEN** 持有 index 2 item 的 `RenderScope`
+- **WHEN** 该 item 被 `move` 到 index 0
+- **THEN** 同一 `RenderScope` 的 `InstanceBinding` 保持相同 `ArrayItemId` chain、`stale: false`，而当前 `InstancePath` 变为 `products[0]`；未 move 的 sibling scope 不重新求值
+
+#### Scenario: 删除后 scope 永久 stale
+- **GIVEN** 持有某 item 的 `RenderScope`
+- **WHEN** 该 item 被 `remove`、`replaceItem`、`clear` 或 `reset` 作废，且新 item 随后位于同一 index
+- **THEN** 旧 scope 的 `InstanceBinding.stale` 为 true，解析与派生操作以稳定 `source: "runtime"` Diagnostic 失败，绝不重绑到新 item
+
+#### Scenario: 拒绝跨 FormInstance 的 RenderScope
+- **GIVEN** 从实例 A 取得的 `RenderScope` 或 `InstanceBinding`
+- **WHEN** 与实例 B 的 selector、facade 或 `getRenderScope()` 组合使用
+- **THEN** 以结构化 Diagnostic 拒绝，实例 B 的 values、state 与 version 均不变化
+
+#### Scenario: RenderScope 不提供 writer
+- **GIVEN** Framework consumer 只持有 `RenderScope`
+- **WHEN** 尝试通过它取得 `setValue`、array command、Store 或 `RuntimeNodeId`
+- **THEN** 公共类型不提供这些成员，consumer 只能把解析出的 `InstancePath`/`ArrayItemId` 交给 `FormInstance` 公开 command
 
 ### Requirement: 后续能力复用受限的 binding 与 subtree lifecycle
 Runtime 必须（SHALL）为 Rule/Schema Dynamics、Validation 和 Renderer integration 提供同一 transaction 所拥有的只读 instance binding、move readdress 与 subtree removal lifecycle contract。后续 owner 可以（MAY）据此关联自有 readonly/source namespace、取消 run token 或订阅 order，但不得（MUST NOT）取得 mutable Array Store、生成/替换 ID、绕过 command/transaction 写 values，或将 `active`、`visible`、validation result 与 array identity 混为同一状态。

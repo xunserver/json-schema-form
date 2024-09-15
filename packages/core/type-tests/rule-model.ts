@@ -30,6 +30,7 @@ const effective: EffectiveState = {
   visible: true,
   disabled: false,
   readonly: false,
+  required: false,
 };
 void effective;
 

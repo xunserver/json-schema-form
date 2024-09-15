@@ -14,6 +14,10 @@ import type { ArrayStateStore } from "../src/runtime/index.js";
 import type { RuntimeNodeId } from "../src/runtime/index.js";
 // @ts-expect-error RuleDynamicsEngine is not exported from the public runtime barrel
 import type { RuleDynamicsEngine } from "../src/runtime/index.js";
+// @ts-expect-error View state store is not exported from the public runtime barrel
+import type { ViewStateStore } from "../src/runtime/index.js";
+// @ts-expect-error Change set types are not exported from the public runtime barrel
+import type { NormalizedChangeSet } from "../src/runtime/index.js";
 // @ts-expect-error evaluateRuleExpression is not exported from the public runtime barrel
 import { evaluateRuleExpression } from "../src/runtime/index.js";
 
@@ -36,3 +40,7 @@ void runtimeNodeId;
 declare const engine: RuleDynamicsEngine;
 void engine;
 void evaluateRuleExpression;
+declare const viewStore: ViewStateStore;
+declare const changeSet: NormalizedChangeSet;
+void viewStore;
+void changeSet;

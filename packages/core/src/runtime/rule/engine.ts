@@ -340,7 +340,7 @@ export class RuleDynamicsEngine implements RuntimeSubtreeOwner {
     const field = this.model.ui.fields.get(modelPath);
     const behavior = field?.behavior ?? {};
     const combined = state.combined.get(path);
-    return combineEffectiveState({
+    const base = combineEffectiveState({
       parent,
       schemaActive: isRoot ? true : state.schemaActive.get(path) !== false,
       uiVisible: behavior.visible !== false,
@@ -353,6 +353,60 @@ export class RuleDynamicsEngine implements RuntimeSubtreeOwner {
       computedTarget: this.computedTargets.has(modelPath),
       isRoot,
     });
+    return Object.freeze({
+      ...base,
+      required: this.fieldRequired(path, draft, state, base.active, modelPath, isRoot),
+    });
+  }
+
+  private fieldRequired(
+    path: InstancePath,
+    draft: TransactionDraft,
+    state: RuleDraftState,
+    active: boolean,
+    modelPath: ModelPath,
+    isRoot: boolean,
+  ): boolean {
+    if (!active || isRoot) {
+      return false;
+    }
+    const requirement = this.model.ui.fields.get(modelPath)?.requirement;
+    if (requirement === undefined || requirement.status === "optional") {
+      return false;
+    }
+    if (requirement.status === "required") {
+      return true;
+    }
+    const sources = requirement.activationSources ?? [];
+    if (sources.length === 0) {
+      return false;
+    }
+    return sources.some((source) => this.activationSourceActive(draft, state, path, modelPath, source, requirement.ownerPath));
+  }
+
+  private activationSourceActive(
+    draft: TransactionDraft,
+    state: RuleDraftState,
+    fieldPath: InstancePath,
+    fieldModel: ModelPath,
+    source: import("../../path/index.js").SchemaPath,
+    ownerPath: ModelPath,
+  ): boolean {
+    const ownerInstance = bindTemplatePath(ownerPath, fieldModel, fieldPath);
+    for (const plan of this.model.schemaDynamics.plans) {
+      for (const branch of plan.branches) {
+        if (branch.schemaPath !== source) {
+          continue;
+        }
+        const probe = branch.exclusiveNodes[0] ?? branch.nodes[0] ?? branch.sharedNodes[0];
+        if (probe === undefined) {
+          return state.schemaActive.get(ownerInstance) !== false;
+        }
+        const instance = bindTemplatePath(probe, plan.ownerPath, ownerInstance);
+        return state.schemaActive.get(instance) !== false;
+      }
+    }
+    return state.schemaActive.get(fieldPath) !== false;
   }
 
   private applyBranch(

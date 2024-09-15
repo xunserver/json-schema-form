@@ -23,6 +23,9 @@ export class FieldStateStore {
 
 export class ViewStateStore {
   readonly focused = new Map<string, true>();
+  readonly collapsed = new Map<string, true>();
+  readonly activeTab = new Map<string, string>();
+  readonly owners = new Map<string, string>();
   revision = 1;
 }
 

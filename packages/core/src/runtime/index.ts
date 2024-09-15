@@ -24,12 +24,15 @@ export type {
   EffectiveState,
   FieldSnapshot,
   FormSnapshot,
+  InstanceBinding,
   JsonValue,
+  RenderScope,
 } from "./contracts.js";
 
 import type { FormInstance } from "./contracts.js";
 import { resolveFormRuntime } from "./handle.js";
 import type { RuntimeDiagnosticEvent, RuntimeSelector, Unsubscribe } from "./selectors.js";
+export { getRenderScope } from "./render-scope.js";
 
 export function getRuntimeSnapshot<T>(form: FormInstance, selector: RuntimeSelector<T>): T {
   return resolveFormRuntime(form).getRuntimeSnapshot(selector);

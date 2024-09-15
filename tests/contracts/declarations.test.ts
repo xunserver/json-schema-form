@@ -41,8 +41,9 @@ const PRIVATE_SYMBOLS = [
   "EnvironmentIdentity",
   "ArrayStateStore",
   "RuleDynamicsEngine",
-  "DependencyScheduler",
-];
+      "ViewStateStore",
+      "NormalizedChangeSet",
+    ];
 
 describe("generated Core public surface", () => {
   test("root declarations expose application contracts only", () => {
@@ -73,6 +74,9 @@ describe("generated Core public surface", () => {
       "arrayOrderSelector",
       "ArrayIdentityResolver",
       "effectiveStateSelector",
+      "InstanceBinding",
+      "RenderScope",
+      "getRenderScope",
     ]) {
       expect(runtime, `missing ${name}`).toContain(name);
     }

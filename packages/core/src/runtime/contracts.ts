@@ -5,8 +5,8 @@ import type { CompileResult } from "../model/compile-result.js";
 import type { FormEnvironment } from "../extension/environment.js";
 import type { FormPlugin } from "../extension/plugin.js";
 import type { RegistryOverride } from "../extension/registry.js";
-import type { ArrayItemId, ViewNodeId } from "../identity/index.js";
-import type { InstancePath, InstancePathLike, ModelPathLike } from "../path/types.js";
+import type { ArrayItemId, DataNodeId, ViewNodeId } from "../identity/index.js";
+import type { InstancePath, InstancePathLike, ModelPath, ModelPathLike } from "../path/types.js";
 
 export type { JsonPrimitive, JsonValue } from "../definition/json-value.js";
 
@@ -15,6 +15,7 @@ export interface EffectiveState {
   readonly visible: boolean;
   readonly disabled: boolean;
   readonly readonly: boolean;
+  readonly required: boolean;
 }
 
 export interface SerializeOptions {
@@ -58,15 +59,19 @@ export interface FieldSnapshot {
   readonly visible: boolean;
   readonly disabled: boolean;
   readonly readonly: boolean;
+  readonly required: boolean;
 }
 
 export interface ViewSnapshot {
   readonly id: ViewNodeId;
   readonly focused: boolean;
+  readonly collapsed: boolean;
+  readonly activeTab: string | undefined;
   readonly active: boolean;
   readonly visible: boolean;
   readonly disabled: boolean;
   readonly readonly: boolean;
+  readonly required: boolean;
 }
 
 export interface ArrayItemSnapshot {
@@ -106,6 +111,9 @@ export interface ScopedFormInstance {
   setValue(path: InstancePathLike, value: unknown): void;
   touch(path: InstancePathLike): void;
   focus(viewId: ViewNodeId): void;
+  blur(viewId: ViewNodeId): void;
+  setCollapsed(viewId: ViewNodeId, collapsed: boolean): void;
+  setActiveTab(viewId: ViewNodeId, tabKey: string | null): void;
   array(path: InstancePathLike): ArrayInstance;
   scope(path: InstancePathLike): ScopedFormInstance;
 }
@@ -120,6 +128,9 @@ export interface FormInstance {
   setValues(values: unknown): void;
   touch(path: InstancePathLike): void;
   focus(viewId: ViewNodeId): void;
+  blur(viewId: ViewNodeId): void;
+  setCollapsed(viewId: ViewNodeId, collapsed: boolean): void;
+  setActiveTab(viewId: ViewNodeId, tabKey: string | null): void;
   reset(): void;
   array(path: InstancePathLike): ArrayInstance;
   scope(path: InstancePathLike): ScopedFormInstance;
@@ -131,7 +142,20 @@ export interface FormEngine {
   create(model: CompiledFormModel, options?: { readonly initialValues?: unknown }): FormInstance;
 }
 
-export interface CurrentBindingSnapshot {
+export interface InstanceBinding {
+  readonly nodeId: DataNodeId;
+  readonly modelPath: ModelPath;
   readonly path: InstancePath;
   readonly itemId: ArrayItemId | undefined;
+  readonly itemChain: readonly ArrayItemId[];
+  readonly stale: boolean;
+}
+
+export type CurrentBindingSnapshot = InstanceBinding;
+
+export interface RenderScope {
+  readonly binding: InstanceBinding;
+  resolve(path: ModelPathLike): InstancePath;
+  item(ref: ArrayItemRef, arrayPath?: ModelPathLike): RenderScope;
+  scope(path: ModelPathLike): RenderScope;
 }

@@ -9,7 +9,20 @@ export type RuntimeCommand =
   | { readonly type: "setValue"; readonly path: InstancePathLike; readonly value: unknown }
   | { readonly type: "setValues"; readonly value: unknown }
   | { readonly type: "touch"; readonly path: InstancePathLike }
-  | { readonly type: "focus"; readonly viewId: ViewNodeId }
+  | { readonly type: "focus"; readonly viewId: ViewNodeId; readonly scopeRuntimeId?: import("./runtime-node-id.js").RuntimeNodeId }
+  | { readonly type: "blur"; readonly viewId: ViewNodeId; readonly scopeRuntimeId?: import("./runtime-node-id.js").RuntimeNodeId }
+  | {
+      readonly type: "setCollapsed";
+      readonly viewId: ViewNodeId;
+      readonly collapsed: boolean;
+      readonly scopeRuntimeId?: import("./runtime-node-id.js").RuntimeNodeId;
+    }
+  | {
+      readonly type: "setActiveTab";
+      readonly viewId: ViewNodeId;
+      readonly tabKey: string | null;
+      readonly scopeRuntimeId?: import("./runtime-node-id.js").RuntimeNodeId;
+    }
   | { readonly type: "reset" }
   | { readonly type: "arrayAppend"; readonly path: InstancePathLike; readonly value: unknown }
   | {
@@ -56,14 +69,26 @@ export class ChangeQueue {
   }
 }
 
+export interface BlurredInteraction {
+  readonly viewId: ViewNodeId;
+  readonly path: InstancePath;
+  readonly itemChain: readonly ArrayItemId[];
+}
+
 export interface TransactionDraft {
   values: JsonValue;
   readonly touched: Map<string, true>;
   readonly focused: Map<string, true>;
+  readonly collapsed: Map<string, true>;
+  readonly activeTab: Map<string, string>;
+  readonly viewOwners: Map<string, import("./runtime-node-id.js").RuntimeNodeId>;
+  readonly blurred: BlurredInteraction[];
   reset: boolean;
   valuesChanged: boolean;
   touchChanged: boolean;
   focusChanged: boolean;
+  collapsedChanged: boolean;
+  activeTabChanged: boolean;
   identityChanged: boolean;
   result?: ArrayItemId;
   arrays: ArrayStateStore;

@@ -51,7 +51,7 @@ Runtime 必须（MUST）以正常嵌套的 business values 作为唯一 value so
 - **THEN** 公共类型拒绝该修改，且 Runtime 后续读取保持不变、version 不递增
 
 ### Requirement: 基础 value 与交互命令具有明确语义
-`FormInstance` 必须（SHALL）提供 `setValue()`、`setValues()`、`touch()`、`focus()` 与 `reset()` 命令。`setValues()` 必须（MUST）把传入的完整嵌套 values 作为一次原子 root replacement；`touch()` 以 Field `InstancePath` 为目标，`focus()` 以具体 `ViewNodeId` 为目标；`reset()` 必须（MUST）恢复创建时的 initial values 和基础 source-state 默认值。合法 object path 上缺失的 object container 可以（MAY）按静态 Model materialize，但数组项不得（MUST NOT）通过越界 index 隐式创建。
+`FormInstance` 必须（SHALL）提供 `setValue()`、`setValues()`、`touch()`、`focus()`、`blur()`、`setCollapsed()`、`setActiveTab()` 与 `reset()` 命令。`setValues()` 必须（MUST）把传入的完整嵌套 values 作为一次原子 root replacement；`touch()` 以 Field `InstancePath` 为目标；`focus()`、`blur()`、`setCollapsed()` 与 `setActiveTab()` 以具体 `ViewNodeId` 为目标，只修改该 View 的 source state，不得（MUST NOT）修改 values、touched 或其他 View 的状态；`blur()` 不得（MUST NOT）隐式 touch。`reset()` 必须（MUST）恢复创建时的 initial values 和全部基础 source-state 默认值。合法 object path 上缺失的 object container 可以（MAY）按静态 Model materialize，但数组项不得（MUST NOT）通过越界 index 隐式创建。不属于静态 ViewTree 的 `ViewNodeId` 必须（MUST）以 `source: "runtime"` 的结构化 Diagnostic 拒绝。
 
 #### Scenario: 原子替换完整 values
 - **GIVEN** 当前 values 包含多个字段且调用者提供一份新的完整嵌套 values
@@ -63,18 +63,38 @@ Runtime 必须（MUST）以正常嵌套的 business values 作为唯一 value so
 - **WHEN** touch 该 Field 并只 focus 其中一个 View
 - **THEN** touched 由 Field 共享，而 focused 只属于目标 View，另一个 View 不被标记 focused
 
+#### Scenario: blur 清除目标 View 的 focused
+- **GIVEN** 某 View 已通过 `focus(viewId)` 处于 focused 状态，且其 Field 尚未 touched
+- **WHEN** 调用 `blur(viewId)`
+- **THEN** 该 View 的 focused 变为 false，Field touched 与 values 均不变，`version` 恰好递增一次并只发布一次稳定 snapshot
+
+#### Scenario: 对未 focused 的 View blur 是 no-op
+- **GIVEN** 某 View 当前 focused 为 false
+- **WHEN** 调用 `blur(viewId)`
+- **THEN** 命令按 effective no-op 处理：`version` 不变、不运行后续 phase、不通知任何订阅者
+
+#### Scenario: collapsed 与 activeTab 属于具体 View
+- **GIVEN** 一个 Group View 与其中一个 Field View 各有独立 `ViewNodeId`
+- **WHEN** 调用 `setCollapsed(groupViewId, true)` 与 `setActiveTab(groupViewId, "advanced")`
+- **THEN** 只有该 Group View 的 snapshot 报告 `collapsed: true` 与 `activeTab: "advanced"`，Field View 与其他 View 保持默认值 `false`/`undefined`，Core 不解释 tab key 是否存在于 layout
+
 #### Scenario: reset 恢复初始基础状态
-- **GIVEN** values、touched 与 focused 已通过多个 transaction 改变
+- **GIVEN** values、touched、focused、collapsed 与 activeTab 已通过多个 transaction 改变
 - **WHEN** 调用 `reset()`
-- **THEN** values 恢复 Runtime-owned initial snapshot，touched/focused 恢复默认值，并作为至多一次有效 commit 对外发布
+- **THEN** values 恢复 Runtime-owned initial snapshot，touched/focused/collapsed/activeTab 全部恢复默认值，并作为至多一次有效 commit 对外发布
 
 #### Scenario: 拒绝隐式创建数组项
 - **GIVEN** 当前数组没有 index 3 对应的 item
 - **WHEN** 调用者尝试通过 `items[3].name` 写入
 - **THEN** 命令以结构化 Runtime Diagnostic 失败，且不会扩展数组或创建伪造 item identity
 
+#### Scenario: 拒绝未知 View 的交互命令
+- **GIVEN** 调用者传入一个不属于该 Compiled ViewTree 的 `ViewNodeId`
+- **WHEN** 调用 `blur()`、`setCollapsed()` 或 `setActiveTab()`
+- **THEN** 命令以稳定 `source: "runtime"` Diagnostic 失败，`version`、snapshot identity 与订阅者均不变化
+
 ### Requirement: Source 与 derived state 保持分离
-Runtime snapshot 必须（MUST）区分 source state 与 derived state：value 来自 nested values，touched 来自 Field source state，focused 来自 View source state，Form/Node/Field 的 dirty 与 aggregate touched 从 initial/current values 和 descendants 推导。派生值不得（MUST NOT）作为第二份可直接修改的 source 保存；Schema `active` 与 UI `visible` 也不得（MUST NOT）在基础 Runtime 中合并为同一状态。
+Runtime snapshot 必须（MUST）区分 source state 与 derived state：value 来自 nested values，touched 来自 Field source state，focused、collapsed 与 activeTab 来自 View source state，Form/Node/Field 的 dirty 与 aggregate touched 从 initial/current values 和 descendants 推导。派生值不得（MUST NOT）作为第二份可直接修改的 source 保存；Schema `active` 与 UI `visible` 也不得（MUST NOT）在基础 Runtime 中合并为同一状态。View source state 只能（MUST）通过对应 View command 修改，公开 snapshot 保持只读。
 
 #### Scenario: value 往返后 dirty 恢复
 - **GIVEN** 一个 Field 的 initial value 为 `A`
@@ -86,10 +106,33 @@ Runtime snapshot 必须（MUST）区分 source state 与 derived state：value �
 - **WHEN** 其中一个 descendant Field 被 touch
 - **THEN** 该 Field 与其 ancestor/Form 的 aggregate touched 为 true，未触及的 sibling Field 保持 false
 
+#### Scenario: View source state 不可绕过命令修改
+- **GIVEN** 调用者通过 `viewSelector` 或 `getState()` 取得包含 `focused`、`collapsed`、`activeTab` 的 View snapshot
+- **WHEN** 尝试直接改写这些属性
+- **THEN** 公共类型与运行时只读边界拒绝该修改，Runtime state 与 `version` 均不变化
+
 #### Scenario: active 与 visible 不被基础状态冒充
 - **GIVEN** Model 包含 conditional activation metadata 和 UI visible policy
-- **WHEN** 仅使用本 change 的 no-op Dynamics/Rule phase 创建实例
+- **WHEN** 仅使用基础 no-op Dynamics/Rule phase 创建实例
 - **THEN** Runtime 不把 visible 推断为 active，也不宣称已执行 conditional 或 Rule 语义
+
+### Requirement: focus-to-blur interaction 通过只读端口供后续 phase 消费
+Runtime 必须（SHALL）在同一 transaction 的 normalized change set 中记录本次 commit 内由 focused 变为非 focused 的 View 及其所属 Field 的 instance binding，并通过与既有 activation/rule/validation phase 相同的只读 context 提供给后续 Core owner。该端口不得（MUST NOT）从任何公共入口导出 writer，不得（MUST NOT）暴露 `RuntimeNodeId`，也不得（MUST NOT）让 Renderer 或 Plugin 伪造 interaction event。
+
+#### Scenario: blur 记录所属 Field binding
+- **GIVEN** 一个数组 item 内的 Field View 处于 focused 状态
+- **WHEN** 调用 `blur(viewId)` 并由测试 Validation owner 读取 phase context
+- **THEN** context 报告该 View 与其 Field 的当前 `InstancePath` 及稳定 `ArrayItemId` chain，且不包含 `RuntimeNodeId`、Store 或 writer
+
+#### Scenario: 非 blur 命令不产生 interaction 记录
+- **GIVEN** 同一实例先后执行 `setValue()` 与 `focus()`
+- **WHEN** 后续 phase 读取 change set
+- **THEN** 两次 commit 的 change set 中 blur interaction 列表为空，`focus()` 只记录 focused View 的变化
+
+#### Scenario: 被删除 item 的 blur 记录不泄漏到新 item
+- **GIVEN** 某 item 的 View 曾 focused，随后该 item 被 `remove` 且新 item 进入同一 index
+- **WHEN** 检查 remove commit 的 change set 与后续 blur 命令
+- **THEN** remove 只按 subtree lifecycle 清理旧 View 的 focused 状态而不生成 blur interaction，新 item 的 View 不继承任何 focused/blur 记录
 
 ### Requirement: 每个 public mutation 都原子提交
 每个 public mutation 必须（MUST）在单一 transaction 中校验并应用其全部 source changes，在成功时至多 commit 一次并将 `version` 恰好递增一次。命令校验或已启用 phase 失败时必须（MUST）保留 transaction 前的 values/state/version，且订阅者不得（MUST NOT）观察半完成状态。

@@ -174,7 +174,7 @@ Activation phase必须（MUST）在State/Computed/Effect前同步求值：oneOf�
 - **THEN** 其State/Computed/Effect与后续Validation plans在当前transaction按保留值重新调度，subscriber只看到最终稳定snapshot
 
 ### Requirement: effective状态具有固定组合优先级且active不等于visible
-Runtime必须（MUST）为Node/Field/View/Form提供readonly effective `active`、`visible`、`disabled`与`readonly` selector。Form root必须（MUST）保持active，Compiler必须（MUST）拒绝以active Rule关闭root。非root `active`由ancestor active、Schema activation和所有适用active Rule以逻辑AND组成；Rule不得重新激活Schema-inactive node。`visible`由effective active、ancestor visible、UI静态visible和适用visible Rule以AND组成；`disabled`由ancestor/UI/适用Rule的true结果以OR组成；`readonly`同样以OR组成并把Computed target作为强制true。缺省gate必须（MUST）分别为active/visible true、disabled/readonly false。
+Runtime必须（MUST）为Node/Field/View/Form提供readonly effective `active`、`visible`、`disabled`与`readonly` selector，并为Field与Field View额外提供readonly effective `required`。Form root必须（MUST）保持active，Compiler必须（MUST）拒绝以active Rule关闭root。非root `active`由ancestor active、Schema activation和所有适用active Rule以逻辑AND组成；Rule不得重新激活Schema-inactive node。`visible`由effective active、ancestor visible、UI静态visible和适用visible Rule以AND组成；`disabled`由ancestor/UI/适用Rule的true结果以OR组成；`readonly`同样以OR组成并把Computed target作为强制true。`required`由Field的requirement presentation source与当前Schema activation state组成：static required为true、static optional或无来源为false、conditional来源仅当其关联activation source当前active时为true；Field自身effective inactive时`required`必须（MUST）为false。`visible`、`disabled`、`readonly`、Widget props、`native`与Validation结果不得（MUST NOT）参与`required`组合。缺省gate必须（MUST）分别为active/visible true、disabled/readonly/required false。
 
 #### Scenario: hidden保持active
 - **GIVEN** Field的visible policy为false但Schema与active Rules均为true
@@ -191,9 +191,24 @@ Runtime必须（MUST）为Node/Field/View/Form提供readonly effective `active`�
 - **WHEN** 构建effective snapshot
 - **THEN** disabled仍为true、readonly为true，组合结果不依赖Rule注册或执行偶然顺序
 
+#### Scenario: 静态required直接投影
+- **GIVEN** Object Schema静态要求`name`而`nickname`为optional，两者都生成Field
+- **WHEN** 读取两个Field及其View的effective snapshot
+- **THEN** `name`报告`required: true`，`nickname`报告`required: false`，且该值不因visible、disabled或readonly变化而改变
+
+#### Scenario: conditional required跟随activation切换
+- **GIVEN** conditional Schema只在`type === "company"`分支active时要求`companyName`
+- **WHEN** 在同一transaction内把`type`从`person`改为`company`
+- **THEN** `companyName`的`required`在同一次commit中从false变为true，切回`person`后恢复false；Field值与touched状态保留
+
+#### Scenario: inactive Field不报告required
+- **GIVEN** 某Field位于当前inactive的Schema branch且其edge静态required
+- **WHEN** 读取effective snapshot
+- **THEN** `active: false`且`required: false`；重新active后`required`恢复为true而无需Renderer读取Schema或DataModel edge
+
 #### Scenario: 精确selector只通知受影响状态
 - **GIVEN** 分别订阅两个sibling Field的effective selectors
-- **WHEN** 一个State Rule只改变首个Field的visible结果
+- **WHEN** 一个State Rule只改变首个Field的visible结果，或一次activation切换只改变首个Field的required
 - **THEN** 首个及受影响ancestor selector发布稳定snapshot，sibling selector不重新求值或通知
 
 ### Requirement: serialize 基于committed active binding生成readonly输出

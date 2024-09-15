@@ -26,6 +26,7 @@ export const RUNTIME_DIAGNOSTIC_CODES = Object.freeze({
   PHASE_FAILED: "runtime.phase-failed",
   SUBSCRIBER_THREW: "runtime.subscriber-threw",
   INSTRUMENTATION_THREW: "runtime.instrumentation-threw",
+  CROSS_INSTANCE: "runtime.cross-instance",
 });
 
 export type RuntimeDiagnosticCode =
@@ -60,4 +61,5 @@ export const RUNTIME_DIAGNOSTIC_CODE_RANK: Readonly<Record<RuntimeDiagnosticCode
     [RUNTIME_DIAGNOSTIC_CODES.PHASE_FAILED]: 24,
     [RUNTIME_DIAGNOSTIC_CODES.SUBSCRIBER_THREW]: 25,
     [RUNTIME_DIAGNOSTIC_CODES.INSTRUMENTATION_THREW]: 26,
+    [RUNTIME_DIAGNOSTIC_CODES.CROSS_INSTANCE]: 27,
   });

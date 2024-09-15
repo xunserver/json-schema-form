@@ -13,7 +13,12 @@ export const compiled = compileForm(
 );
 
 export const form: FormInstance = createForm(compiled.model, { initialValues: { title: "Ada" } });
-void form.serialize();
+form.setValue("title", "Ada");
+form.focus(compiled.model.ui.viewTree.id);
+form.blur(compiled.model.ui.viewTree.id);
+form.setCollapsed(compiled.model.ui.viewTree.id, false);
+form.setActiveTab(compiled.model.ui.viewTree.id, null);
+void form.getField("title").getState().required;
 export const engine = createFormEngine();
 void 0 as unknown as ArrayInstance;
 void 0 as unknown as ScopedFormInstance;

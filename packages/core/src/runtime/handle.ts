@@ -1,18 +1,36 @@
-import type { FormInstance } from "./contracts.js";
+import type { FormInstance, ScopedFormInstance } from "./contracts.js";
 import { RUNTIME_DIAGNOSTIC_CODES } from "./diagnostic-codes.js";
 import { runtimeDiagnostic, sortRuntimeDiagnostics } from "./diagnostics.js";
 import { FormRuntimeError } from "./error.js";
 import type { FormRuntime } from "./form-runtime.js";
+import type { RuntimeNodeId } from "./runtime-node-id.js";
 
-const RUNTIMES = new WeakMap<FormInstance, FormRuntime>();
+export interface RuntimeFacadeHandle {
+  readonly runtime: FormRuntime;
+  readonly runtimeId: RuntimeNodeId;
+}
+
+const FACADES = new WeakMap<object, RuntimeFacadeHandle>();
 
 export function bindFormRuntime(form: FormInstance, runtime: FormRuntime): void {
-  RUNTIMES.set(form, runtime);
+  bindRuntimeFacade(form, runtime, runtime.rootRuntimeId());
+}
+
+export function bindRuntimeFacade(
+  target: object,
+  runtime: FormRuntime,
+  runtimeId: RuntimeNodeId,
+): void {
+  FACADES.set(target, { runtime, runtimeId });
 }
 
 export function resolveFormRuntime(form: FormInstance): FormRuntime {
-  const runtime = RUNTIMES.get(form);
-  if (runtime === undefined) {
+  return resolveRuntimeHandle(form).runtime;
+}
+
+export function resolveRuntimeHandle(target: object): RuntimeFacadeHandle {
+  const handle = FACADES.get(target);
+  if (handle === undefined) {
     throw new FormRuntimeError(
       sortRuntimeDiagnostics([
         runtimeDiagnostic({
@@ -22,5 +40,9 @@ export function resolveFormRuntime(form: FormInstance): FormRuntime {
       ]),
     );
   }
-  return runtime;
+  return handle;
+}
+
+export function isRuntimeFacade(target: object): target is FormInstance | ScopedFormInstance {
+  return FACADES.has(target);
 }

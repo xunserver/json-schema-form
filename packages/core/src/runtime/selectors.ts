@@ -116,6 +116,7 @@ export function effectiveStateSelector(path: InstancePathLike): RuntimeSelector<
         visible: snapshot.visible,
         disabled: snapshot.disabled,
         readonly: snapshot.readonly,
+        required: snapshot.required,
       });
       EFFECTIVE_FROM_FIELD.set(snapshot, next);
       return next;
@@ -150,7 +151,7 @@ export function arrayItemSelector(
 export function currentBindingSelector(path: InstancePathLike): RuntimeSelector<CurrentBindingSnapshot> {
   const canonical = requireCanonicalPath(path, "binding");
   return makeSelector({
-    deps: Object.freeze([`address:${canonical}`, `value:${canonical}`]),
+    deps: Object.freeze([`binding:${canonical}`]),
     project: (host) => host.currentBinding(canonical),
   });
 }

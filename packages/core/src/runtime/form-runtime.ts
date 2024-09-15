@@ -9,11 +9,15 @@ import {
   joinInstancePath,
   parseInstancePath,
   ROOT_INSTANCE_PATH,
+  ROOT_MODEL_PATH,
   toModelPath,
   asInstancePath,
   type InstancePath,
   type InstancePathLike,
+  type ModelPath,
+  type ModelPathLike,
 } from "../path/index.js";
+import { bindTemplatePath } from "../path/bind-path.js";
 import type {
   ArrayInstance,
   ArrayItemRef,
@@ -22,6 +26,7 @@ import type {
   FieldSnapshot,
   FormInstance,
   FormSnapshot,
+  InstanceBinding,
   JsonValue,
   ScopedFormInstance,
   SerializeOptions,
@@ -79,6 +84,13 @@ import {
   type RuleDraftState,
 } from "./rule/engine.js";
 import { DEFAULT_EFFECTIVE } from "./effective.js";
+import { bindRuntimeFacade } from "./handle.js";
+import { resolveModelPath } from "./render-scope.js";
+import {
+  buildFieldRequirementIndex,
+  requirementSourceOf,
+  type FieldRequirementSource,
+} from "./requirement-index.js";
 
 export interface FormRuntimeOptions {
   readonly initialValues?: unknown;
@@ -145,8 +157,11 @@ export class FormRuntime implements SelectorHost {
   private readonly commandLimit: number;
   private readonly iterationLimit: number;
   private readonly viewIndex: ReadonlyMap<string, UIViewNode>;
+  private readonly viewsByField = new Map<string, ViewNodeId[]>();
+  private readonly requirementIndex: ReadonlyMap<ModelPath, FieldRequirementSource>;
   private readonly fieldSnapshots = new Map<string, FieldSnapshot>();
   private readonly viewSnapshots = new Map<string, ViewSnapshot>();
+  private readonly bindingSnapshots = new Map<string, InstanceBinding>();
   private cachedFormSnapshot: FormSnapshot | undefined;
   private readonly selectorCache = new WeakMap<RuntimeSelector<unknown>, SelectorCacheEntry>();
   private readonly subscriptions: Subscription<unknown>[] = [];
@@ -171,6 +186,8 @@ export class FormRuntime implements SelectorHost {
     this.iterationLimit = options?.iterationLimit ?? RUNTIME_ITERATION_LIMIT;
     this.validationOwner = options?.validationOwner;
     this.viewIndex = indexViews(model.ui.viewTree);
+    this.requirementIndex = buildFieldRequirementIndex(model);
+    indexFieldViews(model.ui.viewTree, this.viewsByField);
     this.values = new ValueStoreImpl(readInitialValues(model, options?.initialValues));
     this.originalInitial = this.values.current;
     this.engine = new RuleDynamicsEngine(model, environment);
@@ -235,12 +252,16 @@ export class FormRuntime implements SelectorHost {
     if (this.cachedFormSnapshot !== undefined && this.formSnapshotStamp === stamp) {
       return this.cachedFormSnapshot;
     }
+    const effective = this.effectiveAt(ROOT_INSTANCE_PATH);
     const snapshot: FormSnapshot = Object.freeze({
       values: this.values.current,
       dirty: !jsonEqual(this.values.current, this.values.initial),
       touched: this.fields.touched.size > 0,
       version: this.form.version,
-      ...this.effectiveAt(ROOT_INSTANCE_PATH),
+      active: effective.active,
+      visible: effective.visible,
+      disabled: effective.disabled,
+      readonly: effective.readonly,
     });
     this.cachedFormSnapshot = snapshot;
     this.formSnapshotStamp = stamp;
@@ -325,6 +346,8 @@ export class FormRuntime implements SelectorHost {
     const originalValues = this.values.current;
     const originalTouched = new Map(this.fields.touched);
     const originalFocused = new Map(this.views.focused);
+    const originalCollapsed = new Map(this.views.collapsed);
+    const originalActiveTab = new Map(this.views.activeTab);
     const draft = this.createDraft();
     let committedChangeSet: NormalizedChangeSet | undefined;
     const queue = new ChangeQueue();
@@ -346,11 +369,22 @@ export class FormRuntime implements SelectorHost {
             this.throwDiagnostics([limitDiagnostic(applied, 0, this.commandLimit, this.iterationLimit)]);
           }
           this.applyCommand(draft, command);
+          this.scrubRemovedViewState(draft);
         }
       };
 
       applyQueued();
-      if (!draftDiffers(draft, originalValues, originalTouched, originalFocused) && !draft.identityChanged) {
+      if (
+        !draftDiffers(
+          draft,
+          originalValues,
+          originalTouched,
+          originalFocused,
+          originalCollapsed,
+          originalActiveTab,
+        ) &&
+        !draft.identityChanged
+      ) {
         return;
       }
 
@@ -364,11 +398,13 @@ export class FormRuntime implements SelectorHost {
         const beforeValues = draft.values;
         const beforeTouched = new Map(draft.touched);
         const beforeFocused = new Map(draft.focused);
-        this.runPhase("activation", draft, queue, committedVersion, originalValues, originalTouched, originalFocused, applyQueued);
+        const beforeCollapsed = new Map(draft.collapsed);
+        const beforeActiveTab = new Map(draft.activeTab);
+        this.runPhase("activation", draft, queue, committedVersion, originalValues, originalTouched, originalFocused, originalCollapsed, originalActiveTab, applyQueued);
         applyQueued();
-        this.runPhase("rule", draft, queue, committedVersion, originalValues, originalTouched, originalFocused, applyQueued);
+        this.runPhase("rule", draft, queue, committedVersion, originalValues, originalTouched, originalFocused, originalCollapsed, originalActiveTab, applyQueued);
         applyQueued();
-        progressed = draftDiffers(draft, beforeValues, beforeTouched, beforeFocused);
+        progressed = draftDiffers(draft, beforeValues, beforeTouched, beforeFocused, beforeCollapsed, beforeActiveTab);
       }
 
       this.runPhase(
@@ -379,6 +415,8 @@ export class FormRuntime implements SelectorHost {
         originalValues,
         originalTouched,
         originalFocused,
+        originalCollapsed,
+        originalActiveTab,
       );
       if (queue.size > 0) {
         this.throwDiagnostics([
@@ -389,11 +427,29 @@ export class FormRuntime implements SelectorHost {
         ]);
       }
 
-      if (!draftDiffers(draft, originalValues, originalTouched, originalFocused) && !draft.identityChanged && !this.workingRule?.derivedChanged) {
+      if (
+        !draftDiffers(
+          draft,
+          originalValues,
+          originalTouched,
+          originalFocused,
+          originalCollapsed,
+          originalActiveTab,
+        ) &&
+        !draft.identityChanged &&
+        !this.workingRule?.derivedChanged
+      ) {
         return;
       }
 
-      committedChangeSet = this.changeSetOf(draft, originalValues, originalTouched, originalFocused);
+      committedChangeSet = this.changeSetOf(
+        draft,
+        originalValues,
+        originalTouched,
+        originalFocused,
+        originalCollapsed,
+        originalActiveTab,
+      );
       this.commitDraft(draft, committedChangeSet);
       this.lastCommandResult = draft.result;
       if (this.workingRule !== undefined && this.workingRule.oneOfDiagnostics.length > 0) {
@@ -449,10 +505,16 @@ export class FormRuntime implements SelectorHost {
           values: this.values.current,
           touched: new Map(this.fields.touched),
           focused: new Map(this.views.focused),
+          collapsed: new Map(this.views.collapsed),
+          activeTab: new Map(this.views.activeTab),
+          viewOwners: new Map(this.views.owners) as Map<string, RuntimeNodeId>,
+          blurred: [],
           reset: committedChangeSet.reset,
           valuesChanged: false,
           touchChanged: false,
           focusChanged: false,
+          collapsedChanged: false,
+          activeTabChanged: false,
           identityChanged: false,
           arrays: this.arrays,
           bindings: this.bindings,
@@ -469,6 +531,8 @@ export class FormRuntime implements SelectorHost {
         originalValues,
         originalTouched,
         originalFocused,
+        originalCollapsed,
+        originalActiveTab,
       );
     } catch (error) {
       this.emitNonBlocking([
@@ -498,10 +562,16 @@ export class FormRuntime implements SelectorHost {
       values: this.values.current,
       touched: new Map(this.fields.touched),
       focused: new Map(this.views.focused),
+      collapsed: new Map(this.views.collapsed),
+      activeTab: new Map(this.views.activeTab),
+      viewOwners: new Map(this.views.owners) as Map<string, RuntimeNodeId>,
+      blurred: [],
       reset: false,
       valuesChanged: false,
       touchChanged: false,
       focusChanged: false,
+      collapsedChanged: false,
+      activeTabChanged: false,
       identityChanged: false,
       arrays: this.arrays.clone(),
       bindings: this.bindings.clone(),
@@ -527,7 +597,16 @@ export class FormRuntime implements SelectorHost {
         this.applyTouch(draft, command.path);
         return;
       case "focus":
-        this.applyFocus(draft, command.viewId);
+        this.applyFocus(draft, command.viewId, command.scopeRuntimeId);
+        return;
+      case "blur":
+        this.applyBlur(draft, command.viewId, command.scopeRuntimeId);
+        return;
+      case "setCollapsed":
+        this.applyCollapsed(draft, command.viewId, command.collapsed, command.scopeRuntimeId);
+        return;
+      case "setActiveTab":
+        this.applyActiveTab(draft, command.viewId, command.tabKey, command.scopeRuntimeId);
         return;
       case "reset":
         this.applyReset(draft);
@@ -644,7 +723,90 @@ export class FormRuntime implements SelectorHost {
     draft.touchChanged = true;
   }
 
-  private applyFocus(draft: TransactionDraft, viewId: ViewNodeId): void {
+  private applyFocus(
+    draft: TransactionDraft,
+    viewId: ViewNodeId,
+    scopeRuntimeId?: RuntimeNodeId,
+  ): void {
+    this.requireView(viewId);
+    if (draft.focused.has(viewId)) {
+      this.rememberViewOwner(draft, viewId, scopeRuntimeId);
+      return;
+    }
+    draft.focused.set(viewId, true);
+    draft.focusChanged = true;
+    this.rememberViewOwner(draft, viewId, scopeRuntimeId);
+  }
+
+  private applyBlur(
+    draft: TransactionDraft,
+    viewId: ViewNodeId,
+    scopeRuntimeId?: RuntimeNodeId,
+  ): void {
+    this.requireView(viewId);
+    if (!draft.focused.has(viewId)) {
+      return;
+    }
+    const path = this.viewFieldPath(draft, viewId, scopeRuntimeId);
+    const itemChain = this.viewItemChain(draft, viewId, scopeRuntimeId, path);
+    draft.focused.delete(viewId);
+    if (draft.focused.size === 0 && !draft.collapsed.has(viewId) && !draft.activeTab.has(viewId)) {
+      draft.viewOwners.delete(viewId);
+    }
+    draft.focusChanged = true;
+    draft.blurred.push(
+      Object.freeze({
+        viewId,
+        path,
+        itemChain,
+      }),
+    );
+  }
+
+  private applyCollapsed(
+    draft: TransactionDraft,
+    viewId: ViewNodeId,
+    collapsed: boolean,
+    scopeRuntimeId?: RuntimeNodeId,
+  ): void {
+    this.requireView(viewId);
+    const current = draft.collapsed.has(viewId);
+    if (current === collapsed) {
+      this.rememberViewOwner(draft, viewId, scopeRuntimeId);
+      return;
+    }
+    if (collapsed) {
+      draft.collapsed.set(viewId, true);
+    } else {
+      draft.collapsed.delete(viewId);
+    }
+    draft.collapsedChanged = true;
+    this.rememberViewOwner(draft, viewId, scopeRuntimeId);
+  }
+
+  private applyActiveTab(
+    draft: TransactionDraft,
+    viewId: ViewNodeId,
+    tabKey: string | null,
+    scopeRuntimeId?: RuntimeNodeId,
+  ): void {
+    this.requireView(viewId);
+    const current = draft.activeTab.get(viewId);
+    const next = tabKey === null ? undefined : tabKey;
+    if (current === next) {
+      this.rememberViewOwner(draft, viewId, scopeRuntimeId);
+      return;
+    }
+    if (next === undefined) {
+      draft.activeTab.delete(viewId);
+    } else {
+      draft.activeTab.set(viewId, next);
+    }
+    draft.activeTabChanged = true;
+    this.rememberViewOwner(draft, viewId, scopeRuntimeId);
+  }
+
+  private requireView(viewId: ViewNodeId): void {
     if (!this.viewIndex.has(viewId)) {
       this.throwDiagnostics([
         runtimeDiagnostic({
@@ -654,28 +816,116 @@ export class FormRuntime implements SelectorHost {
         }),
       ]);
     }
-    if (draft.focused.has(viewId)) {
+  }
+
+  private rememberViewOwner(
+    draft: TransactionDraft,
+    viewId: ViewNodeId,
+    scopeRuntimeId: RuntimeNodeId | undefined,
+  ): void {
+    const owner = scopeRuntimeId ?? this.viewBindingRuntimeId(draft, viewId);
+    if (owner !== undefined) {
+      draft.viewOwners.set(viewId, owner);
+    }
+  }
+
+  private viewBindingRuntimeId(draft: TransactionDraft, viewId: ViewNodeId): RuntimeNodeId | undefined {
+    const node = this.viewIndex.get(viewId);
+    const template = viewTemplatePath(node);
+    if (template === undefined || template.includes("[]") || template.includes("[#")) {
+      return undefined;
+    }
+    const instance = asInstancePath(template);
+    return draft.bindings.idAt(instance);
+  }
+
+  private viewFieldPath(
+    draft: TransactionDraft,
+    viewId: ViewNodeId,
+    scopeRuntimeId: RuntimeNodeId | undefined,
+  ): InstancePath {
+    const node = this.viewIndex.get(viewId);
+    const template = viewTemplatePath(node);
+    if (template === undefined) {
+      return scopeRuntimeId === undefined
+        ? ROOT_INSTANCE_PATH
+        : (draft.bindings.pathOf(scopeRuntimeId) ?? ROOT_INSTANCE_PATH);
+    }
+    if (scopeRuntimeId !== undefined) {
+      const scopePath = draft.bindings.pathOf(scopeRuntimeId) ?? ROOT_INSTANCE_PATH;
+      const scopeRecord = draft.bindings.records.get(scopeRuntimeId);
+      const scopeModel = scopeRecord?.modelPath ?? ROOT_MODEL_PATH;
+      if (template.includes("[]") || template.includes("[#")) {
+        return bindTemplatePath(template as ModelPath, scopeModel, scopePath);
+      }
+      if (template.length === 0) {
+        return scopePath;
+      }
+      return joinRelativePath(scopePath, template);
+    }
+    if (!template.includes("[]") && !template.includes("[#")) {
+      return asInstancePath(template);
+    }
+    return ROOT_INSTANCE_PATH;
+  }
+
+  private viewItemChain(
+    draft: TransactionDraft,
+    viewId: ViewNodeId,
+    scopeRuntimeId: RuntimeNodeId | undefined,
+    path: InstancePath,
+  ): readonly ArrayItemId[] {
+    const runtimeId =
+      scopeRuntimeId ??
+      draft.bindings.idAt(path) ??
+      this.viewBindingRuntimeId(draft, viewId);
+    if (runtimeId === undefined) {
+      return Object.freeze([]);
+    }
+    return draft.bindings.itemChainOf(runtimeId);
+  }
+
+  private scrubRemovedViewState(draft: TransactionDraft): void {
+    if (draft.removedRuntimeIds.length === 0) {
       return;
     }
-    draft.focused.set(viewId, true);
-    draft.focusChanged = true;
+    const removed = new Set(draft.removedRuntimeIds);
+    for (const [viewId, owner] of [...draft.viewOwners.entries()]) {
+      if (!removed.has(owner)) {
+        continue;
+      }
+      draft.focused.delete(viewId);
+      draft.collapsed.delete(viewId);
+      draft.activeTab.delete(viewId);
+      draft.viewOwners.delete(viewId);
+      draft.focusChanged = true;
+      draft.collapsedChanged = true;
+      draft.activeTabChanged = true;
+    }
   }
 
   private applyReset(draft: TransactionDraft): void {
     const valuesChanged = !jsonEqual(draft.values, this.originalInitial);
     const touchChanged = draft.touched.size > 0;
     const focusChanged = draft.focused.size > 0;
+    const collapsedChanged = draft.collapsed.size > 0;
+    const activeTabChanged = draft.activeTab.size > 0;
     const hadItems = arrayItemCount(draft.arrays) > 0 || arrayItemCount(this.arrays) > 0;
-    if (!valuesChanged && !touchChanged && !focusChanged && !hadItems) {
+    if (!valuesChanged && !touchChanged && !focusChanged && !collapsedChanged && !activeTabChanged && !hadItems) {
       return;
     }
     draft.values = this.originalInitial;
     draft.touched.clear();
     draft.focused.clear();
+    draft.collapsed.clear();
+    draft.activeTab.clear();
+    draft.viewOwners.clear();
     draft.reset = true;
     draft.valuesChanged = valuesChanged || draft.valuesChanged;
     draft.touchChanged = touchChanged || draft.touchChanged;
     draft.focusChanged = focusChanged || draft.focusChanged;
+    draft.collapsedChanged = collapsedChanged || draft.collapsedChanged;
+    draft.activeTabChanged = activeTabChanged || draft.activeTabChanged;
     if (hadItems) {
       this.kernel.rebuildAll(asKernelDraft(draft), draft.values);
       draft.identityChanged = true;
@@ -701,6 +951,24 @@ export class FormRuntime implements SelectorHost {
       }
       this.views.revision += 1;
     }
+    if (!mapsEqual(this.views.collapsed, draft.collapsed)) {
+      this.views.collapsed.clear();
+      for (const [id] of draft.collapsed) {
+        this.views.collapsed.set(id, true);
+      }
+      this.views.revision += 1;
+    }
+    if (!stringMapsEqual(this.views.activeTab, draft.activeTab)) {
+      this.views.activeTab.clear();
+      for (const [id, tab] of draft.activeTab) {
+        this.views.activeTab.set(id, tab);
+      }
+      this.views.revision += 1;
+    }
+    this.views.owners.clear();
+    for (const [id, owner] of draft.viewOwners) {
+      this.views.owners.set(id, owner);
+    }
     this.form.version += 1;
     this.form.revision += 1;
     if (draft.reset) {
@@ -723,6 +991,10 @@ export class FormRuntime implements SelectorHost {
         this.extraSelectorKeys.add(`effective:${path}`);
         this.extraSelectorKeys.add(`field:${path}`);
         this.fieldSnapshots.delete(path);
+        for (const viewId of this.viewsForInstance(path)) {
+          this.extraSelectorKeys.add(`view:${viewId}`);
+          this.viewSnapshots.delete(viewId);
+        }
       };
       for (const path of changed) {
         mark(path);
@@ -736,6 +1008,18 @@ export class FormRuntime implements SelectorHost {
     }
     for (const path of draft.affectedArrayOrders) {
       this.extraSelectorKeys.add(`array-order:${path}`);
+    }
+    for (const [path, previousId] of this.bindings.pathToId) {
+      if (draft.bindings.pathToId.get(path) !== previousId) {
+        this.extraSelectorKeys.add(`binding:${path}`);
+        this.bindingSnapshots.delete(path);
+      }
+    }
+    for (const path of draft.bindings.pathToId.keys()) {
+      if (!this.bindings.pathToId.has(path)) {
+        this.extraSelectorKeys.add(`binding:${path}`);
+        this.bindingSnapshots.delete(path);
+      }
     }
     for (const id of draft.affectedAddresses) {
       this.extraSelectorKeys.add(`address:${id}`);
@@ -834,12 +1118,21 @@ export class FormRuntime implements SelectorHost {
     originalValues: JsonValue,
     originalTouched: ReadonlyMap<string, true>,
     originalFocused: ReadonlyMap<string, true>,
+    originalCollapsed: ReadonlyMap<string, true>,
+    originalActiveTab: ReadonlyMap<string, string>,
     flush: () => void = () => undefined,
   ): void {
     const context: TransactionPhaseContext = Object.freeze({
       phase,
       committedVersion,
-      changeSet: this.changeSetOf(draft, originalValues, originalTouched, originalFocused),
+      changeSet: this.changeSetOf(
+        draft,
+        originalValues,
+        originalTouched,
+        originalFocused,
+        originalCollapsed,
+        originalActiveTab,
+      ),
       getValue: (path: InstancePath | string) => {
         const segments = parseInstancePath(path);
         if (segments === undefined) {
@@ -940,6 +1233,8 @@ export class FormRuntime implements SelectorHost {
     committedValues: JsonValue,
     committedTouched: ReadonlyMap<string, true>,
     committedFocused: ReadonlyMap<string, true>,
+    committedCollapsed: ReadonlyMap<string, true>,
+    committedActiveTab: ReadonlyMap<string, string>,
   ): NormalizedChangeSet {
     const valuePaths = diffJsonValuePaths(committedValues, draft.values, (segments) =>
       formatInstancePath(segments),
@@ -961,11 +1256,19 @@ export class FormRuntime implements SelectorHost {
         fieldPaths.add(ancestor);
       }
     }
-    const viewIds = uniqueFocused(committedFocused, draft.focused);
+    const viewIds = uniqueViewState(
+      committedFocused,
+      draft.focused,
+      committedCollapsed,
+      draft.collapsed,
+      committedActiveTab,
+      draft.activeTab,
+    );
     return Object.freeze({
       valuePaths: Object.freeze([...valuePaths]),
       fieldPaths: Object.freeze([...fieldPaths]),
       viewIds: Object.freeze(viewIds),
+      blurred: Object.freeze(draft.blurred.map((item) => Object.freeze({ ...item }))),
       reset: draft.reset,
     });
   }
@@ -985,7 +1288,8 @@ export class FormRuntime implements SelectorHost {
       cached.active === effective.active &&
       cached.visible === effective.visible &&
       cached.disabled === effective.disabled &&
-      cached.readonly === effective.readonly
+      cached.readonly === effective.readonly &&
+      cached.required === effective.required
     ) {
       return cached;
     }
@@ -1015,21 +1319,28 @@ export class FormRuntime implements SelectorHost {
 
   private viewSnapshotAt(id: ViewNodeId): ViewSnapshot {
     const focused = this.views.focused.has(id);
+    const collapsed = this.views.collapsed.has(id);
+    const activeTab = this.views.activeTab.get(id);
     const effective = this.viewEffective(id);
     const cached = this.viewSnapshots.get(id);
     if (
       cached !== undefined &&
       cached.focused === focused &&
+      cached.collapsed === collapsed &&
+      cached.activeTab === activeTab &&
       cached.active === effective.active &&
       cached.visible === effective.visible &&
       cached.disabled === effective.disabled &&
-      cached.readonly === effective.readonly
+      cached.readonly === effective.readonly &&
+      cached.required === effective.required
     ) {
       return cached;
     }
     const snapshot: ViewSnapshot = Object.freeze({
       id,
       focused,
+      collapsed,
+      activeTab,
       ...effective,
     });
     this.viewSnapshots.set(id, snapshot);
@@ -1057,10 +1368,16 @@ export class FormRuntime implements SelectorHost {
       values: this.values.current,
       touched: this.fields.touched,
       focused: this.views.focused,
+      collapsed: this.views.collapsed,
+      activeTab: this.views.activeTab,
+      viewOwners: this.views.owners as Map<string, RuntimeNodeId>,
+      blurred: [],
       reset: false,
       valuesChanged: false,
       touchChanged: false,
       focusChanged: false,
+      collapsedChanged: false,
+      activeTabChanged: false,
       identityChanged: false,
       arrays: this.arrays,
       bindings: this.bindings,
@@ -1216,6 +1533,15 @@ export class FormRuntime implements SelectorHost {
       focus(viewId) {
         runtime.dispatch({ type: "focus", viewId });
       },
+      blur(viewId) {
+        runtime.dispatch({ type: "blur", viewId });
+      },
+      setCollapsed(viewId, collapsed) {
+        runtime.dispatch({ type: "setCollapsed", viewId, collapsed });
+      },
+      setActiveTab(viewId, tabKey) {
+        runtime.dispatch({ type: "setActiveTab", viewId, tabKey });
+      },
       reset() {
         runtime.dispatch({ type: "reset" });
       },
@@ -1229,6 +1555,7 @@ export class FormRuntime implements SelectorHost {
         return runtime.serialize(options);
       },
     };
+    bindRuntimeFacade(facade, runtime, runtime.rootRuntimeId());
     return Object.freeze(facade);
   }
 
@@ -1305,11 +1632,7 @@ export class FormRuntime implements SelectorHost {
 
   currentBinding(path: InstancePathLike) {
     const binding = this.requireDraftBinding(this.committedView(), path);
-    const record = this.bindings.records.get(binding.runtimeId);
-    return Object.freeze({
-      path: this.bindings.pathOf(binding.runtimeId) ?? binding.path,
-      itemId: record?.itemId,
-    });
+    return this.projectInstanceBinding(binding.runtimeId);
   }
 
   itemValue(itemId: ArrayItemId, relative?: InstancePathLike): JsonValue | undefined {
@@ -1461,6 +1784,7 @@ export class FormRuntime implements SelectorHost {
         });
       },
     };
+    bindRuntimeFacade(facade, runtime, arrayRid);
     return Object.freeze(facade);
   }
 
@@ -1496,7 +1820,19 @@ export class FormRuntime implements SelectorHost {
       },
       focus(viewId) {
         runtime.assertLive(runtimeId);
-        runtime.dispatch({ type: "focus", viewId });
+        runtime.dispatch({ type: "focus", viewId, scopeRuntimeId: runtimeId });
+      },
+      blur(viewId) {
+        runtime.assertLive(runtimeId);
+        runtime.dispatch({ type: "blur", viewId, scopeRuntimeId: runtimeId });
+      },
+      setCollapsed(viewId, collapsed) {
+        runtime.assertLive(runtimeId);
+        runtime.dispatch({ type: "setCollapsed", viewId, collapsed, scopeRuntimeId: runtimeId });
+      },
+      setActiveTab(viewId, tabKey) {
+        runtime.assertLive(runtimeId);
+        runtime.dispatch({ type: "setActiveTab", viewId, tabKey, scopeRuntimeId: runtimeId });
       },
       array(path) {
         runtime.assertLive(runtimeId);
@@ -1507,6 +1843,7 @@ export class FormRuntime implements SelectorHost {
         return runtime.createScope(joinRelativePath(runtime.bindings.pathOf(runtimeId) ?? ROOT_INSTANCE_PATH, path));
       },
     };
+    bindRuntimeFacade(facade, runtime, runtimeId);
     return Object.freeze(facade);
   }
 
@@ -1519,6 +1856,142 @@ export class FormRuntime implements SelectorHost {
         }),
       ]);
     }
+  }
+
+  requirementSource(path: ModelPath) {
+    return requirementSourceOf(this.requirementIndex, path);
+  }
+
+  rootRuntimeId(): RuntimeNodeId {
+    return this.kernel.internRoot(this.model.data.root);
+  }
+
+  assertScopeLive(runtimeId: RuntimeNodeId): void {
+    this.assertLive(runtimeId);
+  }
+
+  projectInstanceBinding(runtimeId: RuntimeNodeId, previous?: InstanceBinding): InstanceBinding {
+    const record = this.bindings.records.get(runtimeId);
+    if (record === undefined) {
+      if (previous !== undefined) {
+        if (previous.stale) {
+          return previous;
+        }
+        return Object.freeze({
+          ...previous,
+          stale: true,
+        });
+      }
+      this.assertLive(runtimeId);
+    }
+    const path = this.bindings.pathOf(runtimeId) ?? previous?.path ?? ROOT_INSTANCE_PATH;
+    const itemChain = this.bindings.itemChainOf(runtimeId);
+    const next: InstanceBinding = Object.freeze({
+      nodeId: record!.node.id,
+      modelPath: record!.modelPath,
+      path,
+      itemId: itemChain[itemChain.length - 1],
+      itemChain,
+      stale: false,
+    });
+    const cached = this.bindingSnapshots.get(path);
+    if (
+      cached !== undefined &&
+      cached.nodeId === next.nodeId &&
+      cached.modelPath === next.modelPath &&
+      cached.path === next.path &&
+      cached.itemId === next.itemId &&
+      cached.stale === next.stale &&
+      sameItemChain(cached.itemChain, next.itemChain)
+    ) {
+      return cached;
+    }
+    this.bindingSnapshots.set(path, next);
+    return next;
+  }
+
+  itemRuntimeIdInScope(
+    runtimeId: RuntimeNodeId,
+    ref: ArrayItemRef,
+    arrayPath?: ModelPathLike,
+  ): RuntimeNodeId {
+    const draft = this.committedView();
+    const arrayRid = this.resolveArrayRuntimeId(draft, runtimeId, arrayPath);
+    const arrayInstancePath = this.bindings.pathOf(arrayRid) ?? ROOT_INSTANCE_PATH;
+    const index = this.kernel.resolveItemIndex(asKernelDraft(draft), arrayRid, ref, arrayInstancePath);
+    const order = this.arrays.arrays.get(arrayRid)?.order ?? [];
+    const itemId = order[index];
+    if (itemId === undefined) {
+      this.throwDiagnostics([
+        runtimeDiagnostic({
+          code: RUNTIME_DIAGNOSTIC_CODES.UNKNOWN_ARRAY_ITEM,
+          message: "Array item id is unknown",
+          metadata: { path: arrayInstancePath },
+        }),
+      ]);
+    }
+    const itemRid = this.kernel.itemRuntimeId(asKernelDraft(draft), arrayRid, itemId);
+    if (itemRid === undefined) {
+      this.throwDiagnostics([
+        runtimeDiagnostic({
+          code: RUNTIME_DIAGNOSTIC_CODES.UNKNOWN_ARRAY_ITEM,
+          message: "Array item id is unknown",
+          metadata: { path: arrayInstancePath, item: String(itemId) },
+        }),
+      ]);
+    }
+    return itemRid;
+  }
+
+  scopeRuntimeIdInScope(runtimeId: RuntimeNodeId, path: ModelPathLike): RuntimeNodeId {
+    const binding = this.projectInstanceBinding(runtimeId);
+    const instance = this.resolveInScope(runtimeId, path);
+    const child = this.bindings.idAt(instance);
+    if (child === undefined) {
+      this.throwDiagnostics([
+        runtimeDiagnostic({
+          code: RUNTIME_DIAGNOSTIC_CODES.UNKNOWN_PATH,
+          message: `Cannot resolve RenderScope path without materializing: ${instance}`,
+          metadata: { path: instance, modelPath: binding.modelPath },
+        }),
+      ]);
+    }
+    return child;
+  }
+
+  resolveInScope(runtimeId: RuntimeNodeId, path: ModelPathLike): InstancePath {
+    return resolveModelPath(this, this.projectInstanceBinding(runtimeId), path);
+  }
+
+  private resolveArrayRuntimeId(
+    draft: TransactionDraft,
+    runtimeId: RuntimeNodeId,
+    arrayPath?: ModelPathLike,
+  ): RuntimeNodeId {
+    if (arrayPath !== undefined) {
+      const instance = this.resolveInScope(runtimeId, arrayPath);
+      const array = this.kernel.requireArray(asKernelDraft(draft), instance);
+      return array.runtimeId;
+    }
+    const record = draft.bindings.records.get(runtimeId);
+    if (record !== undefined && derefNode(record.node, this.kernel.byId).kind === "array") {
+      return runtimeId;
+    }
+    this.throwDiagnostics([
+      runtimeDiagnostic({
+        code: RUNTIME_DIAGNOSTIC_CODES.NON_ARRAY_PATH,
+        message: "RenderScope.item() requires an array path",
+        metadata: { path: draft.bindings.pathOf(runtimeId) },
+      }),
+    ]);
+  }
+
+  private viewsForInstance(path: InstancePath): readonly ViewNodeId[] {
+    const modelPath = this.bindings.records.get(this.bindings.idAt(path) as RuntimeNodeId)?.modelPath ?? toModelPath(path);
+    if (modelPath === undefined) {
+      return [];
+    }
+    return this.viewsByField.get(modelPath) ?? [];
   }
 
   private applyArrayAppend(draft: TransactionDraft, path: InstancePathLike, value: unknown): void {
@@ -1577,6 +2050,7 @@ export class FormRuntime implements SelectorHost {
     const itemRid = this.kernel.itemRuntimeId(asKernelDraft(draft), array.runtimeId, itemId);
     if (itemRid !== undefined) {
       this.kernel.cleanupSubtree(asKernelDraft(draft), [itemRid], "remove");
+      this.scrubRemovedViewState(draft);
     }
     const current = asMutableArray(getJsonAt(draft.values, array.segments));
     current.splice(index, 1);
@@ -1653,6 +2127,7 @@ export class FormRuntime implements SelectorHost {
     const oldRid = this.kernel.itemRuntimeId(asKernelDraft(draft), array.runtimeId, oldId);
     if (oldRid !== undefined) {
       this.kernel.cleanupSubtree(asKernelDraft(draft), [oldRid], "replace");
+      this.scrubRemovedViewState(draft);
     }
     const cloned = this.cloneValue(value, array.path);
     const current = asMutableArray(getJsonAt(draft.values, array.segments));
@@ -1688,6 +2163,7 @@ export class FormRuntime implements SelectorHost {
         this.kernel.cleanupSubtree(asKernelDraft(draft), [itemRid], "clear");
       }
     }
+    this.scrubRemovedViewState(draft);
     this.writeArray(draft, array.segments, []);
     draft.arrays.setOrder(array.runtimeId, []);
     draft.identityChanged = true;
@@ -1741,8 +2217,16 @@ function draftDiffers(
   values: JsonValue,
   touched: ReadonlyMap<string, true>,
   focused: ReadonlyMap<string, true>,
+  collapsed: ReadonlyMap<string, true>,
+  activeTab: ReadonlyMap<string, string>,
 ): boolean {
-  return !jsonEqual(draft.values, values) || !mapsEqual(draft.touched, touched) || !mapsEqual(draft.focused, focused);
+  return (
+    !jsonEqual(draft.values, values) ||
+    !mapsEqual(draft.touched, touched) ||
+    !mapsEqual(draft.focused, focused) ||
+    !mapsEqual(draft.collapsed, collapsed) ||
+    !stringMapsEqual(draft.activeTab, activeTab)
+  );
 }
 
 function mapsEqual(left: ReadonlyMap<string, true>, right: ReadonlyMap<string, true>): boolean {
@@ -1751,6 +2235,18 @@ function mapsEqual(left: ReadonlyMap<string, true>, right: ReadonlyMap<string, t
   }
   for (const key of left.keys()) {
     if (!right.has(key)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function stringMapsEqual(left: ReadonlyMap<string, string>, right: ReadonlyMap<string, string>): boolean {
+  if (left.size !== right.size) {
+    return false;
+  }
+  for (const [key, value] of left) {
+    if (right.get(key) !== value) {
       return false;
     }
   }
@@ -1781,6 +2277,28 @@ function uniqueFocused(
     }
   }
   return ids;
+}
+
+function uniqueViewState(
+  committedFocused: ReadonlyMap<string, true>,
+  draftFocused: ReadonlyMap<string, true>,
+  committedCollapsed: ReadonlyMap<string, true>,
+  draftCollapsed: ReadonlyMap<string, true>,
+  committedActiveTab: ReadonlyMap<string, string>,
+  draftActiveTab: ReadonlyMap<string, string>,
+): ViewNodeId[] {
+  const ids = new Set<ViewNodeId>(uniqueFocused(committedFocused, draftFocused));
+  for (const key of new Set([...committedCollapsed.keys(), ...draftCollapsed.keys()])) {
+    if (Boolean(committedCollapsed.get(key)) !== Boolean(draftCollapsed.get(key))) {
+      ids.add(key as ViewNodeId);
+    }
+  }
+  for (const key of new Set([...committedActiveTab.keys(), ...draftActiveTab.keys()])) {
+    if (committedActiveTab.get(key) !== draftActiveTab.get(key)) {
+      ids.add(key as ViewNodeId);
+    }
+  }
+  return [...ids];
 }
 
 function isAggregateTouched(path: InstancePath, touched: ReadonlyMap<string, true>): boolean {
@@ -1836,6 +2354,44 @@ function indexViews(node: UIViewNode, map = new Map<string, UIViewNode>()): Read
     }
   }
   return map;
+}
+
+function indexFieldViews(node: UIViewNode, map: Map<string, ViewNodeId[]>): void {
+  if (node.kind === "field") {
+    const list = map.get(node.fieldPath) ?? [];
+    list.push(node.id);
+    map.set(node.fieldPath, list);
+  }
+  if ("children" in node && node.children !== undefined) {
+    for (const child of node.children) {
+      indexFieldViews(child, map);
+    }
+  }
+  if ("itemLayout" in node && node.itemLayout !== undefined) {
+    for (const child of node.itemLayout) {
+      indexFieldViews(child, map);
+    }
+  }
+}
+
+function viewTemplatePath(node: UIViewNode | undefined): string | undefined {
+  if (node === undefined) {
+    return undefined;
+  }
+  if (node.kind === "field") {
+    return node.fieldPath;
+  }
+  if ("path" in node && typeof node.path === "string") {
+    return node.path;
+  }
+  return undefined;
+}
+
+function sameItemChain(left: readonly ArrayItemId[], right: readonly ArrayItemId[]): boolean {
+  if (left.length !== right.length) {
+    return false;
+  }
+  return left.every((item, index) => item === right[index]);
 }
 
 function limitDiagnostic(

@@ -85,6 +85,19 @@ export class BindingIndex {
     return result;
   }
 
+  itemChainOf(id: RuntimeNodeId): readonly ArrayItemId[] {
+    const collected: ArrayItemId[] = [];
+    let current = this.records.get(id);
+    while (current !== undefined) {
+      if (current.itemId !== undefined) {
+        collected.push(current.itemId);
+      }
+      current = current.parent === undefined ? undefined : this.records.get(current.parent);
+    }
+    collected.reverse();
+    return Object.freeze(collected);
+  }
+
   removeTree(root: RuntimeNodeId): RuntimeNodeId[] {
     const removed = [root, ...this.descendants(root)];
     for (const id of removed) {

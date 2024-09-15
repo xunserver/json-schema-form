@@ -31,7 +31,7 @@ describe("consumer export isolation", () => {
     );
     expect(diagnostics.length).toBeGreaterThan(0);
     expect(formatDiagnostics(diagnostics)).toMatch(
-      /has no exported member 'valueSelector'|has no exported member 'subscribeRuntime'/,
+      /has no exported member 'valueSelector'|has no exported member 'subscribeRuntime'|has no exported member 'getRenderScope'|has no exported member 'InstanceBinding'|has no exported member 'RenderScope'/,
     );
   });
 

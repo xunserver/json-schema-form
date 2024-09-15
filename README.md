@@ -44,9 +44,9 @@ pnpm verify
 
 `defineForm()` 只做 authoring，不编译、不创建 Runtime、也不注册全局状态。`compileForm(definition)` 使用默认 Core Environment；需要业务 Plugin 时，从 `@form/core/extension` 显式构建同一个冻结 `FormEnvironment` 并传入 `compileForm(definition, { environment })`。编译不修改输入，也不访问 global registry。
 
-静态 `ModelPath` 使用 `products[].name`、转义 property 的 JSON-string bracket，以及 tuple 的 `[#n]`；`products[0]` 属于 Runtime `InstancePath`，不会出现在 Compiled DataModel。Field Registry 与 ViewTree 分离：检查 Field 用 `model.ui.fields`，检查呈现结构用已解析的 `model.ui.viewTree`。来自 Object property edge 的 Field 带有只读 `requirement` presentation source（`required` / `optional` / `conditional`）；`required` 不是 `FieldUI` 成员，实例级 effective `required` 由后续 Runtime 绑定端口组合 activation state 后再交给 FieldChrome。
+静态 `ModelPath` 使用 `products[].name`、转义 property 的 JSON-string bracket，以及 tuple 的 `[#n]`；`products[0]` 属于 Runtime `InstancePath`，不会出现在 Compiled DataModel。Field Registry 与 ViewTree 分离：检查 Field 用 `model.ui.fields`，检查呈现结构用已解析的 `model.ui.viewTree`。来自 Object property edge 的 Field 带有只读 `requirement` presentation source（`required` / `optional` / `conditional`）；`required` 不是 `FieldUI` 成员。实例级 effective `required` 由 Runtime 在 activation 之后组合进 Field/View snapshot：`required = active && (static required || (conditional && activationSource.active))`。`visible` / `disabled` / `readonly`、Widget props、`native` 与 Validation error 都不参与该组合。Renderer/FieldChrome 只读该 snapshot，不读取 Schema 或 DataModel edge。
 
-自定义逻辑 Widget 使用 `@form/core/extension` 的 `defineWidget()`：它只保留 identity 与 literal inference，不安装 Registry。`WidgetDefinition.interaction` 以纯数据声明 `setValue` / `touch` / `focus` / `blur`；framework Adapter 的 capability preflight、`blur()` / `RenderScope` 与 effective `required` snapshot 由 `add-renderer-interaction-and-binding-ports` 承接。已声明 `x-*` 拆分与非 Draft 2020-12 dialect adapter 由 `align-core-contributions-and-layout` 承接。
+自定义逻辑 Widget 使用 `@form/core/extension` 的 `defineWidget()`：它只保留 identity 与 literal inference，不安装 Registry。`WidgetDefinition.interaction` 以纯数据声明 `setValue` / `touch` / `focus` / `blur`；Renderer 通过 Core 公开 command `setValue()` / `touch()` / `focus()` / `blur()` 实现这些动作。`RenderScope` / `InstanceBinding` / `getRenderScope()` 与 effective `required` snapshot 已由 Core Runtime 提供。已声明 `x-*` 拆分与非 Draft 2020-12 dialect adapter 由 `align-core-contributions-and-layout` 承接。
 
 `FormDefinition.rules` 使用 JSON-compatible 的 `RuleExpression` AST（scalar / `{ const }` / `{ field }` / `{ call, args }` / 固定 operator），分为 State、Computed、Validation、Effect 四类。named function 只通过 `@form/core/extension` 的 `defineRuleFunction()` 注册到 Environment，Compiled Model 只保存 function key。数组 Rule 按同一 item 的相对 `ModelPath` 绑定，不接受无法唯一确定的 sibling/descendant collection。`oneOf`/`anyOf`/`if`/`dependentSchemas` 编译为有限 activation plan；无法保真的 predicate 在编译期阻断。
 
@@ -128,18 +128,18 @@ try {
 
 `createForm(model, { initialValues })` 使用与 `compileForm(definition)` 相同的默认 Core Environment。显式 Environment 必须在 compile 与 create 之间保持同一 identity，不能靠 Plugin 列表结构相等来匹配。需要长期复用同一套 Plugin 时，使用 `createFormEngine({ plugins })`：`engine.compile()` 与 `engine.create()` 闭包持有同一个冻结 Environment，Engine 本身不保存实例 values 或 version。
 
-公开 snapshot 只读。`setValues(nextValues)` 是一次原子的 root replacement，不是隐式 deep-merge。写入必须经过 command/transaction；effective no-op 不增加 `version`。
+公开 snapshot 只读。`setValues(nextValues)` 是一次原子的 root replacement，不是隐式 deep-merge。写入必须经过 command/transaction；effective no-op 不增加 `version`。四个 semantic command 是 `setValue` / `touch` / `focus` / `blur`：`touch()` 以 Field `InstancePath` 为目标，`focus()` / `blur()` / `setCollapsed()` / `setActiveTab()` 以具体 `ViewNodeId` 为目标。`blur()` 只清除该 View 的 focused，不隐式 touch，也不修改 values。View source state 还包括 `collapsed`（默认 `false`）与 `activeTab`（默认 `undefined`）；`reset()` 将它们恢复默认值，数组 item 删除时随 subtree 清理。Core 不解释 tab key 是否存在于 layout，也不实现 Validation `blur` trigger 或 Renderer 的 DOM focus 策略。
 
 `FormInstance.array(path)` 与 `scope(path)` 返回共享同一 Runtime 的轻量 facade。数组 index 只是当前地址，`ArrayItemId` 才是 item 身份：`move` 后 Field/View source state 跟随 ID，`remove`/`replaceItem`/`reset` 以及默认 whole-array `setValue` 会作废旧 ID 与 scope。`setItemValue` 保留根 item ID；未配置 Identity Resolver 时，有效的整个数组替换会重建全部 item ID，而不会按 index 或业务字段猜测复用。可在 `createForm` 选项中按数组 `ModelPath` 提供纯同步 `ArrayIdentityResolver`（从 `@form/core/runtime` 导入类型）做 key reconcile；重复 key 或抛错会使 transaction 回滚。固定 tuple 现存 slot 可 `setItemValue`/`replaceItem`，但不支持 append/insert/remove/move/clear。
 
 `createForm()` 在返回实例前会无 publish 地稳定 Computed/Effect/activation，`version` 仍为 0，稳定后的 values 作为 dirty baseline。`FormInstance.serialize(options?)` 读取已提交 snapshot；默认 active-only。不要假设存在 async Rule、完整 Validation 或 Renderer：Core 不提供 `validate()` / `submit()`，也不渲染 UI。
 
-只读 selector / subscription / Runtime diagnostic observer 以及 array order/item/binding selector 从 `@form/core/runtime` 导入，不从根入口重导出。
+只读 selector / subscription / Runtime diagnostic observer 以及 array order/item/binding selector 从 `@form/core/runtime` 导入，不从根入口重导出。`currentBindingSelector` 发布完整 `InstanceBinding`（静态 `DataNodeId`/`ModelPath`、当前 `InstancePath`、`ArrayItemId` chain 与 `stale`）。`getRenderScope(form | scoped)` 返回只读 `RenderScope`：可把相对或绝对模板 `ModelPath`（如 `products[].name`）解析为当前 `InstancePath`，并按 item/scope 派生；它没有 writer。move 后同一 scope 的 chain 不变而 path 更新；remove/replace/clear/reset 后永久 stale。不要把 `RenderScope` 当作 `FormInstance` 传给 Renderer 去绕过 command。
 
 ```ts
 import { compileForm, createForm, createFormEngine, defineForm, FormRuntimeError } from "@form/core";
 import { createFormEnvironment } from "@form/core/extension";
-import { formSelector, subscribeRuntime, valueSelector } from "@form/core/runtime";
+import { formSelector, getRenderScope, subscribeRuntime, valueSelector } from "@form/core/runtime";
 
 const definition = defineForm({
   schema: {
@@ -158,7 +158,13 @@ const { model } = compileForm(definition);
 const form = createForm(model, { initialValues: { name: "Ada" } });
 form.setValue("profile.title", "Engineer");
 form.setValues({ name: "Grace", profile: { title: "Admiral" } });
+form.focus(model.ui.viewTree.id);
+form.blur(model.ui.viewTree.id);
+form.setCollapsed(model.ui.viewTree.id, false);
 form.reset();
+const scope = getRenderScope(form);
+void scope.resolve("profile.title");
+void form.getField("name").getState().required;
 
 const environment = createFormEnvironment();
 const explicit = createForm(compileForm(definition, { environment }).model, {

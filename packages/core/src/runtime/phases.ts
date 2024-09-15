@@ -1,5 +1,5 @@
 import type { InstancePath } from "../path/types.js";
-import type { ViewNodeId } from "../identity/index.js";
+import type { ArrayItemId, ViewNodeId } from "../identity/index.js";
 import type { JsonValue } from "./contracts.js";
 import type { RuntimeCommand } from "./commands.js";
 
@@ -13,10 +13,17 @@ export const PHASE_ORDER = Object.freeze([
 
 export type PhaseName = (typeof PHASE_ORDER)[number];
 
+export interface BlurredChange {
+  readonly viewId: ViewNodeId;
+  readonly path: InstancePath;
+  readonly itemChain: readonly ArrayItemId[];
+}
+
 export interface NormalizedChangeSet {
   readonly valuePaths: readonly InstancePath[];
   readonly fieldPaths: readonly InstancePath[];
   readonly viewIds: readonly ViewNodeId[];
+  readonly blurred: readonly BlurredChange[];
   readonly reset: boolean;
 }
 
