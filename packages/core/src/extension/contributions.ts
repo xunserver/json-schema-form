@@ -1,4 +1,5 @@
 import type { JsonValue } from "../definition/json-value.js";
+import type { ValidatorDefinition as ProtocolValidatorDefinition } from "../validation/protocol.js";
 
 export interface SchemaDialectDefinition {
   readonly id: string;
@@ -15,11 +16,22 @@ export interface RuleFunctionDefinition {
   readonly evaluate: (args: readonly JsonValue[]) => JsonValue;
 }
 
-export interface ValidatorDefinition {
-  readonly name: string;
-  readonly target?: string;
-  readonly dependencies?: readonly string[];
-}
+export type {
+  AsyncValidatorDefinition,
+  SchemaAdapterCapabilities,
+  SchemaAdapterDefinition,
+  SchemaAdapterIssue,
+  SchemaValidateAffectedInput,
+  SchemaValidateAllInput,
+  SchemaValidateAtInput,
+  SyncValidatorDefinition,
+  CustomValidatorContext,
+  CustomValidatorIssue,
+  ValidatorAbortSignal,
+  ValidatorKind,
+} from "../validation/protocol.js";
+
+export type ValidatorDefinition = ProtocolValidatorDefinition;
 
 export interface SerializerContext {
   readonly version: number;

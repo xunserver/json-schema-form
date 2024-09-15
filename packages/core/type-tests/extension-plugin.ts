@@ -20,7 +20,7 @@ const plugin = definePlugin({
       trim: { name: "trim", evaluate: (args) => args[0] ?? "" },
     },
     validators: {
-      uniqueSku: { name: "uniqueSku", target: "sku" },
+      uniqueSku: { name: "uniqueSku", kind: "sync", validate: () => [] },
     },
   },
 });
@@ -65,7 +65,8 @@ void rejectedWidgetEvent;
 
 const validator: ValidatorDefinition = {
   name: "unique",
-  target: "sku",
+  kind: "sync",
+  validate: () => [],
   // @ts-expect-error Core validator contract has no AJV instance
   ajv: {},
 };

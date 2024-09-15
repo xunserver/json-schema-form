@@ -214,3 +214,47 @@ Core 必须（SHALL）只从 `@form/core/extension` 暴露泛型 `defineWidget()
 - **GIVEN** 已解析 Widget 声明某项 semantic action，而选定 framework Widget binding 无法提供该 action
 - **WHEN** RendererEnvironment 对 binding 执行 capability preflight
 - **THEN** 产生归 Adapter owner 的结构化 capability Diagnostic，且不得用 native event、直接 values 写入或省略动作来冒充兼容
+
+### Requirement: defineValidator是无副作用authoring helper
+Core必须（SHALL）从`@form/core/extension`暴露`defineValidator()`，保留named Validator或Schema Validator Adapter descriptor的literal name、kind、capabilities与provider类型。该helper必须（MUST）返回输入identity，不执行provider、不安装contribution、不构建Environment，也不得（MUST NOT）读取或修改global Registry。
+
+#### Scenario: 声明named validator
+- **GIVEN** extension author提供唯一name、validator kind与对应provider
+- **WHEN** 调用`defineValidator()`
+- **THEN** 返回值保留具体类型且当前Environment Registry不发生变化
+
+#### Scenario: 重复authoring不提前产生冲突
+- **GIVEN** 两次独立author同名descriptor但尚未放入同一Plugin
+- **WHEN** 分别调用helper
+- **THEN** 两个输入保持独立，冲突只在Environment实际注册时按既有规则诊断
+
+### Requirement: Validator provider是框架无关的只读执行边界
+Validator contribution必须（MUST）以kind区分同步Custom、异步Custom与Schema Adapter。Custom provider只能（MUST）接收Runtime-owned readonly target/dependency values、readonly options/context以及异步provider可选的AbortSignal-compatible readonly signal；它只能返回规范化issue data或对应Promise。Schema Adapter必须（MUST）提供同步`validateAll`，并可以（MAY）声明且实现`validateAt`/`validateAffected`安全优化。任何provider contract不得（MUST NOT）暴露FormInstance、mutable Store、TransactionManager、DependencyScheduler、Change Queue、`RuntimeNodeId`、framework component、DOM event或mutation capability。
+
+#### Scenario: 同步与异步provider使用相同只读输入语义
+- **GIVEN** Plugin分别贡献sync与async named validator
+- **WHEN** Environment成功构建并由Runtime调用
+- **THEN** 两者只能读取显式target/dependency/options，async provider额外只能观察可选取消信号，均不能隐藏读取或写Form state
+
+#### Scenario: Schema Adapter保证validateAll
+- **GIVEN** extension author声明Schema Adapter
+- **WHEN** TypeScript和Environment检查descriptor
+- **THEN** `validateAll`是必需同步能力，而incremental methods只有在descriptor显式声明对应safe capability时才可被Core使用
+
+#### Scenario: 拒绝跨层provider能力
+- **GIVEN** author尝试让provider取得Store writer、Renderer context或让同步provider返回Promise
+- **WHEN** 执行类型或Environment shape检查
+- **THEN** descriptor被拒绝且不发布partial Environment
+
+### Requirement: Validator contribution校验key、name与capability一致性
+Environment build必须（MUST）校验`validators` Registry的key与descriptor name完全一致、kind/provider shape合法，并验证每个声明的incremental capability具有对应method。错误必须（MUST）阻止Environment发布并产生`source: "plugin"`的稳定Diagnostic；合法重复key继续遵循既有精确override/provenance策略，成功Environment和Registry view继续冻结。
+
+#### Scenario: 接受一致的validator descriptor
+- **GIVEN** contribution key与descriptor name均为`company.unique-email`且async provider shape合法
+- **WHEN** 构建Environment
+- **THEN** Registry按该key提供确定readonly lookup与Plugin provenance
+
+#### Scenario: 拒绝key或capability不一致
+- **GIVEN** key与name不同，或Adapter声明safe `validateAffected`却没有对应method
+- **WHEN** 构建Environment
+- **THEN** `EnvironmentBuildError`包含registry、key、name/kind与Plugin ID且没有可用partial Environment

@@ -13,6 +13,7 @@ export {
   formSelector,
   itemPathSelector,
   itemValueSelector,
+  presentableErrorSelector,
   valueSelector,
   viewSelector,
 } from "./selectors.js";

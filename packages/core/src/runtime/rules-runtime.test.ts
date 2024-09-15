@@ -246,8 +246,8 @@ describe("transaction phases and rule categories", () => {
     form.setValue("amount", 4);
     expect(form.getValue("total")).toBe(4);
     expect(plans.at(-1)).toEqual({ bindings: [{ ruleId: "rule:0001:validation:total", target: "total" }] });
-    expect(form.getState()).not.toHaveProperty("valid");
-    expect(form).not.toHaveProperty("validate");
+    expect(form.getState()).toHaveProperty("valid", true);
+    expect(typeof form.validate).toBe("function");
   });
 
   test("stabilizes createForm and reset without publishing a partial instance", () => {

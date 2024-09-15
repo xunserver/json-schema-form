@@ -11,12 +11,15 @@
     }
   },
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@form/core": "workspace:*"
+    "@form/core": "workspace:*",
+    "ajv": "^8.20.0"
   }
 }

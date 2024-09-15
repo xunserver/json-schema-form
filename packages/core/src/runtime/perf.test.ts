@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { compileForm, createForm, defineForm } from "../../src/index.js";
-import { createSelector, subscribeRuntime, valueSelector } from "./index.js";
+import { createSelector, fieldSelector, subscribeRuntime, valueSelector } from "./index.js";
 import { peekFormRuntime } from "./test-harness.js";
 
 describe("selector invalidation scaling", () => {
@@ -193,6 +193,39 @@ describe("selector invalidation scaling", () => {
     expect(list.getValue("products[19].total")).toBe(20);
     expect(other).toBe(0);
     expect(listRuntime.engine.stats.evaluatedRules).toBeLessThan(4);
+  });
+});
+
+describe("validation selector scaling", () => {
+  test("server error replacement does not evaluate unrelated field selectors", () => {
+    const properties: Record<string, { type: "string" }> = {};
+    const initialValues: Record<string, string> = {};
+    for (let index = 0; index < 40; index += 1) {
+      const key = `field${index}`;
+      properties[key] = { type: "string" };
+      initialValues[key] = "x";
+    }
+    const form = createForm(
+      compileForm(
+        defineForm({
+          schema: { type: "object", properties },
+        }),
+      ).model,
+      { initialValues },
+    );
+    const runs = new Map<string, number>();
+    for (const key of Object.keys(properties)) {
+      subscribeRuntime(form, fieldSelector(key), () => {
+        runs.set(key, (runs.get(key) ?? 0) + 1);
+      });
+    }
+    for (const key of Object.keys(properties)) {
+      runs.set(key, 0);
+    }
+    form.applyErrors([{ code: "remote", instancePath: "field0" }]);
+    expect(runs.get("field0")).toBe(1);
+    expect(runs.get("field1")).toBe(0);
+    expect(runs.get("field39")).toBe(0);
   });
 });
 

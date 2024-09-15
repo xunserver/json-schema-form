@@ -342,7 +342,8 @@ describe("Rule compiler", () => {
       }),
     );
     expect(ok.model.rule.rules[0]?.action.kind).toBe("validation");
-    expect(ok.model.validation.validators).toEqual([]);
+    expect(ok.model.validation.custom).toEqual([]);
+    expect(ok.model.validation.async).toEqual([]);
     expect(ok.model.rule.rules[1]?.action.kind).toBe("effect");
     expect(JSON.stringify(ok.model.rule)).not.toMatch(/evaluate|serialize\(/);
     expect(ok.model).not.toHaveProperty("environment");

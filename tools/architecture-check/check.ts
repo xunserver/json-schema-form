@@ -138,6 +138,16 @@ function checkManifestPolicy(pkg: DiscoveredPackage): ArchitectureDiagnostic[] {
         file: path.join(pkg.directory, "package.json"),
       });
     }
+
+    if (pkg.name !== "@form/validator-ajv" && (target === "ajv" || target === "ajv-formats")) {
+      diagnostics.push({
+        sourcePackage: pkg.name,
+        targetPackage: target,
+        rule: RULE.forbiddenCorePackage,
+        message: `Only @form/validator-ajv may depend on "${target}".`,
+        file: path.join(pkg.directory, "package.json"),
+      });
+    }
   }
 
   const requiredPeers = REQUIRED_PEERS[pkg.name as FirstPartyPackage] ?? [];
@@ -201,6 +211,18 @@ function checkSourceImports(
           targetPackage: targetName,
           rule: RULE.forbiddenCorePackage,
           message: `Core must not import "${targetName}".`,
+          file,
+          specifier,
+        });
+        continue;
+      }
+
+      if (pkg.name !== "@form/validator-ajv" && (targetName === "ajv" || targetName === "ajv-formats")) {
+        diagnostics.push({
+          sourcePackage: pkg.name,
+          targetPackage: targetName,
+          rule: RULE.forbiddenCorePackage,
+          message: `Only @form/validator-ajv may import "${targetName}".`,
           file,
           specifier,
         });

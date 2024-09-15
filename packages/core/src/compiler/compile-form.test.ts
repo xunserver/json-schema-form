@@ -15,7 +15,11 @@ describe("compileForm", () => {
     expect(result.model).toBeDefined();
     expect(result.model.ui.fields.get("title")?.widget).toBe("text");
     expect(result.model.rule.rules).toEqual([]);
-    expect(result.model.validation.validators).toEqual([]);
+    expect(result.model.validation.custom).toEqual([]);
+    expect(result.model.validation.async).toEqual([]);
+    expect(result.model.validation.schema.unbound).toBe(true);
+    expect(result.model.validation.validateOn).toBe("submit");
+    expect(result.model.validation.presentation.policy).toBe("touched-or-submitted");
     expect(result.model.schemaDynamics.activations).toEqual([]);
   });
 

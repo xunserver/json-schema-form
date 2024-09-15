@@ -16,7 +16,11 @@ function contribution(kind: RegistryKind, key: string): FormPlugin["contributes"
     case "ruleFunctions":
       return { ruleFunctions: { [key]: { name: key, evaluate: (args) => args[0] ?? null } } };
     case "validators":
-      return { validators: { [key]: { name: key } } };
+      return {
+        validators: {
+          [key]: { name: key, kind: "sync", validate: () => [] },
+        },
+      };
     case "serializers":
       return { serializers: { [key]: { name: key, serialize: (value) => value } } };
     case "valueInitializers":

@@ -26,6 +26,7 @@ export interface SelectorHost {
   fieldSnapshot(path: InstancePathLike): FieldSnapshot;
   viewSnapshot(id: ViewNodeId): ViewSnapshot;
   formSnapshot(): FormSnapshot;
+  presentableErrors(path: InstancePathLike): readonly import("../validation/error.js").ValidationError[];
   evaluateSelector<T>(selector: RuntimeSelector<T>): T;
   arrayOrder(path: InstancePathLike): readonly ArrayItemId[];
   arrayItemSnapshot(path: InstancePathLike, item: ArrayItemRef): ArrayItemSnapshot;
@@ -80,7 +81,7 @@ export function valueSelector(path: InstancePathLike): RuntimeSelector<JsonValue
 export function fieldSelector(path: InstancePathLike): RuntimeSelector<FieldSnapshot> {
   const canonical = requireCanonicalPath(path, "field");
   return makeSelector({
-    deps: Object.freeze([`value:${canonical}`, `field:${canonical}`, `effective:${canonical}`]),
+    deps: Object.freeze([`value:${canonical}`, `field:${canonical}`, `effective:${canonical}`, `validation:${canonical}`]),
     project: (host) => host.fieldSnapshot(canonical),
   });
 }
@@ -96,6 +97,14 @@ export function formSelector(): RuntimeSelector<FormSnapshot> {
   return makeSelector({
     deps: Object.freeze(["form"]),
     project: (host) => host.formSnapshot(),
+  });
+}
+
+export function presentableErrorSelector(path?: InstancePathLike): RuntimeSelector<readonly import("../validation/error.js").ValidationError[]> {
+  const canonical = path === undefined ? "" : requireCanonicalPath(path, "presentable");
+  return makeSelector({
+    deps: Object.freeze(canonical === "" ? ["form"] : [`validation:${canonical}`, `field:${canonical}`, "form"]),
+    project: (host) => host.presentableErrors(canonical),
   });
 }
 

@@ -51,7 +51,15 @@ describe("runtime export resolution", () => {
     expect(typeof extension.defineWidget).toBe("function");
     expect(typeof extension.createFormEnvironment).toBe("function");
     expect(typeof extension.defineRuleFunction).toBe("function");
+    expect(typeof extension.defineValidator).toBe("function");
+    expect("defineValidator" in core).toBe(false);
     expect(extension.CORE_EXTENSION_PROTOCOL).toEqual({ major: 1, minor: 0 });
+  });
+
+  test("resolves validator-ajv through package exports", () => {
+    expect(resolveWithNode("@form/validator-ajv").stdout.trim()).toMatch(
+      /packages\/validator-ajv\/dist\/index\.js$/,
+    );
   });
 
   test("rejects an undeclared Core deep path at runtime", () => {

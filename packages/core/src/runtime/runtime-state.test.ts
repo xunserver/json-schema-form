@@ -104,7 +104,8 @@ describe("readonly snapshot cache", () => {
     expect(form.getField("age").getState()).toBe(field);
     expect(form.getState()).toHaveProperty("active", true);
     expect(form.getState()).toHaveProperty("visible", true);
-    expect(form.getState()).not.toHaveProperty("valid");
+    expect(form.getState()).toHaveProperty("valid", true);
+    expect(form.getState()).toHaveProperty("errors");
   });
 
   test("rejects using a public snapshot as a mutation channel", () => {

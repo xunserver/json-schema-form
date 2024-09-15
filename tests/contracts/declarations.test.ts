@@ -22,6 +22,9 @@ const PUBLIC_ROOT_CONTRACTS = [
   "ScopedFormInstance",
   "ArrayItemId",
   "FormRuntimeError",
+  "ValidationError",
+  "ValidationResult",
+  "SubmitResult",
   "CompileOptions",
   "CompiledFormModel",
   "CompileResult",
@@ -40,9 +43,11 @@ const PRIVATE_SYMBOLS = [
   "ChangeQueue",
   "EnvironmentIdentity",
   "ArrayStateStore",
-  "RuleDynamicsEngine",
+      "RuleDynamicsEngine",
       "ViewStateStore",
       "NormalizedChangeSet",
+      "ValidationEngine",
+      "ErrorStore",
     ];
 
 describe("generated Core public surface", () => {
@@ -77,6 +82,7 @@ describe("generated Core public surface", () => {
       "InstanceBinding",
       "RenderScope",
       "getRenderScope",
+      "presentableErrorSelector",
     ]) {
       expect(runtime, `missing ${name}`).toContain(name);
     }
@@ -105,7 +111,10 @@ describe("generated Core public surface", () => {
       "WidgetInteractionContract",
       "Registry",
       "defineRuleFunction",
+      "defineValidator",
       "RuleFunctionDefinition",
+      "ValidatorDefinition",
+      "SchemaAdapterDefinition",
       "SerializerDefinition",
     ]) {
       expect(extension, `missing ${name}`).toContain(name);

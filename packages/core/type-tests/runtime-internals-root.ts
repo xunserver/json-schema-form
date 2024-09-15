@@ -22,6 +22,10 @@ import type { ViewStateStore } from "../src/index.js";
 import type { NormalizedChangeSet } from "../src/index.js";
 // @ts-expect-error evaluateRuleExpression is not part of the public root barrel
 import { evaluateRuleExpression } from "../src/index.js";
+// @ts-expect-error ValidationEngine is not part of the public root barrel
+import type { ValidationEngine } from "../src/index.js";
+// @ts-expect-error ErrorStore is not part of the public root barrel
+import type { ErrorStore } from "../src/index.js";
 
 declare const transactionManager: TransactionManager;
 declare const changeQueue: ChangeQueue;
@@ -49,3 +53,8 @@ declare const viewStore: ViewStateStore;
 declare const changeSet: NormalizedChangeSet;
 void viewStore;
 void changeSet;
+
+declare const validationEngine: ValidationEngine;
+declare const errorStore: ErrorStore;
+void validationEngine;
+void errorStore;

@@ -43,15 +43,10 @@ void values;
 void state.version;
 void fieldState.dirty;
 
-type FormKeys = keyof FormInstance;
-type ForbiddenFacades = Extract<FormKeys, "validate" | "applyErrors" | "submit">;
-type AssertNoLaterFacades = ForbiddenFacades extends never ? true : never;
-const noLaterFacades: AssertNoLaterFacades = true;
-void noLaterFacades;
-
-const serialized = form.serialize();
-void serialized;
 form.serialize({ includeInactive: true });
+void form.validate;
+void form.applyErrors;
+void form.submit;
 
 const array = form.array;
 const scoped = form.scope;
@@ -76,13 +71,27 @@ void snapshot.active;
 void snapshot.visible;
 void snapshot.disabled;
 void snapshot.readonly;
+void snapshot.valid;
+void snapshot.validating;
+void snapshot.submitting;
+void snapshot.submitCount;
+void snapshot.errors;
+void snapshot.directErrors;
 
 const fieldValues = field.getState();
 void fieldValues.required;
+void fieldValues.valid;
+void fieldValues.validating;
+void fieldValues.errors;
+void fieldValues.directErrors;
 // @ts-expect-error field snapshot is readonly
 fieldValues.touched = true;
 // @ts-expect-error required is readonly
 fieldValues.required = false;
+// @ts-expect-error field errors are readonly
+fieldValues.errors = [];
+// @ts-expect-error form valid is readonly
+snapshot.valid = false;
 
 type EffectiveKeys = keyof import("../src/index.js").EffectiveState;
 type AllowedEffective = "active" | "visible" | "disabled" | "readonly" | "required";
@@ -121,6 +130,19 @@ if (typeof rootValues === "object" && rootValues !== null && !Array.isArray(root
   rootValues.name = "mutated";
 }
 
-// @ts-expect-error baseline snapshots do not claim valid
-const valid = snapshot.valid;
-void valid;
+const products = form.array("name");
+void products.items;
+const nested = form.scope("name");
+void nested.getField;
+const payload = form.serialize();
+void payload;
+void form.validate();
+form.applyErrors([{ code: "remote", instancePath: "name" }]);
+void form.submit(async (serialized) => serialized);
+
+type FormKeys = keyof FormInstance;
+type AssertValidate = "validate" extends FormKeys ? true : never;
+type AssertApply = "applyErrors" extends FormKeys ? true : never;
+type AssertSubmit = "submit" extends FormKeys ? true : never;
+const hasValidationFacades: AssertValidate & AssertApply & AssertSubmit = true;
+void hasValidationFacades;

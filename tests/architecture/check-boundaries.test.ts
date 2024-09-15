@@ -154,4 +154,30 @@ describe("architecture checker", () => {
       expect.arrayContaining(["ajv", "react", "vue"]),
     );
   });
+
+  test("rejects AJV imports outside validator-ajv", () => {
+    const root = copyRepoPackages();
+    writeText(path.join(root, "packages", "vue", "src", "index.ts"), 'import "ajv";\n');
+    mutateManifest(root, "react", (manifest) => {
+      manifest.dependencies = { ...manifest.dependencies, ajv: "^8.17.0" };
+    });
+
+    const diagnostics = checkArchitecture(root);
+    expect(
+      diagnostics.some(
+        (diagnostic) =>
+          diagnostic.rule === RULE.forbiddenCorePackage &&
+          diagnostic.sourcePackage === "@form/vue" &&
+          diagnostic.targetPackage === "ajv",
+      ),
+    ).toBe(true);
+    expect(
+      diagnostics.some(
+        (diagnostic) =>
+          diagnostic.rule === RULE.forbiddenCorePackage &&
+          diagnostic.sourcePackage === "@form/react" &&
+          diagnostic.targetPackage === "ajv",
+      ),
+    ).toBe(true);
+  });
 });

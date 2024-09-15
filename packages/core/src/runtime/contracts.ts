@@ -1,4 +1,12 @@
 import type { JsonValue } from "../definition/json-value.js";
+import type {
+  ApplyErrorsOptions,
+  ServerErrorInput,
+  SubmitHandler,
+  SubmitResult,
+  ValidationError,
+  ValidationResult,
+} from "../validation/error.js";
 import type { CompiledFormModel } from "../model/compiled-form-model.js";
 import type { FormDefinition } from "../definition/form-definition.js";
 import type { CompileResult } from "../model/compile-result.js";
@@ -9,6 +17,15 @@ import type { ArrayItemId, DataNodeId, ViewNodeId } from "../identity/index.js";
 import type { InstancePath, InstancePathLike, ModelPath, ModelPathLike } from "../path/types.js";
 
 export type { JsonPrimitive, JsonValue } from "../definition/json-value.js";
+export type {
+  ApplyErrorsOptions,
+  ServerErrorInput,
+  SubmitHandler,
+  SubmitResult,
+  ValidationError,
+  ValidationErrorSource,
+  ValidationResult,
+} from "../validation/error.js";
 
 export interface EffectiveState {
   readonly active: boolean;
@@ -48,6 +65,12 @@ export interface FormSnapshot {
   readonly visible: boolean;
   readonly disabled: boolean;
   readonly readonly: boolean;
+  readonly directErrors: readonly ValidationError[];
+  readonly errors: readonly ValidationError[];
+  readonly valid: boolean;
+  readonly validating: boolean;
+  readonly submitting: boolean;
+  readonly submitCount: number;
 }
 
 export interface FieldSnapshot {
@@ -60,6 +83,10 @@ export interface FieldSnapshot {
   readonly disabled: boolean;
   readonly readonly: boolean;
   readonly required: boolean;
+  readonly directErrors: readonly ValidationError[];
+  readonly errors: readonly ValidationError[];
+  readonly valid: boolean;
+  readonly validating: boolean;
 }
 
 export interface ViewSnapshot {
@@ -135,6 +162,9 @@ export interface FormInstance {
   array(path: InstancePathLike): ArrayInstance;
   scope(path: InstancePathLike): ScopedFormInstance;
   serialize(options?: SerializeOptions): JsonValue;
+  validate(): Promise<ValidationResult>;
+  applyErrors(errors: readonly ServerErrorInput[], options?: ApplyErrorsOptions): void;
+  submit(handler: SubmitHandler): Promise<SubmitResult>;
 }
 
 export interface FormEngine {

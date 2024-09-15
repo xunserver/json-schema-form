@@ -15,7 +15,15 @@ export function emptyRuleModel(): RuleModel {
 
 export function emptyValidationModel(): ValidationModel {
   return deepFreeze({
-    validators: [],
+    schema: { id: "schema", schema: true, unbound: true },
+    custom: [],
+    async: [],
+    rules: [],
+    server: { preserveOnChange: false },
+    presentation: { policy: "touched-or-submitted" },
+    validateOn: "submit",
+    byTarget: createReadonlyKeyedCollection([]),
+    byDependency: createReadonlyKeyedCollection([]),
   });
 }
 

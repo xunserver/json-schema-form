@@ -7,6 +7,7 @@ import {
   getRenderScope,
   getRuntimeSnapshot,
   observeRuntimeDiagnostics,
+  presentableErrorSelector,
   subscribeRuntime,
   valueSelector,
 } from "@form/core/runtime";
@@ -32,6 +33,7 @@ export const resolver: ArrayIdentityResolver = () => undefined;
 export const scope: RenderScope = getRenderScope(form);
 export const binding: InstanceBinding = scope.binding;
 void currentBindingSelector("title");
+void presentableErrorSelector("title");
 
 void snapshot;
 void unsubscribe;

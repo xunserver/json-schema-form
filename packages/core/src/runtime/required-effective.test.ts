@@ -161,7 +161,7 @@ describe("effective required", () => {
     const form = createForm(model, { environment, initialValues: { name: "Ada", nickname: "n" } });
     expect(form.getField("name").getState().required).toBe(true);
     expect(form.getField("nickname").getState().required).toBe(false);
-    expect(form.getField("name").getState()).not.toHaveProperty("errors");
+    expect(form.getField("name").getState().errors).toEqual([]);
     void sampleProducts;
   });
 });

@@ -8,6 +8,7 @@ import {
   formSelector,
   getRuntimeSnapshot,
   observeRuntimeDiagnostics,
+  presentableErrorSelector,
   subscribeRuntime,
   valueSelector,
   viewSelector,
@@ -29,6 +30,7 @@ const composed = createSelector([name, field], (value, snapshot) => ({ value, sn
 void effectiveStateSelector("name");
 void arrayOrderSelector("name");
 void arrayItemSelector;
+void presentableErrorSelector("name");
 
 void getRuntimeSnapshot(form, composed);
 void subscribeRuntime(form, aggregate, () => undefined);

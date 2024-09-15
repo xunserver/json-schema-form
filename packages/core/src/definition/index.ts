@@ -51,4 +51,9 @@ export type {
   ValidationRuleAction,
   ValidationRuleDefinition,
 } from "./rule-definition.js";
-export type { FormConfig, ValidationTrigger } from "./form-config.js";
+export type {
+  ErrorPresentationPolicy,
+  FormConfig,
+  ValidationTrigger,
+  ValidatorUse,
+} from "./form-config.js";

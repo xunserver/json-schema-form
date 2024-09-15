@@ -52,7 +52,7 @@ describe("consumer export isolation", () => {
     );
     expect(diagnostics.length).toBeGreaterThan(0);
     expect(formatDiagnostics(diagnostics)).toMatch(
-      /has no exported member 'definePlugin'|has no exported member 'defineWidget'|has no exported member 'createFormEnvironment'/,
+      /has no exported member 'definePlugin'|has no exported member 'defineWidget'|has no exported member 'createFormEnvironment'|has no exported member 'defineValidator'/,
     );
   });
 
@@ -63,6 +63,17 @@ describe("consumer export isolation", () => {
     );
     expect(diagnostics.length).toBeGreaterThan(0);
     expect(formatDiagnostics(diagnostics)).toMatch(/has no exported member 'RuntimeNodeId'|has no exported member 'TransactionManager'|has no exported member 'RuleDynamicsEngine'/);
+  });
+
+  test("rejects validation internals and AJV factory from the public root", () => {
+    const diagnostics = typecheckFiles(
+      [path.join(REPO_ROOT, "tests/contracts/negative/validation-internals.ts")],
+      consumerOptions,
+    );
+    expect(diagnostics.length).toBeGreaterThan(0);
+    expect(formatDiagnostics(diagnostics)).toMatch(
+      /has no exported member 'ValidationEngine'|has no exported member 'ErrorStore'|has no exported member 'createAjvValidator'/,
+    );
   });
 
   test("rejects Path category mismatch", () => {

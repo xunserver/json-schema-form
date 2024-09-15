@@ -34,7 +34,8 @@ describe("requirement presentation handoff for renderer binding ports", () => {
     expect(company?.status).toBe("conditional");
     expect(personal?.status).toBe("conditional");
     expect(model.ui.fields.get("companyName")).not.toHaveProperty("required");
-    expect(model.validation.validators).toEqual([]);
+    expect(model.validation.custom).toEqual([]);
+    expect(model.validation.async).toEqual([]);
 
     const ifPlan = model.schemaDynamics.plans.find((plan) => plan.kind === "if");
     const thenSource = ifPlan?.branches.find((branch) => branch.id.endsWith(":then"))?.schemaPath;

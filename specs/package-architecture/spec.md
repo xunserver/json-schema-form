@@ -75,3 +75,16 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **GIVEN** 存在 manifest、import 或编译器 library 违规
 - **WHEN** 运行仓库验证
 - **THEN** 命令以失败状态退出，并报告足以定位问题的 package 和规则信息
+
+### Requirement: AJV具体依赖与实现只属于validator package
+`@form/validator-ajv`必须（SHALL）作为`@form/core` Validator Adapter协议的叶子实现持有AJV生产依赖，并且只能沿既有`@form/validator-ajv -> @form/core`产品依赖边消费公共契约。`@form/core`及Vue、React、Element Plus、MUI package不得（MUST NOT）直接依赖、导入或在公共declaration中引用AJV类型；Core validation行为必须（MUST）在没有AJV package时仍可构建和类型检查。
+
+#### Scenario: validator-ajv合法依赖AJV与Core
+- **GIVEN** `@form/validator-ajv` manifest声明AJV和`@form/core`，源码只从Core受支持入口导入协议
+- **WHEN** 运行workspace build、typecheck和boundary checks
+- **THEN** package成功构建且既有产品依赖方向保持不变
+
+#### Scenario: 拒绝Core或Renderer导入AJV
+- **GIVEN** Core或任一framework/UI package直接import AJV或在公共类型中暴露AJV `ErrorObject`
+- **WHEN** 运行Core independence、declaration和architecture checks
+- **THEN** 检查失败并指出违规package、import或declaration边界

@@ -13,6 +13,7 @@ import { DiagnosticBag, compilerError } from "./diagnostics.js";
 import { emptyRuleModel, emptySchemaDynamics, emptyValidationModel } from "./empty-ports.js";
 import { CloneShapeError, clonePlain, deepFreeze, isPlainObject } from "./immutable.js";
 import { compileRuleModel } from "./rule/compile.js";
+import { compileValidationModel } from "./validation/compile.js";
 import { runSchemaFrontend } from "./schema/frontend.js";
 import { analyzeShapes } from "./shape/analyze.js";
 import { compileUIModel } from "./ui-model.js";
@@ -43,6 +44,14 @@ export function compileForm(definition: FormDefinition, options?: CompileOptions
   const ui = compileUIModel(data, snapshot.uiSchema, environment, diagnostics);
   const ruleResult = compileRuleModel(snapshot.rules, snapshot.config, data, environment, diagnostics);
   const dynamicsResult = compileSchemaDynamics(frontend.graph, data, diagnostics);
+  const validationResult = compileValidationModel(
+    snapshot.schema,
+    snapshot.config,
+    data,
+    ruleResult.model ?? emptyRuleModel(),
+    environment,
+    diagnostics,
+  );
 
   if (diagnostics.hasErrors()) {
     throwFailure(diagnostics);
@@ -53,7 +62,7 @@ export function compileForm(definition: FormDefinition, options?: CompileOptions
     data,
     ui,
     rule: ruleResult.model ?? emptyRuleModel(),
-    validation: emptyValidationModel(),
+    validation: validationResult.model ?? emptyValidationModel(),
     schemaDynamics: dynamicsResult.model ?? emptySchemaDynamics(),
     diagnostics: frozenDiagnostics,
   });

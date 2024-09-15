@@ -3,6 +3,7 @@ export type { FormPlugin, PluginContributions } from "./plugin.js";
 
 export { defineWidget } from "./define-widget.js";
 export { defineRuleFunction } from "./define-rule-function.js";
+export { defineValidator } from "./define-validator.js";
 
 export { createFormEnvironment } from "./create-form-environment.js";
 export { EnvironmentBuildError } from "./environment-build-error.js";
@@ -31,14 +32,26 @@ export type {
 } from "./widget.js";
 
 export type {
+  AsyncValidatorDefinition,
+  CustomValidatorContext,
+  CustomValidatorIssue,
   InstrumentationDefinition,
   InstrumentationObservation,
   RuleFunctionDefinition,
+  SchemaAdapterCapabilities,
+  SchemaAdapterDefinition,
+  SchemaAdapterIssue,
   SchemaDialectDefinition,
   SchemaExtensionDefinition,
+  SchemaValidateAffectedInput,
+  SchemaValidateAllInput,
+  SchemaValidateAtInput,
   SerializerContext,
   SerializerDefinition,
+  SyncValidatorDefinition,
+  ValidatorAbortSignal,
   ValidatorDefinition,
+  ValidatorKind,
   ValueInitializerDefinition,
 } from "./contributions.js";
 

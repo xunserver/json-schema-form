@@ -3,6 +3,7 @@ import {
   createFormEnvironment,
   definePlugin,
   defineRuleFunction,
+  defineValidator,
   defineWidget,
   EnvironmentBuildError,
 } from "@form/core/extension";
@@ -32,6 +33,13 @@ export const plugin: FormPlugin = definePlugin({
       "sample.echo": defineRuleFunction({
         name: "sample.echo",
         evaluate: (args) => args[0] ?? null,
+      }),
+    },
+    validators: {
+      "sample.ok": defineValidator({
+        name: "sample.ok",
+        kind: "sync",
+        validate: () => [],
       }),
     },
   },

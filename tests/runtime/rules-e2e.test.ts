@@ -144,8 +144,8 @@ describe("rules and schema dynamics end-to-end", () => {
         ],
       },
     });
-    expect(form).not.toHaveProperty("validate");
-    expect(form.getState()).not.toHaveProperty("valid");
+    expect(typeof form.validate).toBe("function");
+    expect(form.getState()).toHaveProperty("valid");
     expect(() => {
       throw new FormRuntimeError([]);
     }).toThrow(FormRuntimeError);

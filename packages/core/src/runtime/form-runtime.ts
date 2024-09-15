@@ -91,6 +91,17 @@ import {
   requirementSourceOf,
   type FieldRequirementSource,
 } from "./requirement-index.js";
+import { ValidationEngine } from "./validation/engine.js";
+import type { ValidationHost } from "./validation/host.js";
+import type { NamedValidationPlan } from "../model/validation.js";
+import type { ValidationTrigger } from "../definition/form-config.js";
+import type {
+  ApplyErrorsOptions,
+  ServerErrorInput,
+  SubmitHandler,
+  SubmitResult,
+  ValidationResult,
+} from "../validation/error.js";
 
 export interface FormRuntimeOptions {
   readonly initialValues?: unknown;
@@ -149,6 +160,7 @@ export class FormRuntime implements SelectorHost {
   readonly kernel: ArrayKernel;
   readonly interner = new RuntimeNodeInterner();
   readonly engine: RuleDynamicsEngine;
+  readonly validation: ValidationEngine;
   lastCommandResult: RuntimeCommandResult = undefined;
   ownerGenerations = new Map<string, number>();
 
@@ -177,6 +189,11 @@ export class FormRuntime implements SelectorHost {
   private workingRule: RuleDraftState | undefined;
   private readonly validationOwner: ((plan: AffectedValidationRulePlan) => void) | undefined;
   private forceAllRules = false;
+  private validationIntent: ValidationTrigger | undefined;
+  private validationChanged = false;
+  private currentAttempt = 0;
+  private mutationEpoch = 0;
+  private pendingAsyncJobs: Array<{ plan: NamedValidationPlan; runtimeId: RuntimeNodeId }> = [];
 
   constructor(model: CompiledFormModel, environment: FormEnvironment, options?: FormRuntimeOptions) {
     this.model = model;
@@ -191,13 +208,14 @@ export class FormRuntime implements SelectorHost {
     this.values = new ValueStoreImpl(readInitialValues(model, options?.initialValues));
     this.originalInitial = this.values.current;
     this.engine = new RuleDynamicsEngine(model, environment);
+    this.validation = new ValidationEngine(this.createValidationHost());
     this.arrays = new ArrayStateStore(`f${nextInstanceNonce()}`);
     this.kernel = new ArrayKernel(
       model,
       indexDataNodes(model),
       this.interner,
       freezeResolvers(model, options?.arrayIdentityResolvers),
-      [this.engine, ...(options?.subtreeOwners ?? [])],
+      [this.engine, this.validation, ...(options?.subtreeOwners ?? [])],
     );
     const bootstrap = emptyKernelDraft(this.values.current, this.arrays, this.bindings);
     this.kernel.materializeTree(
@@ -253,6 +271,7 @@ export class FormRuntime implements SelectorHost {
       return this.cachedFormSnapshot;
     }
     const effective = this.effectiveAt(ROOT_INSTANCE_PATH);
+    const validation = this.validation.formSnapshot();
     const snapshot: FormSnapshot = Object.freeze({
       values: this.values.current,
       dirty: !jsonEqual(this.values.current, this.values.initial),
@@ -262,10 +281,22 @@ export class FormRuntime implements SelectorHost {
       visible: effective.visible,
       disabled: effective.disabled,
       readonly: effective.readonly,
+      directErrors: validation.directErrors,
+      errors: validation.errors,
+      valid: validation.valid,
+      validating: validation.validating,
+      submitting: validation.submitting,
+      submitCount: validation.submitCount,
     });
     this.cachedFormSnapshot = snapshot;
     this.formSnapshotStamp = stamp;
     return snapshot;
+  }
+
+  presentableErrors(path: InstancePathLike) {
+    const canonical = path === "" ? ROOT_INSTANCE_PATH : this.requireDraftBinding(this.committedView(), path).path;
+    const snapshot = canonical === ROOT_INSTANCE_PATH ? this.formSnapshot() : this.fieldSnapshotAt(canonical);
+    return this.validation.presentable(snapshot.errors, canonical);
   }
 
   evaluateSelector<T>(selector: RuntimeSelector<T>): T {
@@ -355,6 +386,8 @@ export class FormRuntime implements SelectorHost {
       queue.enqueue(command);
     }
     this.workingRule = this.engine.snapshot();
+    this.validationChanged = false;
+    this.pendingAsyncJobs = [];
 
     try {
       let applied = 0;
@@ -383,7 +416,9 @@ export class FormRuntime implements SelectorHost {
           originalCollapsed,
           originalActiveTab,
         ) &&
-        !draft.identityChanged
+        !draft.identityChanged &&
+        !draft.reset &&
+        this.validationIntent === undefined
       ) {
         return;
       }
@@ -437,7 +472,10 @@ export class FormRuntime implements SelectorHost {
           originalActiveTab,
         ) &&
         !draft.identityChanged &&
-        !this.workingRule?.derivedChanged
+        !this.workingRule?.derivedChanged &&
+        !this.validationChanged &&
+        !draft.reset &&
+        this.validationIntent === undefined
       ) {
         return;
       }
@@ -543,6 +581,19 @@ export class FormRuntime implements SelectorHost {
           metadata: { reason: error instanceof Error ? error.message : "unknown" },
         }),
       ]);
+    }
+    const pendingIds = this.validation.pendingRuntimeIds();
+    if (pendingIds.length > 0) {
+      const keys = new Set<string>(["form"]);
+      for (const id of pendingIds) {
+        const path = this.bindings.pathOf(id);
+        if (path !== undefined) {
+          for (const key of this.validation.affectedFor(path)) {
+            keys.add(key);
+          }
+        }
+      }
+      this.publishValidationState(keys, true);
     }
     this.notifyInstrumentation();
   }
@@ -911,7 +962,8 @@ export class FormRuntime implements SelectorHost {
     const collapsedChanged = draft.collapsed.size > 0;
     const activeTabChanged = draft.activeTab.size > 0;
     const hadItems = arrayItemCount(draft.arrays) > 0 || arrayItemCount(this.arrays) > 0;
-    if (!valuesChanged && !touchChanged && !focusChanged && !collapsedChanged && !activeTabChanged && !hadItems) {
+    const validationDirty = this.validation.hasLifecycleState();
+    if (!valuesChanged && !touchChanged && !focusChanged && !collapsedChanged && !activeTabChanged && !hadItems && !validationDirty) {
       return;
     }
     draft.values = this.originalInitial;
@@ -971,10 +1023,25 @@ export class FormRuntime implements SelectorHost {
     }
     this.form.version += 1;
     this.form.revision += 1;
+    this.mutationEpoch += 1;
     if (draft.reset) {
       this.values.initial = draft.values;
     }
     this.extraSelectorKeys = new Set();
+    if (this.validationChanged) {
+      for (const key of this.validation.selectorKeysForDirty()) {
+        this.extraSelectorKeys.add(key);
+      }
+      for (const path of changeSet.valuePaths) {
+        for (const key of this.validation.affectedFor(path)) {
+          this.extraSelectorKeys.add(key);
+        }
+      }
+      for (const path of changeSet.fieldPaths) {
+        this.extraSelectorKeys.add(`validation:${path}`);
+        this.extraSelectorKeys.add(`field:${path}`);
+      }
+    }
     if (this.workingRule !== undefined) {
       const previous = this.engine.peekState();
       const changed = this.engine.changedEffectivePaths(previous, this.workingRule);
@@ -1172,6 +1239,44 @@ export class FormRuntime implements SelectorHost {
       if (phase === "syncValidation" && this.workingRule !== undefined) {
         const plan = this.engine.validationPlan(this.workingRule);
         this.validationOwner?.(plan);
+        this.validationChanged = this.validation.sync(draft, context.changeSet, this.validationIntent, plan);
+        this.pendingAsyncJobs = this.validation.collectAsync(draft, context.changeSet, this.validationIntent);
+        if (this.validationChanged) {
+          this.extraSelectorKeys.add("form");
+        }
+      }
+      if (phase === "asyncSchedule") {
+        this.currentAttempt = this.validation.beginAttempt();
+        this.validation.startAsync(
+          {
+            values: this.values.current,
+            touched: new Map(this.fields.touched),
+            focused: new Map(this.views.focused),
+            collapsed: new Map(this.views.collapsed),
+            activeTab: new Map(this.views.activeTab),
+            viewOwners: new Map(this.views.owners) as Map<string, RuntimeNodeId>,
+            blurred: [],
+            reset: false,
+            valuesChanged: false,
+            touchChanged: false,
+            focusChanged: false,
+            collapsedChanged: false,
+            activeTabChanged: false,
+            identityChanged: false,
+            arrays: this.arrays,
+            bindings: this.bindings,
+            orderOnlyArrayPaths: new Set(),
+            affectedEntityValues: new Set(),
+            affectedAddresses: new Set(),
+            affectedArrayOrders: new Set(),
+            abortEffects: [],
+            generationInvalidations: [],
+            removedRuntimeIds: [],
+          },
+          this.pendingAsyncJobs,
+          this.currentAttempt,
+        );
+        this.pendingAsyncJobs = [];
       }
       this.phases[phase](context);
     } catch (error) {
@@ -1279,6 +1384,8 @@ export class FormRuntime implements SelectorHost {
     const dirty = !jsonEqual(value, initial);
     const touched = this.isAggregateTouched(path);
     const effective = this.effectiveAt(path);
+    const runtimeId = this.bindings.idAt(path);
+    const validation = this.validation.nodeSnapshot(runtimeId, true);
     const cached = this.fieldSnapshots.get(path);
     if (
       cached !== undefined &&
@@ -1289,7 +1396,11 @@ export class FormRuntime implements SelectorHost {
       cached.visible === effective.visible &&
       cached.disabled === effective.disabled &&
       cached.readonly === effective.readonly &&
-      cached.required === effective.required
+      cached.required === effective.required &&
+      cached.errors === validation.errors &&
+      cached.directErrors === validation.directErrors &&
+      cached.valid === validation.valid &&
+      cached.validating === validation.validating
     ) {
       return cached;
     }
@@ -1299,6 +1410,10 @@ export class FormRuntime implements SelectorHost {
       dirty,
       touched,
       ...effective,
+      directErrors: validation.directErrors,
+      errors: validation.errors,
+      valid: validation.valid,
+      validating: validation.validating,
     });
     this.fieldSnapshots.set(path, snapshot);
     return snapshot;
@@ -1418,7 +1533,7 @@ export class FormRuntime implements SelectorHost {
   }
 
   private sourceStamp(): string {
-    return `${this.values.revision}:${this.fields.revision}:${this.views.revision}:${this.form.revision}:${this.derivedRevision}`;
+    return `${this.values.revision}:${this.fields.revision}:${this.views.revision}:${this.form.revision}:${this.derivedRevision}:${this.validation.revision}:${this.validation.store.revision}`;
   }
 
   private throwDiagnostics(diagnostics: readonly Diagnostic[]): never {
@@ -1459,6 +1574,123 @@ export class FormRuntime implements SelectorHost {
     const draft = this.committedView();
     const state = this.engine.peekState();
     return this.engine.serialize(draft, state, options, this.form.version);
+  }
+
+  async validate(): Promise<ValidationResult> {
+    this.validationIntent = "manual";
+    try {
+      this.runTransaction([]);
+    } finally {
+      this.validationIntent = undefined;
+    }
+    const mutation = this.mutationEpoch;
+    const version = this.form.version;
+    await this.validation.waitForAttempt(this.currentAttempt, mutation);
+    return this.validation.result(this.form.version, this.mutationEpoch !== mutation);
+  }
+
+  applyErrors(errors: readonly ServerErrorInput[], options?: ApplyErrorsOptions): void {
+    const changed = this.validation.applyErrors(errors, options);
+    if (changed) {
+      this.publishValidationState(this.validation.selectorKeysForDirty(), true);
+    }
+  }
+
+  async submit(handler: SubmitHandler): Promise<SubmitResult> {
+    this.validation.beginSubmit();
+    this.publishValidationState(new Set(["form"]), true);
+    try {
+      this.validationIntent = "submit";
+      try {
+        this.runTransaction([]);
+      } finally {
+        this.validationIntent = undefined;
+      }
+      const mutation = this.mutationEpoch;
+      const version = this.form.version;
+      await this.validation.waitForAttempt(this.currentAttempt, mutation);
+      const superseded = this.mutationEpoch !== mutation;
+      const validation = this.validation.result(this.form.version, superseded);
+      if (!validation.valid || superseded) {
+        return this.validation.submitResult(this.form.version, superseded, false);
+      }
+      const payload = this.serialize();
+      await handler(payload);
+      return this.validation.submitResult(this.form.version, false, true, payload);
+    } finally {
+      this.validation.endSubmit();
+      this.publishValidationState(new Set(["form"]), true);
+    }
+  }
+
+  private createValidationHost(): ValidationHost {
+    const runtime = this;
+    return {
+      model: runtime.model,
+      environment: runtime.environment,
+      bindings(draft) {
+        return draft?.bindings ?? runtime.bindings;
+      },
+      values(draft) {
+        return draft?.values ?? runtime.values.current;
+      },
+      version() {
+        return runtime.form.version;
+      },
+      mutationEpoch() {
+        return runtime.mutationEpoch;
+      },
+      isActive(path) {
+        return runtime.effectiveAt(path).active;
+      },
+      activationChanged(path) {
+        if (runtime.workingRule === undefined) {
+          return false;
+        }
+        const previous = runtime.engine.peekState();
+        return (
+          runtime.engine.schemaEffectiveActive(path, previous) !==
+          runtime.engine.schemaEffectiveActive(path, runtime.workingRule)
+        );
+      },
+      isTouched(path) {
+        return runtime.isAggregateTouched(path);
+      },
+      serialize(options) {
+        return runtime.serialize(options);
+      },
+      emit(diagnostics) {
+        runtime.emitNonBlocking(diagnostics);
+      },
+      fail(diagnostics) {
+        return runtime.throwDiagnostics(diagnostics);
+      },
+      publishState(affected, bumpVersion) {
+        runtime.publishValidationState(affected, bumpVersion);
+      },
+    };
+  }
+
+  private publishValidationState(affected: ReadonlySet<string>, bumpVersion: boolean): void {
+    if (this.running) {
+      this.extraSelectorKeys = new Set([...this.extraSelectorKeys, ...affected]);
+      return;
+    }
+    if (bumpVersion) {
+      this.form.version += 1;
+      this.form.revision += 1;
+    }
+    this.cachedFormSnapshot = undefined;
+    this.formSnapshotStamp = "";
+    this.fieldSnapshots.clear();
+    this.extraSelectorKeys = new Set(affected);
+    this.publish({
+      valuePaths: Object.freeze([]),
+      fieldPaths: Object.freeze([]),
+      viewIds: Object.freeze([]),
+      blurred: Object.freeze([]),
+      reset: false,
+    });
   }
 
   private stabilizeInitial(): void {
@@ -1553,6 +1785,15 @@ export class FormRuntime implements SelectorHost {
       },
       serialize(options) {
         return runtime.serialize(options);
+      },
+      validate() {
+        return runtime.validate();
+      },
+      applyErrors(errors, options) {
+        runtime.applyErrors(errors, options);
+      },
+      submit(handler) {
+        return runtime.submit(handler);
       },
     };
     bindRuntimeFacade(facade, runtime, runtime.rootRuntimeId());

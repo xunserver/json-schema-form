@@ -483,7 +483,7 @@ function validateNamedProvider(
   value: unknown,
   tracked: TrackedDiagnostic[],
 ): boolean {
-  if (kind !== "ruleFunctions" && kind !== "serializers") {
+  if (kind !== "ruleFunctions" && kind !== "serializers" && kind !== "validators") {
     return true;
   }
   if (!isPlainObject(value)) {
@@ -558,6 +558,128 @@ function validateNamedProvider(
         registry: kind,
         key,
         metadata: { registry: kind, key, name, reason: "invalid-serialize" },
+      }),
+    );
+    return false;
+  }
+  if (kind === "validators" && !validateValidatorDescriptor(snapshot, key, name, value, tracked)) {
+    return false;
+  }
+  return true;
+}
+
+function validateValidatorDescriptor(
+  snapshot: PluginSnapshot,
+  key: string,
+  name: string,
+  value: Record<string, unknown>,
+  tracked: TrackedDiagnostic[],
+): boolean {
+  const kind = value.kind;
+  if (kind !== "sync" && kind !== "async" && kind !== "schema-adapter") {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" validators descriptor "${key}" must declare kind "sync", "async", or "schema-adapter"`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: "validators",
+        key,
+        metadata: { registry: "validators", key, name, kind, reason: "invalid-kind" },
+      }),
+    );
+    return false;
+  }
+  if (kind === "sync" || kind === "async") {
+    if (typeof value.validate !== "function") {
+      tracked.push(
+        trackDiagnostic({
+          code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+          severity: "error",
+          message: `Plugin "${snapshot.id}" validators descriptor "${key}" must provide validate()`,
+          pluginId: snapshot.id,
+          ordinal: snapshot.ordinal,
+          registry: "validators",
+          key,
+          metadata: { registry: "validators", key, name, kind, reason: "invalid-validate" },
+        }),
+      );
+      return false;
+    }
+    return true;
+  }
+  if (typeof value.validateAll !== "function") {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" validators descriptor "${key}" must provide synchronous validateAll()`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: "validators",
+        key,
+        metadata: { registry: "validators", key, name, kind, reason: "invalid-validateAll" },
+      }),
+    );
+    return false;
+  }
+  const capabilities = value.capabilities;
+  if (capabilities !== undefined && !isPlainObject(capabilities)) {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" validators descriptor "${key}" capabilities must be a plain object`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: "validators",
+        key,
+        metadata: { registry: "validators", key, name, kind, reason: "invalid-capabilities" },
+      }),
+    );
+    return false;
+  }
+  if (capabilities?.validateAt === true && typeof value.validateAt !== "function") {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" validators descriptor "${key}" declared safe validateAt without the method`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: "validators",
+        key,
+        metadata: {
+          registry: "validators",
+          key,
+          name,
+          kind,
+          capability: "validateAt",
+          reason: "missing-capability-method",
+        },
+      }),
+    );
+    return false;
+  }
+  if (capabilities?.validateAffected === true && typeof value.validateAffected !== "function") {
+    tracked.push(
+      trackDiagnostic({
+        code: PLUGIN_DIAGNOSTIC_CODES.INVALID_DESCRIPTOR,
+        severity: "error",
+        message: `Plugin "${snapshot.id}" validators descriptor "${key}" declared safe validateAffected without the method`,
+        pluginId: snapshot.id,
+        ordinal: snapshot.ordinal,
+        registry: "validators",
+        key,
+        metadata: {
+          registry: "validators",
+          key,
+          name,
+          kind,
+          capability: "validateAffected",
+          reason: "missing-capability-method",
+        },
       }),
     );
     return false;

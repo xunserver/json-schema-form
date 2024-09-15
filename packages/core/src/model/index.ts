@@ -42,7 +42,14 @@ export type {
   RuleModel,
   SerializationPlan,
 } from "./rule.js";
-export type { CompiledValidator, ValidationModel } from "./validation.js";
+export type {
+  NamedValidationPlan,
+  PresentationPlan,
+  SchemaValidationPlan,
+  ServerValidationPlan,
+  ValidationModel,
+  ValidationRulePlan,
+} from "./validation.js";
 export type {
   ActivationBranch,
   ActivationKind,

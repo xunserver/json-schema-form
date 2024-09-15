@@ -98,3 +98,34 @@ Core 必须（SHALL）从 `@form/core` 根入口暴露 `defineForm()`。该 help
 - **GIVEN** author配置`serializeInactive: false`和serializer key`company.payload`
 - **WHEN** 使用`defineForm()`创建Definition
 - **THEN** 两个literal配置被保留供Compiler校验，不执行serializer或创建Runtime
+
+### Requirement: Form Config 以名称和ModelPath声明validation计划
+`FormConfig`可以（MAY）声明`schemaValidator` Registry key，并可以（MAY）声明readonly named validator uses；每个use必须（MUST）包含validator key、target `ModelPathLike`、显式dependencies与可选automatic triggers，provider的sync/async/schema类别由冻结Registry descriptor决定。Definition只能（MUST）保存名称、Path、trigger与JSON-compatible options，不得（MUST NOT）内嵌provider function、AJV实例、Runtime binding、`InstancePath`、run token或mutable state。
+
+#### Scenario: 声明named custom与async validator uses
+- **GIVEN** author为`account.email`声明同步format validator，并为`account.username`声明异步uniqueness validator及其dependencies
+- **WHEN** 使用`defineForm()`创建Definition
+- **THEN** validator key、`ModelPathLike`、dependency、trigger和readonly options保留literal inference，但provider不会被执行或安装
+
+#### Scenario: schema adapter只按Registry key选择
+- **GIVEN** author将`schemaValidator`配置为`ajv-2020`
+- **WHEN** Definition进入Compiler
+- **THEN** 配置只表达对frozen Environment contribution的名称引用，不携带AJV对象或具体adapter实现
+
+#### Scenario: 拒绝Runtime或具体validator实例
+- **GIVEN** author尝试在Form Config中放入AJV instance、validator callback、`InstancePath` binding、FormInstance或run token
+- **WHEN** 执行TypeScript检查或Compiler输入校验
+- **THEN** 输入被拒绝且不能借Definition绕过Registry、Compiler或transaction boundary
+
+### Requirement: validation trigger与error presentation分别配置
+`FormConfig.validateOn`必须（MUST）只控制automatic validation trigger，并接受`change`、`blur`、`submit`或`manual`；未配置时缺省为`submit`。Form Config可以（MAY）独立声明error-presentation policy，以`touched`、`submitCount`或两者组合决定presentable errors；该policy不得（MUST NOT）改变raw errors、`valid`、Schema语义或validator是否执行。显式`validate()`和`submit()`必须（MUST）执行完整effective validation，不受仅用于automatic scheduling的缺省trigger限制。
+
+#### Scenario: submit触发但touched时展示
+- **GIVEN** Form Config使用`validateOn: "submit"`和基于touched的presentation policy
+- **WHEN** Field被touch但尚未submit
+- **THEN** presentation policy本身不会运行validator；只有已有raw errors可被标记为presentable
+
+#### Scenario: trigger与展示策略互不替代
+- **GIVEN** Form配置change validation但presentation直到submit后才展示
+- **WHEN** value change产生新的ValidationError且`submitCount`仍为0
+- **THEN** raw errors和`valid`立即更新，而presentable errors仍按独立policy隐藏
