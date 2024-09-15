@@ -8,6 +8,10 @@ import type { ValueStoreImpl } from "../src/runtime/index.js";
 import type { EffectScheduler } from "../src/runtime/index.js";
 // @ts-expect-error Environment identity is not exported from the public runtime barrel
 import type { EnvironmentIdentity } from "../src/runtime/index.js";
+// @ts-expect-error ArrayStateStore is not exported from the public runtime barrel
+import type { ArrayStateStore } from "../src/runtime/index.js";
+// @ts-expect-error RuntimeNodeId is not exported from the public runtime barrel
+import type { RuntimeNodeId } from "../src/runtime/index.js";
 
 declare const transactionManager: TransactionManager;
 declare const changeQueue: ChangeQueue;
@@ -19,3 +23,8 @@ void changeQueue;
 void valueStore;
 void scheduler;
 void identity;
+
+declare const arrayStore: ArrayStateStore;
+declare const runtimeNodeId: RuntimeNodeId;
+void arrayStore;
+void runtimeNodeId;

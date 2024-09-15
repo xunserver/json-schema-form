@@ -18,6 +18,9 @@ const PUBLIC_ROOT_CONTRACTS = [
   "createFormEngine",
   "FormInstance",
   "FieldInstance",
+  "ArrayInstance",
+  "ScopedFormInstance",
+  "ArrayItemId",
   "FormRuntimeError",
   "CompileOptions",
   "CompiledFormModel",
@@ -33,6 +36,7 @@ const PRIVATE_SYMBOLS = [
   "ValueStoreImpl",
   "ChangeQueue",
   "EnvironmentIdentity",
+  "ArrayStateStore",
 ];
 
 describe("generated Core public surface", () => {
@@ -61,6 +65,8 @@ describe("generated Core public surface", () => {
       "subscribeRuntime",
       "observeRuntimeDiagnostics",
       "RuntimeSelector",
+      "arrayOrderSelector",
+      "ArrayIdentityResolver",
     ]) {
       expect(runtime, `missing ${name}`).toContain(name);
     }

@@ -1,7 +1,15 @@
-import type { ViewNodeId } from "../identity/index.js";
+import type { ArrayItemId, ViewNodeId } from "../identity/index.js";
 import type { InstancePathLike } from "../path/types.js";
 import { toInstancePath } from "../path/instance-path.js";
-import type { FieldSnapshot, FormSnapshot, JsonValue, ViewSnapshot } from "./contracts.js";
+import type {
+  ArrayItemRef,
+  ArrayItemSnapshot,
+  CurrentBindingSnapshot,
+  FieldSnapshot,
+  FormSnapshot,
+  JsonValue,
+  ViewSnapshot,
+} from "./contracts.js";
 import { RUNTIME_DIAGNOSTIC_CODES } from "./diagnostic-codes.js";
 import { runtimeDiagnostic } from "./diagnostics.js";
 import { FormRuntimeError } from "./error.js";
@@ -19,6 +27,11 @@ export interface SelectorHost {
   viewSnapshot(id: ViewNodeId): ViewSnapshot;
   formSnapshot(): FormSnapshot;
   evaluateSelector<T>(selector: RuntimeSelector<T>): T;
+  arrayOrder(path: InstancePathLike): readonly ArrayItemId[];
+  arrayItemSnapshot(path: InstancePathLike, item: ArrayItemRef): ArrayItemSnapshot;
+  currentBinding(path: InstancePathLike): CurrentBindingSnapshot;
+  itemValue(itemId: ArrayItemId, relative?: InstancePathLike): JsonValue | undefined;
+  itemPath(itemId: ArrayItemId): import("../path/types.js").InstancePath;
 }
 
 export interface SelectorRecord<T> {
@@ -83,6 +96,55 @@ export function formSelector(): RuntimeSelector<FormSnapshot> {
   return makeSelector({
     deps: Object.freeze(["form"]),
     project: (host) => host.formSnapshot(),
+  });
+}
+
+export function arrayOrderSelector(path: InstancePathLike): RuntimeSelector<readonly ArrayItemId[]> {
+  const canonical = requireCanonicalPath(path, "array order");
+  return makeSelector({
+    deps: Object.freeze([`array-order:${canonical}`]),
+    project: (host) => host.arrayOrder(canonical),
+  });
+}
+
+export function arrayItemSelector(
+  path: InstancePathLike,
+  item: ArrayItemRef,
+): RuntimeSelector<ArrayItemSnapshot> {
+  const canonical = requireCanonicalPath(path, "array item");
+  const itemKey = typeof item === "number" ? String(item) : String(item);
+  return makeSelector({
+    deps: Object.freeze(
+      typeof item === "number"
+        ? [`array-order:${canonical}`, `value:${canonical}`]
+        : [`entity-value:${itemKey}`, `address:${itemKey}`],
+    ),
+    project: (host) => host.arrayItemSnapshot(canonical, item),
+  });
+}
+
+export function currentBindingSelector(path: InstancePathLike): RuntimeSelector<CurrentBindingSnapshot> {
+  const canonical = requireCanonicalPath(path, "binding");
+  return makeSelector({
+    deps: Object.freeze([`address:${canonical}`, `value:${canonical}`]),
+    project: (host) => host.currentBinding(canonical),
+  });
+}
+
+export function itemValueSelector(
+  itemId: ArrayItemId,
+  relative?: InstancePathLike,
+): RuntimeSelector<JsonValue | undefined> {
+  return makeSelector({
+    deps: Object.freeze([`entity-value:${itemId}`]),
+    project: (host) => host.itemValue(itemId, relative),
+  });
+}
+
+export function itemPathSelector(itemId: ArrayItemId): RuntimeSelector<import("../path/types.js").InstancePath> {
+  return makeSelector({
+    deps: Object.freeze([`address:${itemId}`]),
+    project: (host) => host.itemPath(itemId),
   });
 }
 

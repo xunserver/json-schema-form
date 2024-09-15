@@ -2,16 +2,16 @@ import type { DataNode } from "../model/data.js";
 import type { CompiledFormModel } from "../model/compiled-form-model.js";
 import type { ModelPath } from "../path/types.js";
 import {
+  formatInstancePath,
+  parseInstancePath,
   ROOT_INSTANCE_PATH,
   asInstancePath,
-  formatInstancePath,
-  formatModelPath,
-  parseInstancePath,
   type InstancePath,
   type InstancePathLike,
   type InstancePathSegment,
 } from "../path/index.js";
 import { RUNTIME_DIAGNOSTIC_CODES, type RuntimeDiagnosticCode } from "./diagnostic-codes.js";
+import { indexDataNodes, walkModel } from "./templates.js";
 
 export interface BoundInstancePath {
   readonly path: InstancePath;
@@ -43,27 +43,14 @@ export function bindInstancePath(model: CompiledFormModel, input: InstancePathLi
     };
   }
 
-  if (segments.some((segment) => segment.kind === "index")) {
-    const path = formatInstancePath(segments);
-    return {
-      ok: false,
-      failure: {
-        code: RUNTIME_DIAGNOSTIC_CODES.ARRAY_BINDING_UNAVAILABLE,
-        message: "Array item InstancePath binding is not available",
-        path,
-      },
-    };
-  }
-
   const path = formatInstancePath(segments);
-  const modelPath = instanceSegmentsToModelPath(segments);
-  const node = model.data.nodes.get(modelPath);
-  if (node === undefined) {
+  const walked = walkModel(model, indexDataNodes(model), segments);
+  if (!walked.ok) {
     return {
       ok: false,
       failure: {
-        code: RUNTIME_DIAGNOSTIC_CODES.UNKNOWN_PATH,
-        message: `InstancePath is not bound to the compiled model: ${path}`,
+        code: walked.code,
+        message: walked.message,
         path,
       },
     };
@@ -74,8 +61,8 @@ export function bindInstancePath(model: CompiledFormModel, input: InstancePathLi
     binding: {
       path,
       segments,
-      modelPath,
-      node,
+      modelPath: walked.modelPath,
+      node: walked.node,
     },
   };
 }
@@ -84,18 +71,20 @@ export function canMaterializeObject(
   model: CompiledFormModel,
   segments: readonly InstancePathSegment[],
 ): boolean {
-  const node =
-    segments.length === 0
-      ? model.data.root
-      : model.data.nodes.get(instanceSegmentsToModelPath(segments));
-  if (node === undefined) {
+  const walked = walkModel(model, indexDataNodes(model), segments);
+  if (!walked.ok) {
     return false;
   }
+  const node = walked.concrete;
   return node.kind === "object" || node.kind === "any" || node.kind === "union" || node.kind === "recursive-ref";
 }
 
 export function isFieldPath(model: CompiledFormModel, path: InstancePath): boolean {
-  return model.ui.fields.has(path as unknown as ModelPath);
+  const walked = walkModel(model, indexDataNodes(model), parseInstancePath(path) ?? []);
+  if (!walked.ok) {
+    return false;
+  }
+  return model.ui.fields.has(walked.modelPath);
 }
 
 export function rootInstancePath(): InstancePath {
@@ -104,10 +93,4 @@ export function rootInstancePath(): InstancePath {
 
 export function canonicalRootPath(): InstancePath {
   return asInstancePath("");
-}
-
-function instanceSegmentsToModelPath(segments: readonly InstancePathSegment[]): ModelPath {
-  return formatModelPath(
-    segments.flatMap((segment) => (segment.kind === "property" ? [{ kind: "property" as const, name: segment.name }] : [])),
-  );
 }

@@ -97,7 +97,7 @@ export function getJsonAt(
   return current as JsonValue | undefined;
 }
 
-export type JsonUpdateFailure = "not-container" | "index-write";
+export type JsonUpdateFailure = "not-container" | "index-write" | "index-oob";
 
 export function setJsonPath(
   root: JsonValue | undefined,
@@ -137,6 +137,16 @@ export function diffJsonValuePaths(
         ...diffJsonValuePaths(before[key], after[key], formatPath, [
           ...prefix,
           { kind: "property", name: key },
+        ]),
+      );
+    }
+  } else if (Array.isArray(before) && Array.isArray(after)) {
+    const length = Math.max(before.length, after.length);
+    for (let index = 0; index < length; index += 1) {
+      paths.push(
+        ...diffJsonValuePaths(before[index], after[index], formatPath, [
+          ...prefix,
+          { kind: "index", index },
         ]),
       );
     }
@@ -184,7 +194,24 @@ function setAt(
   }
 
   if (segment.kind === "index") {
-    return { ok: false, reason: "index-write" };
+    if (!Array.isArray(current)) {
+      return { ok: false, reason: "index-write" };
+    }
+    if (segment.index < 0 || segment.index >= current.length) {
+      return { ok: false, reason: "index-oob" };
+    }
+    const childPrefix = [...prefix, segment];
+    const existing = current[segment.index];
+    const child = setAt(existing, segments, index + 1, nextValue, materializeObject, childPrefix);
+    if (!child.ok) {
+      return child;
+    }
+    if (!child.changed && Object.is(existing, child.value)) {
+      return { ok: true, value: current, changed: false };
+    }
+    const copy = current.slice();
+    copy[segment.index] = child.value;
+    return { ok: true, value: Object.freeze(copy), changed: true };
   }
 
   let container: Record<string, JsonValue>;

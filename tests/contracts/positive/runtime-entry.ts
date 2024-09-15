@@ -1,4 +1,5 @@
 import {
+  arrayOrderSelector,
   createSelector,
   formSelector,
   getRuntimeSnapshot,
@@ -6,6 +7,7 @@ import {
   subscribeRuntime,
   valueSelector,
 } from "@form/core/runtime";
+import type { ArrayIdentityResolver } from "@form/core/runtime";
 import { compileForm, createForm, defineForm } from "@form/core";
 
 const form = createForm(
@@ -21,8 +23,12 @@ export const snapshot = getRuntimeSnapshot(form, valueSelector("title"));
 export const unsubscribe = subscribeRuntime(form, formSelector(), () => undefined);
 export const composed = createSelector([valueSelector("title")], (title) => title);
 export const stopDiagnostics = observeRuntimeDiagnostics(form, () => undefined);
+export const order = arrayOrderSelector("title");
+export const resolver: ArrayIdentityResolver = () => undefined;
 
 void snapshot;
 void unsubscribe;
 void composed;
 void stopDiagnostics;
+void order;
+void resolver;

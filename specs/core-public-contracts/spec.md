@@ -100,24 +100,34 @@ Core 必须（SHALL）暴露 `CompileResult`，其中 `CompiledFormModel` 始终
 - **THEN** 该失败表示为带结构化 diagnostics 的 `CompileError`，而不是 `model` 可选的成功结果
 
 ### Requirement: 受支持的 export 隔离内部模块
-`@form/core` 必须（SHALL）从 package 根入口暴露面向应用的契约，并为 Advanced Runtime 和 Extension 契约预留显式支持的子路径。Package export map 必须（SHALL）拒绝未声明的 deep import，并将可变 Store、Compiler Context、Dependency Graph、Transaction 设施、Scheduler 和内部 ID 生成逻辑保持私有。
+`@form/core` 必须（SHALL）从 package 根入口暴露面向应用的 authoring、compile、instantiate 与实例 facade 契约，包括 `createForm`、`createFormEngine`、`FormEngine`、基础 `FormInstance`/`FieldInstance`、`ArrayInstance`、`ScopedFormInstance`、`ArrayItemId` 和结构化 Runtime failure。只读 selector、subscription、snapshot、array binding、Identity Resolver 与 Runtime diagnostic observation 必须（MUST）从显式支持的 `@form/core/runtime` 子路径获得，Extension 契约继续从 `@form/core/extension` 获得。Package export map 必须（SHALL）拒绝未声明的 deep import，并将可变 Store、Environment identity token、Compiler Context、Dependency Graph、Transaction Manager、Change Queue、phase implementation、Scheduler、array binding/cleanup writer、ID generator 和 `RuntimeNodeId` generation 保持私有。
 
 #### Scenario: 导入根入口公共契约
-- **GIVEN** 外部消费者从 `@form/core` 导入 `FormDefinition`、`CompiledFormModel` 或 `Diagnostic` 等面向应用的类型
-- **WHEN** 解析 fixture 并执行类型检查
-- **THEN** import 通过文档声明的根入口成功
+- **GIVEN** 外部消费者从 `@form/core` 导入 `createForm`、`createFormEngine`、`FormInstance`、`FieldInstance`、`ArrayInstance`、`ScopedFormInstance`、`ArrayItemId` 或 Runtime failure contract
+- **WHEN** 通过 package exports 解析 fixture 并执行类型检查
+- **THEN** 这些 Application API 可以与根入口的 `defineForm`、`compileForm` 及只读 Model 契约共同使用，并可调用 `array()` 与 `scope()`
 
 #### Scenario: 导入受支持的子路径
-- **GIVEN** 外部消费者解析已声明的 `@form/core/runtime` 或 `@form/core/extension` 模块入口
-- **WHEN** 解析 fixture 并执行类型检查
-- **THEN** 解析仅通过该已声明子路径成功
+- **GIVEN** Framework binding 或高级消费者从 `@form/core/runtime` 导入只读 selector、subscription、snapshot、array binding、Identity Resolver 或 Runtime diagnostic observation contract
+- **WHEN** 解析 fixture并执行类型检查
+- **THEN** import 仅通过该显式子路径成功，且返回契约不包含公开 mutation Store、binding writer 或 ID generator
+
+#### Scenario: 根入口不重导出 Advanced 或 Extension factory
+- **GIVEN** 消费者尝试从 `@form/core` 导入 selector factory、Identity Resolver helper、subscription helper、`definePlugin` 或 `createFormEnvironment`
+- **WHEN** 对 consumer fixture 执行类型检查
+- **THEN** import 因角色级 export 不属于根入口而失败
 
 #### Scenario: 拒绝内部 deep import
-- **GIVEN** 外部消费者导入未声明的 Core 内部模块路径下的文件
+- **GIVEN** 外部消费者导入未声明的 Core runtime、transaction、store、array binding 或 engine implementation 文件路径
 - **WHEN** 使用 package exports 解析 fixture
 - **THEN** 即使内部源文件存在，解析仍然失败
 
 #### Scenario: 根导出不包含内部符号
-- **GIVEN** 外部消费者尝试从 `@form/core` 导入可变 Store、`TransactionManager`、Compiler Context、Scheduler 或内部 ID generator
-- **WHEN** 对 fixture 执行类型检查
-- **THEN** 因该符号不属于公共表面而导致 import 失败
+- **GIVEN** 外部消费者尝试从 `@form/core` 导入 `RuntimeNodeId`、`ArrayStateStore`、`TransactionManager`、`ChangeQueue`、mutable Store、phase implementation、Scheduler、subtree cleanup writer、array binding table、identity generator 或 Environment identity token
+- **WHEN** 对 consumer fixture 执行类型检查
+- **THEN** import 因这些符号不属于根公共表面而失败
+
+#### Scenario: 所有公共入口均不泄漏 Runtime internals
+- **GIVEN** 外部消费者尝试从根入口、runtime 或 extension 子路径导入 `RuntimeNodeId`、`ArrayStateStore`、`TransactionManager`、`ChangeQueue`、mutable Store、phase implementation、Scheduler、subtree cleanup writer、array binding table、identity generator 或 Environment identity token
+- **WHEN** 对 fixture 和生成 declaration 执行检查
+- **THEN** 所有 import 均失败，且公开 interface 不提供等价的 mutable escape hatch

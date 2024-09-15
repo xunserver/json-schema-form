@@ -8,6 +8,10 @@ import type { ValueStoreImpl } from "../src/index.js";
 import type { EffectScheduler } from "../src/index.js";
 // @ts-expect-error Environment identity is not part of the public root barrel
 import type { EnvironmentIdentity } from "../src/index.js";
+// @ts-expect-error ArrayStateStore is not part of the public root barrel
+import type { ArrayStateStore } from "../src/index.js";
+// @ts-expect-error RuntimeNodeId is not part of the public root barrel
+import type { RuntimeNodeId } from "../src/index.js";
 
 declare const transactionManager: TransactionManager;
 declare const changeQueue: ChangeQueue;
@@ -19,3 +23,8 @@ void changeQueue;
 void valueStore;
 void scheduler;
 void identity;
+
+declare const arrayStore: ArrayStateStore;
+declare const runtimeNodeId: RuntimeNodeId;
+void arrayStore;
+void runtimeNodeId;

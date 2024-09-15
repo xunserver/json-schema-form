@@ -4,14 +4,26 @@ export type {
   Unsubscribe,
 } from "./selectors.js";
 export {
+  arrayItemSelector,
+  arrayOrderSelector,
   createSelector,
+  currentBindingSelector,
   fieldSelector,
   formSelector,
+  itemPathSelector,
+  itemValueSelector,
   valueSelector,
   viewSelector,
 } from "./selectors.js";
 
-export type { FieldSnapshot, FormSnapshot, JsonValue, ViewSnapshot } from "./contracts.js";
+export type { ArrayIdentityResolver, ArrayIdentityResolverBinding } from "./identity-resolver.js";
+export type {
+  ArrayItemSnapshot,
+  CurrentBindingSnapshot,
+  FieldSnapshot,
+  FormSnapshot,
+  JsonValue,
+} from "./contracts.js";
 
 import type { FormInstance } from "./contracts.js";
 import { resolveFormRuntime } from "./handle.js";

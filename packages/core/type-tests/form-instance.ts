@@ -40,13 +40,21 @@ void state.version;
 void fieldState.dirty;
 
 type FormKeys = keyof FormInstance;
-type ForbiddenFacades = Extract<
-  FormKeys,
-  "array" | "scope" | "validate" | "applyErrors" | "submit" | "serialize"
->;
+type ForbiddenFacades = Extract<FormKeys, "validate" | "applyErrors" | "submit" | "serialize">;
 type AssertNoLaterFacades = ForbiddenFacades extends never ? true : never;
 const noLaterFacades: AssertNoLaterFacades = true;
 void noLaterFacades;
+
+const array = form.array;
+const scoped = form.scope;
+void array;
+void scoped;
+
+type ScopedKeys = keyof import("../src/index.js").ScopedFormInstance;
+type ForbiddenScoped = Extract<ScopedKeys, "setValues" | "reset" | "validate" | "submit" | "serialize">;
+type AssertNoScopedRoot = ForbiddenScoped extends never ? true : never;
+const noScopedRoot: AssertNoScopedRoot = true;
+void noScopedRoot;
 
 type AssertEngine = FormEngine["compile"] | FormEngine["create"];
 const engineMethods: AssertEngine | undefined = undefined;

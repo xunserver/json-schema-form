@@ -12,12 +12,14 @@ import { runtimeDiagnostic, sortRuntimeDiagnostics } from "./diagnostics.js";
 import { FormRuntimeError } from "./error.js";
 import { FormRuntime, type FormRuntimeOptions } from "./form-runtime.js";
 import { bindFormRuntime } from "./handle.js";
+import type { RuntimeSubtreeOwner } from "./subtree-lifecycle.js";
 import type { PhaseSet } from "./phases.js";
 
 export interface CreateFormInternals {
   readonly phases?: Partial<PhaseSet>;
   readonly commandLimit?: number;
   readonly iterationLimit?: number;
+  readonly subtreeOwners?: readonly RuntimeSubtreeOwner[];
 }
 
 export function createForm(model: CompiledFormModel, options?: CreateFormOptions): FormInstance {
@@ -50,9 +52,13 @@ export function instantiateForm(
 
   const runtimeOptions: FormRuntimeOptions = {
     ...(options?.initialValues === undefined ? {} : { initialValues: options.initialValues }),
+    ...(options?.arrayIdentityResolvers === undefined
+      ? {}
+      : { arrayIdentityResolvers: options.arrayIdentityResolvers }),
     ...(internals?.phases === undefined ? {} : { phases: internals.phases }),
     ...(internals?.commandLimit === undefined ? {} : { commandLimit: internals.commandLimit }),
     ...(internals?.iterationLimit === undefined ? {} : { iterationLimit: internals.iterationLimit }),
+    ...(internals?.subtreeOwners === undefined ? {} : { subtreeOwners: internals.subtreeOwners }),
   };
   const runtime = new FormRuntime(model, environment, runtimeOptions);
   bindFormRuntime(runtime.facade, runtime);

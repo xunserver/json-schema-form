@@ -59,14 +59,16 @@ describe("InstancePath codec", () => {
     expect(missing.ok).toBe(true);
   });
 
-  test("returns a capability diagnostic for array indexes without creating identity", () => {
+  test("binds compiled array item templates without creating values", () => {
     const model = compilePersonModel();
-    const result = bindInstancePath(model, "tags[3].oops");
-    expect(result.ok).toBe(false);
-    if (result.ok) {
+    const result = bindInstancePath(model, "tags[0]");
+    expect(result.ok).toBe(true);
+    const missing = bindInstancePath(model, "tags[3].oops");
+    expect(missing.ok).toBe(false);
+    if (missing.ok) {
       return;
     }
-    expect(result.failure.code).toBe(RUNTIME_DIAGNOSTIC_CODES.ARRAY_BINDING_UNAVAILABLE);
+    expect(missing.failure.code).toBe(RUNTIME_DIAGNOSTIC_CODES.UNKNOWN_PATH);
     expect(model.data.nodes.has("tags[3]" as never)).toBe(false);
   });
 

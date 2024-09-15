@@ -110,7 +110,7 @@ describe("value commands", () => {
     const unknown = expectRuntimeError(() => form.setValue("missing", "x"));
     expect(unknown.diagnostics[0]?.code).toBe(RUNTIME_DIAGNOSTIC_CODES.UNKNOWN_PATH);
     const index = expectRuntimeError(() => form.setValue("tags[3]", "z"));
-    expect(index.diagnostics[0]?.code).toBe(RUNTIME_DIAGNOSTIC_CODES.ARRAY_BINDING_UNAVAILABLE);
+    expect(index.diagnostics[0]?.code).toBe(RUNTIME_DIAGNOSTIC_CODES.ARRAY_INDEX_OUT_OF_RANGE);
     expect(form.getValues()).toBe(before);
     expect(form.getState().version).toBe(0);
   });

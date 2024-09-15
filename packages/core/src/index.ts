@@ -91,8 +91,13 @@ export { FormRuntimeError } from "./runtime/error.js";
 export { RUNTIME_DIAGNOSTIC_CODES } from "./runtime/diagnostic-codes.js";
 export type { RuntimeDiagnosticCode } from "./runtime/diagnostic-codes.js";
 export type {
+  ArrayIdentityResolverConfig,
+  ArrayInstance,
+  ArrayItemRef,
+  ArrayItemSnapshot,
   CreateFormEngineOptions,
   CreateFormOptions,
+  CurrentBindingSnapshot,
   FieldInstance,
   FieldSnapshot,
   FormEngine,
@@ -100,5 +105,6 @@ export type {
   FormSnapshot,
   JsonPrimitive,
   JsonValue,
+  ScopedFormInstance,
   ViewSnapshot,
 } from "./runtime/contracts.js";

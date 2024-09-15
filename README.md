@@ -112,9 +112,11 @@ try {
 
 `createForm(model, { initialValues })` 使用与 `compileForm(definition)` 相同的默认 Core Environment。显式 Environment 必须在 compile 与 create 之间保持同一 identity，不能靠 Plugin 列表结构相等来匹配。需要长期复用同一套 Plugin 时，使用 `createFormEngine({ plugins })`：`engine.compile()` 与 `engine.create()` 闭包持有同一个冻结 Environment，Engine 本身不保存实例 values 或 version。
 
-公开 snapshot 只读。`setValues(nextValues)` 是一次原子的 root replacement，不是隐式 deep-merge。写入必须经过 command/transaction；effective no-op 不增加 `version`。当前 Runtime 可以替换整个 array value，但 `items[0]` 这类 index path 尚不能绑定，数组项身份由后续切片交付。
+公开 snapshot 只读。`setValues(nextValues)` 是一次原子的 root replacement，不是隐式 deep-merge。写入必须经过 command/transaction；effective no-op 不增加 `version`。
 
-只读 selector / subscription / Runtime diagnostic observer 从 `@form/core/runtime` 导入，不从根入口重导出。`FormInstance` 目前提供 get/set/state/touch/focus/reset；`array()`、`scope()`、`validate()`、`submit()`、`serialize()` 以及 Rule/Validation 求值尚未实现。
+`FormInstance.array(path)` 与 `scope(path)` 返回共享同一 Runtime 的轻量 facade。数组 index 只是当前地址，`ArrayItemId` 才是 item 身份：`move` 后 Field/View source state 跟随 ID，`remove`/`replaceItem`/`reset` 以及默认 whole-array `setValue` 会作废旧 ID 与 scope。`setItemValue` 保留根 item ID；未配置 Identity Resolver 时，有效的整个数组替换会重建全部 item ID，而不会按 index 或业务字段猜测复用。可在 `createForm` 选项中按数组 `ModelPath` 提供纯同步 `ArrayIdentityResolver`（从 `@form/core/runtime` 导入类型）做 key reconcile；重复 key 或抛错会使 transaction 回滚。固定 tuple 现存 slot 可 `setItemValue`/`replaceItem`，但不支持 append/insert/remove/move/clear。Rule、Validation、Renderer 仍由后续切片拥有，本 Runtime 不求值 active/visible，也不提供 `validate()`/`submit()`/`serialize()`。
+
+只读 selector / subscription / Runtime diagnostic observer 以及 array order/item/binding selector 从 `@form/core/runtime` 导入，不从根入口重导出。
 
 ```ts
 import { compileForm, createForm, createFormEngine, defineForm, FormRuntimeError } from "@form/core";
