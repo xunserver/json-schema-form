@@ -60,9 +60,9 @@ export interface PreviewChrome {
 }
 
 export const PREVIEW_CHROME: readonly PreviewChrome[] = Object.freeze([
-  Object.freeze({ id: "element-plus", label: "Element Plus", href: "/element-plus.html" }),
-  Object.freeze({ id: "antd", label: "Ant Design", href: "/antd.html" }),
-  Object.freeze({ id: "arco-vue", label: "Arco Vue", href: "/arco-vue.html" }),
-  Object.freeze({ id: "arco-react", label: "Arco React", href: "/arco-react.html" }),
-  Object.freeze({ id: "shadcn", label: "shadcn", href: "/shadcn.html" }),
+  Object.freeze({ id: "element-plus", label: "Element Plus", href: "element-plus.html" }),
+  Object.freeze({ id: "antd", label: "Ant Design", href: "antd.html" }),
+  Object.freeze({ id: "arco-vue", label: "Arco Vue", href: "arco-vue.html" }),
+  Object.freeze({ id: "arco-react", label: "Arco React", href: "arco-react.html" }),
+  Object.freeze({ id: "shadcn", label: "shadcn", href: "shadcn.html" }),
 ]);

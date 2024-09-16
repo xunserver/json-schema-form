@@ -1,20 +1,14 @@
 # Arco Design Vue Adapter
 
-本文说明 `@form/arco-vue` 与 `@form/vue` 的公开用法。Core `FormEnvironment` 仍是 Widget 定义、规则和校验的真相；Arco Form 的 model / validate 不得作为业务状态。
+公开用法已迁至用户文档站：
 
-```ts
-import { FormRenderer } from "@form/vue";
-import { arcoVueAdapter, createArcoVueAdapter, extendArcoVueAdapter } from "@form/arco-vue";
-```
+- [Vue Renderer](./pages/vue/renderer.md)
+- [Arco Vue Adapter](./pages/vue/arco-vue.md)
 
-默认 adapter ID 为 `arco-vue`。九类内置 Widget 与四类 layout 均有 binding。`native["arco-vue"]` 可提供非保留外观选项。
-
-date/datetime 使用 canonical 字符串，adapter 不引入 dayjs。
-
-## Playground
+本地预览文档：
 
 ```bash
-pnpm playground
+pnpm docs:dev
 ```
 
-打开 http://127.0.0.1:5173/ ，右侧 Arco Vue 预览帧会挂载本 adapter。
+GitHub Pages 发布后见站点 `/vue/renderer.html` 与 `/vue/arco-vue.html`。贡献者架构基线仍是 [architecture.md](./architecture.md)。

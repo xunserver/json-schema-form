@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 const root = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  base: process.env.PLAYGROUND_BASE ?? "/",
   plugins: [
     vue(),
     react({ include: /\.[jt]sx$/ }),

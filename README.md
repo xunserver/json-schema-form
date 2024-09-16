@@ -2,7 +2,16 @@
 
 以 JSON Schema 为数据契约的表单引擎。当前仓库完成的是 pnpm/TypeScript 工作区、首期 package 边界与扩展 UI Adapter，以及 `@form/core` 的框架无关公共契约：无副作用的 `defineForm()`、可诊断的冻结 `FormEnvironment`、把 Draft 2020-12 Schema / UI Schema / Rule AST / Schema Dynamics 编译为不可变静态模型的 `compileForm()`，事务化的 `createForm()` / `createFormEngine()` Runtime（含 Rule 求值、activation、effective state 与 `serialize()`），以及 Core 拥有的 Validation pipeline（`validate()` / `applyErrors()` / `submit()`，AJV 只存在于 `@form/validator-ajv`）。Vue/Element Plus、React/Ant Design、Arco Vue、Arco React、shadcn 渲染链路已交付；可浏览对照台见 `examples/playground`，共享 catalog 见 `examples/shared`。
 
-架构基线见 [`docs/architecture.md`](docs/architecture.md)。工作区命令、package 职责、公共 export 规则以及 `packages/core/src` 的领域目录见 [`docs/workspace.md`](docs/workspace.md)。
+完整使用文档与 Playground 通过 GitHub Pages 发布（文档在站点根路径，Playground 在 `/playground/`）：
+
+```text
+https://<owner>.github.io/json-schema-form/
+https://<owner>.github.io/json-schema-form/playground/
+```
+
+仓库 Settings → Pages → Source 必须选择 GitHub Actions。若 GitHub 仓库名不是 `json-schema-form`，改 `.github/workflows/pages.yml` 中的 `DOCS_BASE`。本地预览文档用 `pnpm docs:dev`；拼接静态站点用 `pnpm site:build`。
+
+架构基线见 [`docs/architecture.md`](docs/architecture.md)。工作区命令、package 职责、公共 export 规则以及 `packages/core/src` 的领域目录见 [`docs/workspace.md`](docs/workspace.md)。用户文档源在 [`docs/pages`](docs/pages)。
 
 ## 首期 package
 
@@ -45,6 +54,8 @@ pnpm check:v1-matrix
 pnpm verify
 pnpm verify:v1
 pnpm playground
+pnpm docs:dev
+pnpm site:build
 ```
 
 `pnpm verify` 按依赖顺序构建全部 package，并执行类型检查、契约测试与跨 package 边界检查。`pnpm verify:v1` 是架构第 3/16–21 节的发布门禁：先核对 coverage matrix 与 prerequisite，再跑边界、build/typecheck/unit、跨栈集成、SSR/browser/playground 与文档证据。本地 `verify:v1` **不会**删除或重装开发者 workspace；干净 checkout 由 CI 执行 `pnpm install --frozen-lockfile` 后再跑同一门禁。覆盖索引见 [`docs/generated/v1-coverage.md`](docs/generated/v1-coverage.md)。

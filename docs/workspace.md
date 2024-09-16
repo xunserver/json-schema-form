@@ -19,6 +19,9 @@
 | `pnpm verify` | `build && typecheck && test && check:boundaries`。 |
 | `pnpm verify:v1` | 架构 v1 发布门禁。本地不重装依赖；证据写入 `artifacts/v1/`（该目录已 gitignore）。 |
 | `pnpm playground` | 启动单 Vite MPA 工作台（http://127.0.0.1:5173/）：React + shadcn + Monaco 编辑器，右侧 Adapter Tab 对照 Element Plus / Ant Design / Arco Vue / Arco React / shadcn。 |
+| `pnpm docs:dev` | 启动 VitePress 用户文档站（`docs/pages`）。贡献者 `architecture.md` / `workspace.md` / `generated/` 不进入该站点。 |
+| `pnpm docs:build` | 构建 VitePress 静态产物到 `docs/.vitepress/dist`。`DOCS_BASE` 默认 `/json-schema-form/`。 |
+| `pnpm site:build` | 构建产品 package、文档站与 playground，并把 playground 拼到文档产物的 `/playground/`，供 GitHub Pages 发布。不包含在 `verify:v1` 中。 |
 
 根 package 为 private，并通过 `packageManager` 固定 pnpm。共享语言设置在 `tsconfig.base.json`；各 package 使用自己的 composite project，不使用会绕过 package exports 的根级 `paths` alias。pnpm 11 需要在 `pnpm-workspace.yaml` 中允许 `esbuild` 的 `allowBuilds`，否则 vitest/tsx 无法安装其原生绑定。
 
@@ -36,7 +39,7 @@
 | `@form/arco-react` | `packages/adapter/arco-react` | Arco Design React Adapter 边界 | `arcoReactAdapter` / `createArcoReactAdapter()` / `extendArcoReactAdapter()`；依赖 `@form/react` 与 `@form/core`，peer 为 `react` 与 `@arco-design/web-react` |
 | `@form/shadcn` | `packages/adapter/shadcn` | shadcn UI Adapter 边界（组件由消费方注入） | `createShadcnAdapter({ components })` / `extendShadcnAdapter()`；依赖 `@form/react` 与 `@form/core`，peer 仅 `react` |
 
-叶子 package 中 `@form/vue` / `@form/element-plus` / `@form/arco-vue` 与 `@form/react` / `@form/antd` / `@form/arco-react` / `@form/shadcn` 分别提供框架渲染链路。`@form/core` 已提供 `defineForm()`、`compileForm()` 静态编译（含 Rule AST 与 Schema Dynamics）、事务 Runtime、array identity / `array()` / `scope()`、`blur()` / `setCollapsed()` / `setActiveTab()`、`RenderScope` / `InstanceBinding`、effective state（含 `required`）、`serialize()` 以及 Validation owner（`validate()` / `applyErrors()` / `submit()`）。AJV 只允许出现在 `@form/validator-ajv`。可浏览 playground 在 `examples/playground`（共享 catalog 在 `examples/shared`），复用 `tests/fixtures/v1/` 的业务 Definition/Plugin。Renderer 用法见 [`vue-element-plus.md`](./vue-element-plus.md)、[`antd.md`](./antd.md)、[`arco-vue.md`](./arco-vue.md)、[`arco-react.md`](./arco-react.md) 与 [`shadcn.md`](./shadcn.md)。第 20 节 deferred 项不得作为产品入口出现。
+叶子 package 中 `@form/vue` / `@form/element-plus` / `@form/arco-vue` 与 `@form/react` / `@form/antd` / `@form/arco-react` / `@form/shadcn` 分别提供框架渲染链路。`@form/core` 已提供 `defineForm()`、`compileForm()` 静态编译（含 Rule AST 与 Schema Dynamics）、事务 Runtime、array identity / `array()` / `scope()`、`blur()` / `setCollapsed()` / `setActiveTab()`、`RenderScope` / `InstanceBinding`、effective state（含 `required`）、`serialize()` 以及 Validation owner（`validate()` / `applyErrors()` / `submit()`）。AJV 只允许出现在 `@form/validator-ajv`。可浏览 playground 在 `examples/playground`（共享 catalog 在 `examples/shared`），复用 `tests/fixtures/v1/` 的业务 Definition/Plugin。用户文档站源在 [`pages/`](./pages/index.md)；Renderer 用法见该站点的 Vue / React 页面，仓库内 [`vue-element-plus.md`](./vue-element-plus.md) 等仅为短链。GitHub Pages 把文档放在站点根路径、playground 放在 `/playground/`；Pages source 必须设为 GitHub Actions。第 20 节 deferred 项不得作为产品入口出现。
 
 ## 允许的依赖图
 

@@ -20,7 +20,10 @@
     "test:v1:docs": "vitest run tests/architecture/v1-docs.test.ts tests/architecture/v1-scenario-map.test.ts tests/architecture/v1-deferred.test.ts",
     "verify:v1": "tsx tools/architecture-check/v1-cli.ts --mode gate",
     "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm check:boundaries",
-    "playground": "pnpm --filter @form/example-playground playground"
+    "playground": "pnpm --filter @form/example-playground playground",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "site:build": "pnpm build && tsx tools/site-build.ts"
   },
   "devDependencies": {
     "@form/antd": "workspace:*",
@@ -46,6 +49,7 @@
     "playwright": "^1.55.0",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
+    "vitepress": "^1.6.4",
     "vitest": "^3.2.4"
   }
 }
