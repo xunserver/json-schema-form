@@ -1,2 +1,2 @@
-import { FormRenderer } from "@form/vue/src/renderer/FormRenderer.js";
+import { FormRenderer } from "@xunserver-jsf/vue/src/renderer/FormRenderer.js";
 void FormRenderer;

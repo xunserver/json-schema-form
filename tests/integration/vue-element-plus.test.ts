@@ -2,9 +2,9 @@
 import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 import { describe, expect, test } from "vitest";
-import { FormRenderer } from "@form/vue";
-import { elementPlusAdapter } from "@form/element-plus";
-import { compileForm, createForm, defineForm } from "@form/core";
+import { FormRenderer } from "@xunserver-jsf/vue";
+import { elementPlusAdapter } from "@xunserver-jsf/element-plus";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { createDemoForm } from "../../examples/shared/src/demo.ts";
 import { createDemoRendererEnvironment } from "../lib/demo-element-plus-environment.ts";
 import { createRecordingAdapter } from "../../packages/vue/src/test-utils/fake-adapter.ts";

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { compileV1 } from "../fixtures/v1/index.js";
-import { formSelector, subscribeRuntime, valueSelector } from "@form/core/runtime";
+import { formSelector, subscribeRuntime, valueSelector } from "@xunserver-jsf/core/runtime";
 
 describe("v1 stable transactions", () => {
   test("V1-STABLE-TX publishes one commit after computed and sync validation", async () => {

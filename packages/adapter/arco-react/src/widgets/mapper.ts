@@ -1,5 +1,5 @@
-import type { Diagnostic } from "@form/core";
-import { RENDERER_DIAGNOSTIC_CODES, RendererAdapterError, type WidgetRenderInput } from "@form/react";
+import type { Diagnostic } from "@xunserver-jsf/core";
+import { RENDERER_DIAGNOSTIC_CODES, RendererAdapterError, type WidgetRenderInput } from "@xunserver-jsf/react";
 
 export const ARCO_REACT_NAMESPACE = "arco-react";
 

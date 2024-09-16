@@ -1,2 +1,2 @@
-import { mapElementPlusProps } from "@form/element-plus/src/widgets/mapper.js";
+import { mapElementPlusProps } from "@xunserver-jsf/element-plus/src/widgets/mapper.js";
 void mapElementPlusProps;

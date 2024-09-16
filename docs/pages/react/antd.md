@@ -1,10 +1,10 @@
 # Ant Design Adapter
 
-`@form/antd` 位于 React Renderer 之上。默认 adapter ID 为 `antd`。Core `FormEnvironment` 仍是 Widget、规则和校验的真相；Ant Design Form 的 model / validate / DOM validity 不得作为业务状态。
+`@xunserver-jsf/antd` 位于 React Renderer 之上。默认 adapter ID 为 `antd`。Core `FormEnvironment` 仍是 Widget、规则和校验的真相；Ant Design Form 的 model / validate / DOM validity 不得作为业务状态。
 
 ```tsx
-import { FormRenderer } from "@form/react";
-import { antdAdapter, createAntdAdapter, extendAntdAdapter } from "@form/antd";
+import { FormRenderer } from "@xunserver-jsf/react";
+import { antdAdapter, createAntdAdapter, extendAntdAdapter } from "@xunserver-jsf/antd";
 ```
 
 ```tsx

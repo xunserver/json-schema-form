@@ -3,7 +3,7 @@
 本文件由 `tests/architecture/v1-coverage.json` 生成，仅作索引，不改写 `docs/architecture.md` 规范正文。
 
 - schemaVersion: 1
-- architectureDigest: `1291e57d3e0432e59768c4c966bc523f9ee658dd67e436ce310cbc4142ece6c4`
+- architectureDigest: `ade5b0af24c265ba97b604f2f086443efa9e9918d234198bd107381e565f7a1e`
 
 ## Invariants
 
@@ -117,12 +117,12 @@
 
 | ID | Status | Owner | Entry | Evidence |
 |---|---|---|---|---|
-| PRE-WIDGET-HELPER | resolved | compile-static-form-model / 保留自定义 Widget identity 与 literal | @form/core/extension | V1-PRE-WIDGET-HELPER |
-| PRE-RENDER-BINDING | resolved | add-renderer-interaction-and-binding-ports / RenderScope 不提供 writer | @form/core/runtime | V1-PRE-RENDER-BINDING |
-| PRE-BLUR-PORT | resolved | add-renderer-interaction-and-binding-ports / blur 清除目标 View 的 focused | @form/core | V1-PRE-BLUR-PORT |
-| PRE-WIDGET-INTERACTION | resolved | compile-static-form-model / 默认 Widget 提供完整 semantic action capability | @form/core/extension | V1-PRE-WIDGET-INTERACTION |
-| PRE-REQUIRED-PRESENTATION | resolved | add-renderer-interaction-and-binding-ports / 静态required直接投影 | @form/core | V1-PRE-REQUIRED-PRESENTATION |
-| PRE-VIEW-STATE | resolved | add-renderer-interaction-and-binding-ports / collapsed 与 activeTab 属于具体 View | @form/core | V1-PRE-VIEW-STATE |
+| PRE-WIDGET-HELPER | resolved | compile-static-form-model / 保留自定义 Widget identity 与 literal | @xunserver-jsf/core/extension | V1-PRE-WIDGET-HELPER |
+| PRE-RENDER-BINDING | resolved | add-renderer-interaction-and-binding-ports / RenderScope 不提供 writer | @xunserver-jsf/core/runtime | V1-PRE-RENDER-BINDING |
+| PRE-BLUR-PORT | resolved | add-renderer-interaction-and-binding-ports / blur 清除目标 View 的 focused | @xunserver-jsf/core | V1-PRE-BLUR-PORT |
+| PRE-WIDGET-INTERACTION | resolved | compile-static-form-model / 默认 Widget 提供完整 semantic action capability | @xunserver-jsf/core/extension | V1-PRE-WIDGET-INTERACTION |
+| PRE-REQUIRED-PRESENTATION | resolved | add-renderer-interaction-and-binding-ports / 静态required直接投影 | @xunserver-jsf/core | V1-PRE-REQUIRED-PRESENTATION |
+| PRE-VIEW-STATE | resolved | add-renderer-interaction-and-binding-ports / collapsed 与 activeTab 属于具体 View | @xunserver-jsf/core | V1-PRE-VIEW-STATE |
 | PRE-CORE-LAYOUT | resolved | align-core-contributions-and-layout / 顶层目录与架构一致 | check:boundaries | V1-PRE-CORE-LAYOUT |
-| PRE-CONTRIBUTION-PORTS | resolved | align-core-contributions-and-layout / Plugin注册dialect、extension与initializer providers | @form/core/extension | V1-PRE-CONTRIBUTION-PORTS |
+| PRE-CONTRIBUTION-PORTS | resolved | align-core-contributions-and-layout / Plugin注册dialect、extension与initializer providers | @xunserver-jsf/core/extension | V1-PRE-CONTRIBUTION-PORTS |
 

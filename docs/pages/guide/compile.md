@@ -1,11 +1,11 @@
 # 编译
 
-`compileForm(definition)` 把只读输入编译为不可变 `CompiledFormModel`。默认使用 Core Environment；需要业务 Plugin 时，从 `@form/core/extension` 显式构建同一个冻结 `FormEnvironment` 并传入 `compileForm(definition, { environment })`。
+`compileForm(definition)` 把只读输入编译为不可变 `CompiledFormModel`。默认使用 Core Environment；需要业务 Plugin 时，从 `@xunserver-jsf/core/extension` 显式构建同一个冻结 `FormEnvironment` 并传入 `compileForm(definition, { environment })`。
 
 编译不修改输入，也不访问 global registry。`CompiledFormModel` 是模板，实例 values 只存在于 `FormInstance`。
 
 ```ts
-import { compileForm, CompileError, defineForm } from "@form/core";
+import { compileForm, CompileError, defineForm } from "@xunserver-jsf/core";
 
 const definition = defineForm({
   schema: {

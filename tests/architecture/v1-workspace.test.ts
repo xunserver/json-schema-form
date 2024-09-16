@@ -34,8 +34,8 @@ describe("v1 workspace layout and dependency graph", () => {
   test("V1-DEP-FAULT fails reverse, cross-framework, AJV, and MUI X violations", () => {
     const root = makeTempDir("v1-dep-fault-");
     copyWorkspacePackages(root);
-    writeText(path.join(root, "packages/core/src/leak.ts"), 'import "ajv";\nimport "@form/vue";\n');
-    writeText(path.join(root, "packages/adapter/antd/src/x.ts"), 'import "@mui/x-date-pickers";\nimport "@form/vue";\n');
+    writeText(path.join(root, "packages/core/src/leak.ts"), 'import "ajv";\nimport "@xunserver-jsf/vue";\n');
+    writeText(path.join(root, "packages/adapter/antd/src/x.ts"), 'import "@mui/x-date-pickers";\nimport "@xunserver-jsf/vue";\n');
     const diagnostics = checkArchitecture(root);
     expect(diagnostics.some((item) => item.rule === RULE.forbiddenCorePackage)).toBe(true);
     expect(diagnostics.some((item) => item.rule === RULE.crossFrameworkDependency || item.rule === RULE.reverseDependency)).toBe(

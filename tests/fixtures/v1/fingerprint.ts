@@ -1,4 +1,4 @@
-import type { CompiledFormModel, ViewNode } from "@form/core";
+import type { CompiledFormModel, ViewNode } from "@xunserver-jsf/core";
 
 export function semanticFingerprint(model: CompiledFormModel): string {
   return JSON.stringify(normalize(model, new Map()));

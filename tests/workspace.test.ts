@@ -5,15 +5,15 @@ import { describe, expect, test } from "vitest";
 import { REPO_ROOT, readJson } from "./lib/fs.js";
 
 const FIRST_PARTY_PACKAGES = [
-  "@form/core",
-  "@form/validator-ajv",
-  "@form/vue",
-  "@form/react",
-  "@form/element-plus",
-  "@form/antd",
-  "@form/arco-vue",
-  "@form/arco-react",
-  "@form/shadcn",
+  "@xunserver-jsf/core",
+  "@xunserver-jsf/validator-ajv",
+  "@xunserver-jsf/vue",
+  "@xunserver-jsf/react",
+  "@xunserver-jsf/element-plus",
+  "@xunserver-jsf/antd",
+  "@xunserver-jsf/arco-vue",
+  "@xunserver-jsf/arco-react",
+  "@xunserver-jsf/shadcn",
 ] as const;
 
 describe("workspace contract", () => {

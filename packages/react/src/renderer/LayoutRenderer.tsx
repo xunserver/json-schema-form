@@ -1,4 +1,4 @@
-import type { LayoutView } from "@form/core";
+import type { LayoutView } from "@xunserver-jsf/core";
 import type { ReactNode } from "react";
 import { wrapAdapterCall } from "../adapter/runtime-error.js";
 import { useRendererContext } from "../context/renderer-context.js";

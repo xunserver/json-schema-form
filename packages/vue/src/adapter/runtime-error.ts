@@ -1,4 +1,4 @@
-import type { Diagnostic } from "@form/core";
+import type { Diagnostic } from "@xunserver-jsf/core";
 import { RENDERER_DIAGNOSTIC_CODES } from "./diagnostic-codes.js";
 import { freezeAdapterDiagnostic, RendererAdapterError } from "./errors.js";
 

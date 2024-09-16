@@ -1,6 +1,6 @@
-import { createReactRendererEnvironment } from "@form/react";
-import { createAntdAdapter, extendAntdAdapter } from "@form/antd";
-import type { WidgetRenderInput } from "@form/react";
+import { createReactRendererEnvironment } from "@xunserver-jsf/react";
+import { createAntdAdapter, extendAntdAdapter } from "@xunserver-jsf/antd";
+import type { WidgetRenderInput } from "@xunserver-jsf/react";
 
 export function createDemoRendererEnvironment() {
   return createReactRendererEnvironment({

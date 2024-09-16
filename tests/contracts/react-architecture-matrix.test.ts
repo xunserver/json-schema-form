@@ -9,12 +9,12 @@ describe("react architecture matrix", () => {
     const antd = fs.readFileSync(path.join(REPO_ROOT, "packages/adapter/antd/src/index.ts"), "utf8");
     expect(react).toMatch(/FormRenderer/);
     expect(react).toMatch(/defineReactUIAdapter/);
-    expect(react).not.toMatch(/VueUIAdapter|UniversalRenderer|@form\/vue|@form\/element-plus/);
+    expect(react).not.toMatch(/VueUIAdapter|UniversalRenderer|@xunserver-jsf\/vue|@xunserver-jsf\/element-plus/);
     expect(antd).toMatch(/antdAdapter/);
-    expect(antd).not.toMatch(/@form\/vue|@form\/element-plus|@mui\/x-date-pickers|UniversalRenderer/);
+    expect(antd).not.toMatch(/@xunserver-jsf\/vue|@xunserver-jsf\/element-plus|@mui\/x-date-pickers|UniversalRenderer/);
     const shadcn = fs.readFileSync(path.join(REPO_ROOT, "packages/adapter/shadcn/src/index.ts"), "utf8");
     expect(shadcn).toMatch(/createShadcnAdapter/);
-    expect(shadcn).not.toMatch(/shadcnAdapter[^C]|@form\/vue|@base-ui\/react|UniversalRenderer/);
+    expect(shadcn).not.toMatch(/shadcnAdapter[^C]|@xunserver-jsf\/vue|@base-ui\/react|UniversalRenderer/);
   });
 
   test("records Core owner ports as already published", () => {
@@ -42,7 +42,7 @@ describe("react architecture matrix", () => {
     );
     for (const file of files) {
       const source = fs.readFileSync(file, "utf8");
-      expect(source, file).not.toMatch(/from ["']vue["']|from ["']@form\/vue["']|from ["']@mui\/x-date-pickers["']/);
+      expect(source, file).not.toMatch(/from ["']vue["']|from ["']@xunserver-jsf\/vue["']|from ["']@mui\/x-date-pickers["']/);
     }
   });
 });

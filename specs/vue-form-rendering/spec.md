@@ -7,7 +7,7 @@
 ## Requirements
 
 ### Requirement: Vue Renderer 只遍历最终 resolved ViewTree
-`@form/vue` 必须（SHALL）提供 `FormRenderer`、`ViewRenderer`、`FieldRenderer` 以及 Object、Array、Group/Grid 等 View kind 的遍历行为。Renderer 必须（MUST）把 `CompiledFormModel.ui.viewTree` 视为唯一呈现结构，按编译后的 Field 引用、children 顺序与 layout 参数呈现；不得（MUST NOT）读取 JSON Schema、Rule/Validation source、原始 UI Schema，或在运行时补 Field、Widget、`remaining-fields` 与 layout。
+`@xunserver-jsf/vue` 必须（SHALL）提供 `FormRenderer`、`ViewRenderer`、`FieldRenderer` 以及 Object、Array、Group/Grid 等 View kind 的遍历行为。Renderer 必须（MUST）把 `CompiledFormModel.ui.viewTree` 视为唯一呈现结构，按编译后的 Field 引用、children 顺序与 layout 参数呈现；不得（MUST NOT）读取 JSON Schema、Rule/Validation source、原始 UI Schema，或在运行时补 Field、Widget、`remaining-fields` 与 layout。
 
 #### Scenario: 默认与显式 layout 使用同一遍历入口
 - **GIVEN** 两份模型分别由缺省 layout 和显式 authoritative layout 编译，且都已有最终 ViewTree
@@ -33,7 +33,7 @@ Vue provide/inject Context 必须（MUST）只保存当前 `FormInstance`、冻�
 - **THEN** 所有层级仍使用根 Form 的同一 Runtime/transaction，且 Context 不创建嵌套 Store
 
 ### Requirement: Vue composables 精确桥接 Core external store
-`@form/vue` 必须（SHALL）提供基于受支持 Core runtime selector/subscription 的 readonly composables，用于 Form、Field、View、Array order/item 与 current binding snapshots。每个 composable 必须（MUST）仅订阅其显式 selector dependency，在语义结果变化时触发 Vue 更新，并在 component scope dispose、Form/selector/scope 替换时取消旧订阅；不得（MUST NOT）用整 Form 深度 watch 或轮询代替精确订阅。
+`@xunserver-jsf/vue` 必须（SHALL）提供基于受支持 Core runtime selector/subscription 的 readonly composables，用于 Form、Field、View、Array order/item 与 current binding snapshots。每个 composable 必须（MUST）仅订阅其显式 selector dependency，在语义结果变化时触发 Vue 更新，并在 component scope dispose、Form/selector/scope 替换时取消旧订阅；不得（MUST NOT）用整 Form 深度 watch 或轮询代替精确订阅。
 
 #### Scenario: 无关 Field commit 不重渲染
 - **GIVEN** 两个 sibling `FieldRenderer` 分别订阅自己的 effective Field snapshot
@@ -59,9 +59,9 @@ Object/Array Renderer 必须（MUST）以 `RenderScope`/readonly `InstanceBindin
 - **THEN** 旧 key/subtree 被卸载，新 item 使用新 `ArrayItemId`，旧 subscription 不会绑定到新占用者
 
 #### Scenario: RenderScope 只来自 Core owning 入口
-- **GIVEN** `@form/vue` 需要在 Context 中保存当前 scope 并解析 `products[].name`
+- **GIVEN** `@xunserver-jsf/vue` 需要在 Context 中保存当前 scope 并解析 `products[].name`
 - **WHEN** 检查其类型与运行时依赖
-- **THEN** `RenderScope`/`InstanceBinding` 类型与 `getRenderScope()` 均从 `@form/core/runtime` 导入，Vue 包不重新定义、不 deep import binding index，也不把 `ScopedFormInstance` 等含 writer 的 facade 放入 Context
+- **THEN** `RenderScope`/`InstanceBinding` 类型与 `getRenderScope()` 均从 `@xunserver-jsf/core/runtime` 导入，Vue 包不重新定义、不 deep import binding index，也不把 `ScopedFormInstance` 等含 writer 的 facade 放入 Context
 
 ### Requirement: 折叠与 Tab 状态只来自 Core View state
 Group/Layout binding 若呈现可折叠区域或 Tab，必须（MUST）以 Core `ViewSnapshot.collapsed`/`activeTab` 为唯一状态来源，并只通过 `setCollapsed(viewId, ...)`/`setActiveTab(viewId, ...)` 公开命令修改；不得（MUST NOT）在 Vue 组件内保存可与 Core 分叉的折叠/Tab 副本。Layout adapter 必须（MUST）在 preflight 时校验 tab key 属于其 layout 参数，非法 key 产生 adapter diagnostic 而不写入 Core。

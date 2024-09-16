@@ -1,6 +1,6 @@
-import { FormRenderer } from "@form/vue";
-import { elementPlusAdapter, createElementPlusAdapter, extendElementPlusAdapter } from "@form/element-plus";
-import { compileForm, createForm, defineForm } from "@form/core";
+import { FormRenderer } from "@xunserver-jsf/vue";
+import { elementPlusAdapter, createElementPlusAdapter, extendElementPlusAdapter } from "@xunserver-jsf/element-plus";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { h } from "vue";
 
 const form = createForm(

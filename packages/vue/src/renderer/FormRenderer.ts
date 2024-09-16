@@ -1,5 +1,5 @@
-import type { Diagnostic, FormInstance, SubmitHandler } from "@form/core";
-import { getRenderScope } from "@form/core/runtime";
+import type { Diagnostic, FormInstance, SubmitHandler } from "@xunserver-jsf/core";
+import { getRenderScope } from "@xunserver-jsf/core/runtime";
 import { defineComponent, h, type PropType } from "vue";
 import { createVueRendererEnvironment } from "../adapter/create-environment.js";
 import { RENDERER_DIAGNOSTIC_CODES } from "../adapter/diagnostic-codes.js";

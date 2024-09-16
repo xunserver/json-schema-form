@@ -7,7 +7,7 @@
 ## Requirements
 
 ### Requirement: 官方 Ant Design adapter 完整提供四类角色
-`@form/antd` 必须（SHALL）公开一个冻结且具有稳定 ID `antd` 的 UIAdapter，组合 FormAdapter、FieldChromeAdapter、WidgetAdapterRegistry 与 LayoutAdapterRegistry。FormAdapter 必须（MUST）只作为结构/样式容器，不得（MUST NOT）把 UI library form model、validation 或 DOM validity 当作业务 values、errors 或 transaction 真相。
+`@xunserver-jsf/antd` 必须（SHALL）公开一个冻结且具有稳定 ID `antd` 的 UIAdapter，组合 FormAdapter、FieldChromeAdapter、WidgetAdapterRegistry 与 LayoutAdapterRegistry。FormAdapter 必须（MUST）只作为结构/样式容器，不得（MUST NOT）把 UI library form model、validation 或 DOM validity 当作业务 values、errors 或 transaction 真相。
 
 #### Scenario: Form wrapper 不接管 Core 状态
 - **GIVEN** FormRenderer 使用 `antd` adapter 且 Core snapshot 已有 values/errors

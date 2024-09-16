@@ -1,37 +1,37 @@
 export const FIRST_PARTY_PACKAGES = [
-  "@form/core",
-  "@form/validator-ajv",
-  "@form/vue",
-  "@form/react",
-  "@form/element-plus",
-  "@form/antd",
-  "@form/arco-vue",
-  "@form/arco-react",
-  "@form/shadcn",
+  "@xunserver-jsf/core",
+  "@xunserver-jsf/validator-ajv",
+  "@xunserver-jsf/vue",
+  "@xunserver-jsf/react",
+  "@xunserver-jsf/element-plus",
+  "@xunserver-jsf/antd",
+  "@xunserver-jsf/arco-vue",
+  "@xunserver-jsf/arco-react",
+  "@xunserver-jsf/shadcn",
 ] as const;
 
 export type FirstPartyPackage = (typeof FIRST_PARTY_PACKAGES)[number];
 
 export const ALLOWED_EDGES: Readonly<Record<FirstPartyPackage, readonly FirstPartyPackage[]>> = {
-  "@form/core": [],
-  "@form/validator-ajv": ["@form/core"],
-  "@form/vue": ["@form/core"],
-  "@form/react": ["@form/core"],
-  "@form/element-plus": ["@form/core", "@form/vue"],
-  "@form/antd": ["@form/core", "@form/react"],
-  "@form/arco-vue": ["@form/core", "@form/vue"],
-  "@form/arco-react": ["@form/core", "@form/react"],
-  "@form/shadcn": ["@form/core", "@form/react"],
+  "@xunserver-jsf/core": [],
+  "@xunserver-jsf/validator-ajv": ["@xunserver-jsf/core"],
+  "@xunserver-jsf/vue": ["@xunserver-jsf/core"],
+  "@xunserver-jsf/react": ["@xunserver-jsf/core"],
+  "@xunserver-jsf/element-plus": ["@xunserver-jsf/core", "@xunserver-jsf/vue"],
+  "@xunserver-jsf/antd": ["@xunserver-jsf/core", "@xunserver-jsf/react"],
+  "@xunserver-jsf/arco-vue": ["@xunserver-jsf/core", "@xunserver-jsf/vue"],
+  "@xunserver-jsf/arco-react": ["@xunserver-jsf/core", "@xunserver-jsf/react"],
+  "@xunserver-jsf/shadcn": ["@xunserver-jsf/core", "@xunserver-jsf/react"],
 };
 
 export const REQUIRED_PEERS: Readonly<Partial<Record<FirstPartyPackage, readonly string[]>>> = {
-  "@form/vue": ["vue"],
-  "@form/react": ["react"],
-  "@form/element-plus": ["vue", "element-plus"],
-  "@form/antd": ["react", "antd"],
-  "@form/arco-vue": ["vue", "@arco-design/web-vue"],
-  "@form/arco-react": ["react", "@arco-design/web-react"],
-  "@form/shadcn": ["react"],
+  "@xunserver-jsf/vue": ["vue"],
+  "@xunserver-jsf/react": ["react"],
+  "@xunserver-jsf/element-plus": ["vue", "element-plus"],
+  "@xunserver-jsf/antd": ["react", "antd"],
+  "@xunserver-jsf/arco-vue": ["vue", "@arco-design/web-vue"],
+  "@xunserver-jsf/arco-react": ["react", "@arco-design/web-react"],
+  "@xunserver-jsf/shadcn": ["react"],
 };
 
 export const HOST_PACKAGES = [
@@ -121,18 +121,18 @@ export function isReverseEdge(source: FirstPartyPackage, target: FirstPartyPacka
 
 export function frameworkFamily(packageName: string): "vue" | "react" | undefined {
   if (
-    packageName === "@form/vue" ||
-    packageName === "@form/element-plus" ||
-    packageName === "@form/arco-vue"
+    packageName === "@xunserver-jsf/vue" ||
+    packageName === "@xunserver-jsf/element-plus" ||
+    packageName === "@xunserver-jsf/arco-vue"
   ) {
     return "vue";
   }
 
   if (
-    packageName === "@form/react" ||
-    packageName === "@form/antd" ||
-    packageName === "@form/arco-react" ||
-    packageName === "@form/shadcn"
+    packageName === "@xunserver-jsf/react" ||
+    packageName === "@xunserver-jsf/antd" ||
+    packageName === "@xunserver-jsf/arco-react" ||
+    packageName === "@xunserver-jsf/shadcn"
   ) {
     return "react";
   }

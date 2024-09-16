@@ -2,7 +2,7 @@ import type {
   SchemaDialectDefinition,
   SchemaExtensionDefinition,
   ValueInitializerDefinition,
-} from "@form/core/runtime";
+} from "@xunserver-jsf/core/runtime";
 
 export type LeakedDialect = SchemaDialectDefinition;
 export type LeakedExtension = SchemaExtensionDefinition;

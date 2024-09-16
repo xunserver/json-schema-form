@@ -1,6 +1,6 @@
-import { compileForm, createForm, defineForm } from "@form/core";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { describe, expect, test } from "vitest";
-import { RENDERER_DIAGNOSTIC_CODES, RendererAdapterError, type WidgetRenderInput } from "@form/vue";
+import { RENDERER_DIAGNOSTIC_CODES, RendererAdapterError, type WidgetRenderInput } from "@xunserver-jsf/vue";
 import { mapArcoVueProps } from "./mapper.js";
 
 function input(overrides?: Partial<WidgetRenderInput>): WidgetRenderInput {

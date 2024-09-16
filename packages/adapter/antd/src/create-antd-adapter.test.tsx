@@ -1,10 +1,10 @@
 /** @vitest-environment jsdom */
-import { compileForm, createForm, defineForm } from "@form/core";
-import { createFormEnvironment, definePlugin, defineWidget } from "@form/core/extension";
-import { createReactRendererEnvironment } from "@form/react";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
+import { createFormEnvironment, definePlugin, defineWidget } from "@xunserver-jsf/core/extension";
+import { createReactRendererEnvironment } from "@xunserver-jsf/react";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { FormRenderer } from "@form/react";
+import { FormRenderer } from "@xunserver-jsf/react";
 import { ANTD_ADAPTER_ID, createAntdAdapter, extendAntdAdapter, antdAdapter } from "./index.js";
 
 afterEach(() => {

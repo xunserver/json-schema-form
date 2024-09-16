@@ -1,6 +1,6 @@
 import { ElCheckbox, ElDatePicker, ElInput, ElInputNumber, ElOption, ElSelect, ElSwitch } from "element-plus";
 import { h, type Component } from "vue";
-import type { WidgetBinding, WidgetRenderInput } from "@form/vue";
+import type { WidgetBinding, WidgetRenderInput } from "@xunserver-jsf/vue";
 import {
   booleanCodec,
   dateCodec,
@@ -12,7 +12,7 @@ import {
 } from "./codecs.js";
 import { applyCodecChange, controlledWidget, describedBy, EDITABLE_CAPABILITIES } from "./controlled.js";
 import { mapElementPlusProps } from "./mapper.js";
-import { FULL_WIDGET_INTERACTION } from "@form/core/extension";
+import { FULL_WIDGET_INTERACTION } from "@xunserver-jsf/core/extension";
 
 function optionsOf(
   input: WidgetRenderInput,

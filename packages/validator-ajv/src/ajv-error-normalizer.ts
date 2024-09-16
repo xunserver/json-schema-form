@@ -1,6 +1,6 @@
 import type { ErrorObject } from "ajv";
-import type { SchemaAdapterIssue } from "@form/core/extension";
-import type { JsonValue } from "@form/core";
+import type { SchemaAdapterIssue } from "@xunserver-jsf/core/extension";
+import type { JsonValue } from "@xunserver-jsf/core";
 
 export function normalizeAjvErrors(
   errors: readonly ErrorObject[] | null | undefined,

@@ -1,11 +1,11 @@
-import { compileForm, createForm, defineForm } from "@form/core";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import {
   FormRenderer,
   createReactRendererEnvironment,
   defineReactUIAdapter,
   useRuntimeSelector,
   type ReactUIAdapter,
-} from "@form/react";
+} from "@xunserver-jsf/react";
 import { createElement } from "react";
 
 const adapter: ReactUIAdapter = defineReactUIAdapter({

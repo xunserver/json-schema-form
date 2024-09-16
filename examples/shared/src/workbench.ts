@@ -8,9 +8,9 @@ import type {
   RuleDefinition,
   UISchema,
   CompiledFormModel,
-} from "@form/core";
-import { CompileError, compileForm, createForm, defineForm, FormRuntimeError } from "@form/core";
-import type { FormEnvironment } from "@form/core/extension";
+} from "@xunserver-jsf/core";
+import { CompileError, compileForm, createForm, defineForm, FormRuntimeError } from "@xunserver-jsf/core";
+import type { FormEnvironment } from "@xunserver-jsf/core/extension";
 import type { WorkbenchDiagnoseResult, WorkbenchDocument, WorkbenchResult } from "./types.js";
 
 export type EditorKey = "schema" | "uiSchema" | "rules" | "config" | "formData";

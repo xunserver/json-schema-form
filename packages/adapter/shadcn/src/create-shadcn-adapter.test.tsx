@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
-import { compileForm, createForm, defineForm } from "@form/core";
-import { createFormEnvironment, definePlugin, defineWidget } from "@form/core/extension";
-import { createReactRendererEnvironment, FormRenderer, RENDERER_DIAGNOSTIC_CODES } from "@form/react";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
+import { createFormEnvironment, definePlugin, defineWidget } from "@xunserver-jsf/core/extension";
+import { createReactRendererEnvironment, FormRenderer, RENDERER_DIAGNOSTIC_CODES } from "@xunserver-jsf/react";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vitest";
 import type { ComponentProps, ReactNode } from "react";

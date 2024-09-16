@@ -64,7 +64,7 @@ Core Schema Validator Adapter协议必须（MUST）要求同步`validateAll`接�
 - **THEN** Core忽略该method并使用`validateAll`，不会以性能优化改变error语义
 
 ### Requirement: validator-ajv实现Draft 2020-12并规范化AJV errors
-`@form/validator-ajv`必须（SHALL）提供可显式注册的Draft 2020-12 Schema Adapter factory，并只从`@form/core/extension`消费公共协议。它必须（MUST）把AJV instancePath JSON Pointer、keyword、params、message与schemaPath转换为Core adapter issue；Core随后将其映射到合法Runtime binding、稳定code与`ValidationError`。`required` error必须（MUST）从object地址加missingProperty定位缺失child的`InstancePath`，同时保留readonly params与原`SchemaPath`。非法pointer、未知binding或malformed AJV result必须（MUST）产生结构化adapter Diagnostic，不得静默挂到相邻Field或泄漏AJV `ErrorObject`。
+`@xunserver-jsf/validator-ajv`必须（SHALL）提供可显式注册的Draft 2020-12 Schema Adapter factory，并只从`@xunserver-jsf/core/extension`消费公共协议。它必须（MUST）把AJV instancePath JSON Pointer、keyword、params、message与schemaPath转换为Core adapter issue；Core随后将其映射到合法Runtime binding、稳定code与`ValidationError`。`required` error必须（MUST）从object地址加missingProperty定位缺失child的`InstancePath`，同时保留readonly params与原`SchemaPath`。非法pointer、未知binding或malformed AJV result必须（MUST）产生结构化adapter Diagnostic，不得静默挂到相邻Field或泄漏AJV `ErrorObject`。
 
 #### Scenario: 规范化required target
 - **GIVEN** AJV在`/profile`对象上报告required且params.missingProperty为`name`
@@ -77,7 +77,7 @@ Core Schema Validator Adapter协议必须（MUST）要求同步`validateAll`接�
 - **THEN** error挂到当前item identity对应的精确DataNode，move后owner identity不因旧index改变
 
 #### Scenario: AJV实现不泄漏到Core
-- **GIVEN** 构建Core和`@form/validator-ajv`生成declarations
+- **GIVEN** 构建Core和`@xunserver-jsf/validator-ajv`生成declarations
 - **WHEN** 检查依赖与公共类型
 - **THEN** 只有validator package依赖AJV，Core声明和Schema Adapter协议中不存在AJV-specific类型
 
@@ -231,5 +231,5 @@ Compiler、Adapter与Runtime必须（MUST）使用稳定Diagnostic code、正确
 #### Scenario: 公共入口隔离validation internals
 - **GIVEN** consumer尝试从root/runtime/extension或deep path取得mutable error writer、ValidationScheduler、run generation、AbortController或AJV `ErrorObject`
 - **WHEN** 构建consumer fixtures与declarations
-- **THEN** import或类型检查失败，而批准的Application、Advanced、Extension与`@form/validator-ajv`factory入口仍可用
+- **THEN** import或类型检查失败，而批准的Application、Advanced、Extension与`@xunserver-jsf/validator-ajv`factory入口仍可用
 

@@ -1,5 +1,5 @@
-import type { Diagnostic, FormInstance, ViewNodeId } from "@form/core";
-import type { RenderScope } from "@form/core/runtime";
+import type { Diagnostic, FormInstance, ViewNodeId } from "@xunserver-jsf/core";
+import type { RenderScope } from "@xunserver-jsf/core/runtime";
 import { type InjectionKey, inject, provide } from "vue";
 import type { ResolvedVueAdapter, VueRendererEnvironment } from "../adapter/types.js";
 

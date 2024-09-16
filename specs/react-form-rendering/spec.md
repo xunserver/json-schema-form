@@ -5,7 +5,7 @@
 ## Requirements
 
 ### Requirement: Renderer 只遍历 resolved ViewTree
-`@form/react` 必须（SHALL）提供 `FormRenderer`、`ViewRenderer`、`FieldRenderer`、`ObjectRenderer`、`ArrayRenderer` 与 `LayoutRenderer`，并按 `CompiledFormModel.ui.viewTree` 已解析的 Field 引用、children 顺序与 layout 参数呈现。Renderer 不得（MUST NOT）读取或解释 JSON Schema、Rule/Validation source、原始 UI Schema，亦不得在 render-time 补 Field、推断 Widget、展开 `remaining-fields` 或改变编译模型。
+`@xunserver-jsf/react` 必须（SHALL）提供 `FormRenderer`、`ViewRenderer`、`FieldRenderer`、`ObjectRenderer`、`ArrayRenderer` 与 `LayoutRenderer`，并按 `CompiledFormModel.ui.viewTree` 已解析的 Field 引用、children 顺序与 layout 参数呈现。Renderer 不得（MUST NOT）读取或解释 JSON Schema、Rule/Validation source、原始 UI Schema，亦不得在 render-time 补 Field、推断 Widget、展开 `remaining-fields` 或改变编译模型。
 
 #### Scenario: 编译结果决定呈现顺序
 - **GIVEN** resolved ViewTree 已包含重复 Field view、Group、Grid、Object 与 Array 节点
@@ -31,9 +31,9 @@ React Context 必须（MUST）只保存当前 `FormInstance`、所选冻结 adap
 - **THEN** React key 与 descendant binding 仍跟随各自 `ArrayItemId`，而 InstancePath 反映新 index
 
 #### Scenario: RenderScope 类型只来自 Core owning 入口
-- **GIVEN** `@form/react` 在 Context 与 hooks 签名中使用 `RenderScope`/`InstanceBinding`
+- **GIVEN** `@xunserver-jsf/react` 在 Context 与 hooks 签名中使用 `RenderScope`/`InstanceBinding`
 - **WHEN** 检查其类型来源与运行时依赖
-- **THEN** 二者与 `getRenderScope()` 均从 `@form/core/runtime` 导入，React 包不重新定义、不 deep import binding index，也不把含 writer 的 `ScopedFormInstance` 放入 Context
+- **THEN** 二者与 `getRenderScope()` 均从 `@xunserver-jsf/core/runtime` 导入，React 包不重新定义、不 deep import binding index，也不把含 writer 的 `ScopedFormInstance` 放入 Context
 
 ### Requirement: 折叠与 Tab 状态只来自 Core View state
 Group/Layout binding 若呈现可折叠区域或 Tab，必须（MUST）以 Core `ViewSnapshot.collapsed`/`activeTab` 为唯一状态来源，并只通过 `setCollapsed(viewId, ...)`/`setActiveTab(viewId, ...)` 公开命令修改；不得（MUST NOT）以 React state 保存可与 Core 分叉的折叠/Tab 副本。Layout adapter 必须（MUST）在 preflight 时校验 tab key 属于其 layout 参数，非法 key 产生 adapter diagnostic 而不写入 Core。
@@ -49,7 +49,7 @@ Group/Layout binding 若呈现可折叠区域或 Tab，必须（MUST）以 Core 
 - **THEN** adapter preflight 以 `source: "adapter"` diagnostic 拒绝并不调用 Core 命令，Core `activeTab` 与 `version` 不变
 
 ### Requirement: React hooks 精准桥接 Core external store
-`@form/react` 必须（SHALL）公开基于受支持 Core selector/subscription 的 readonly hooks，用于 Form、Field、View、Array order/item 和当前 binding snapshots。桥接必须（MUST）满足 React external-store 约束：`subscribe` identity 稳定且返回幂等 cleanup，`getSnapshot` 与 `getServerSnapshot` 在语义未变时返回同一引用，每个 consumer 只订阅显式 selector dependency；不得（MUST NOT）以整 Form clone、轮询或组件本地镜像代替 Core snapshot。
+`@xunserver-jsf/react` 必须（SHALL）公开基于受支持 Core selector/subscription 的 readonly hooks，用于 Form、Field、View、Array order/item 和当前 binding snapshots。桥接必须（MUST）满足 React external-store 约束：`subscribe` identity 稳定且返回幂等 cleanup，`getSnapshot` 与 `getServerSnapshot` 在语义未变时返回同一引用，每个 consumer 只订阅显式 selector dependency；不得（MUST NOT）以整 Form clone、轮询或组件本地镜像代替 Core snapshot。
 
 #### Scenario: 无关更新不重渲染叶节点
 - **GIVEN** 两个 Field 组件分别订阅互不相交的 selector

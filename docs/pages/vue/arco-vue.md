@@ -1,14 +1,14 @@
 # Arco Design Vue Adapter
 
-`@form/arco-vue` 位于 Vue Renderer 之上。默认 adapter ID 为 `arco-vue`。Core `FormEnvironment` 仍是 Widget、规则和校验的真相；Arco Form 的 model / validate 不得作为业务状态。
+`@xunserver-jsf/arco-vue` 位于 Vue Renderer 之上。默认 adapter ID 为 `arco-vue`。Core `FormEnvironment` 仍是 Widget、规则和校验的真相；Arco Form 的 model / validate 不得作为业务状态。
 
 ```ts
-import { FormRenderer } from "@form/vue";
+import { FormRenderer } from "@xunserver-jsf/vue";
 import {
   arcoVueAdapter,
   createArcoVueAdapter,
   extendArcoVueAdapter,
-} from "@form/arco-vue";
+} from "@xunserver-jsf/arco-vue";
 ```
 
 ```vue

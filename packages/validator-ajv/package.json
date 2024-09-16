@@ -1,25 +1,48 @@
 {
-  "name": "@form/validator-ajv",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@xunserver-jsf/validator-ajv",
+  "version": "1.0.1",
+  "description": "AJV Draft 2020-12 validator adapter for @xunserver-jsf/core.",
+  "keywords": [
+    "json-schema",
+    "form",
+    "ajv",
+    "validator"
+  ],
+  "license": "MIT",
+  "author": "xunserver",
+  "homepage": "https://xunserver.github.io/json-schema-form/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xunserver/json-schema-form.git",
+    "directory": "packages/validator-ajv"
+  },
+  "bugs": {
+    "url": "https://github.com/xunserver/json-schema-form/issues"
+  },
   "type": "module",
   "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     }
   },
-  "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@form/core": "workspace:*",
+    "@xunserver-jsf/core": "workspace:*",
     "ajv": "^8.20.0"
   }
 }

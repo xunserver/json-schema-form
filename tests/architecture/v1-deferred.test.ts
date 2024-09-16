@@ -5,13 +5,13 @@ import { REPO_ROOT } from "../lib/fs.js";
 import { runNodeProcess } from "../lib/process.js";
 
 const FORBIDDEN = [
-  "@form/compiler",
-  "@form/runtime",
-  "@form/schema",
-  "@form/rules",
-  "@form/validation",
-  "@form/ant-design-vue",
-  "@form/antd-react",
+  "@xunserver-jsf/compiler",
+  "@xunserver-jsf/runtime",
+  "@xunserver-jsf/schema",
+  "@xunserver-jsf/rules",
+  "@xunserver-jsf/validation",
+  "@xunserver-jsf/ant-design-vue",
+  "@xunserver-jsf/antd-react",
 ];
 
 describe("v1 deferred absence", () => {
@@ -26,7 +26,7 @@ describe("v1 deferred absence", () => {
     expect(readme).not.toMatch(/supports?\s+async\s+rule/i);
     expect(readme).not.toMatch(/delivered\s+async\s+rule/i);
     const workspace = fs.readFileSync(path.join(REPO_ROOT, "docs/workspace.md"), "utf8");
-    expect(workspace).not.toContain("@form/compiler");
+    expect(workspace).not.toContain("@xunserver-jsf/compiler");
     for (const name of FORBIDDEN) {
       const resolved = runNodeProcess(process.execPath, [
         "--input-type=module",
@@ -42,7 +42,7 @@ describe("v1 deferred absence", () => {
     const result = runNodeProcess(process.execPath, [
       "--input-type=module",
       "-e",
-      'import.meta.resolve("@form/core/src/runtime/form/form-runtime.js").then((url) => console.log(url), (error) => { console.error(error.code); process.exit(1); })',
+      'import.meta.resolve("@xunserver-jsf/core/src/runtime/form/form-runtime.js").then((url) => console.log(url), (error) => { console.error(error.code); process.exit(1); })',
     ]);
     expect(result.status).not.toBe(0);
     expect(`${result.stdout}\n${result.stderr}`).toMatch(/ERR_PACKAGE_PATH_NOT_EXPORTED|Package subpath/);

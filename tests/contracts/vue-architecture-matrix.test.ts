@@ -7,8 +7,8 @@ describe("vue + element-plus architecture matrix", () => {
   test("does not implement React, Ant Design, or a Universal Renderer", () => {
     const vue = fs.readFileSync(path.join(REPO_ROOT, "packages/vue/src/index.ts"), "utf8");
     const elementPlus = fs.readFileSync(path.join(REPO_ROOT, "packages/adapter/element-plus/src/index.ts"), "utf8");
-    expect(vue).not.toMatch(/ReactUIAdapter|UniversalRenderer|@form\/react|@form\/antd/);
-    expect(elementPlus).not.toMatch(/@form\/react|@form\/antd|ReactUIAdapter/);
+    expect(vue).not.toMatch(/ReactUIAdapter|UniversalRenderer|@xunserver-jsf\/react|@xunserver-jsf\/antd/);
+    expect(elementPlus).not.toMatch(/@xunserver-jsf\/react|@xunserver-jsf\/antd|ReactUIAdapter/);
   });
 
   test("records Core owner ports as already published", () => {

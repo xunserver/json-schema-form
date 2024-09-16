@@ -3,7 +3,7 @@
 `defineForm()` 只做 authoring：组装 JSON Schema、UI Schema、Rule 与 FormConfig。它不编译、不创建 Runtime、也不注册全局状态。
 
 ```ts
-import { defineForm } from "@form/core";
+import { defineForm } from "@xunserver-jsf/core";
 
 const definition = defineForm({
   schema: {
@@ -53,6 +53,6 @@ Field Registry 与 ViewTree 分离：
 
 ## Rules
 
-`FormDefinition.rules` 使用 JSON-compatible AST：scalar / `{ const }` / `{ field }` / `{ call, args }` / 固定 operator。named function 只通过 `@form/core/extension` 的 `defineRuleFunction()` 注册到 Environment，Compiled Model 只保存 function key。
+`FormDefinition.rules` 使用 JSON-compatible AST：scalar / `{ const }` / `{ field }` / `{ call, args }` / 固定 operator。named function 只通过 `@xunserver-jsf/core/extension` 的 `defineRuleFunction()` 注册到 Environment，Compiled Model 只保存 function key。
 
 数组 Rule 按同一 item 的相对 `ModelPath` 绑定，不接受无法唯一确定的 sibling/descendant collection。`oneOf` / `anyOf` / `if` / `dependentSchemas` 编译为有限 activation plan；无法保真的 predicate 在编译期阻断。

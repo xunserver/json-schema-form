@@ -100,7 +100,7 @@ Core 必须（SHALL）暴露 `CompileResult`，其中 `CompiledFormModel` 始终
 - **THEN** 该失败表示为带结构化 diagnostics 的 `CompileError`，而不是 `model` 可选的成功结果
 
 ### Requirement: compileForm 提供纯编译 Application API
-`@form/core` 必须（SHALL）从根入口暴露 `compileForm(definition, options?)` 与其 options 契约。未提供 Environment 时必须（MUST）使用默认 Core Environment；提供 Environment 时必须（MUST）只消费该冻结 Environment。编译不得（MUST NOT）创建 `FormInstance`、读取或修改 global mutable state，或修改 Definition 与 Environment 输入。
+`@xunserver-jsf/core` 必须（SHALL）从根入口暴露 `compileForm(definition, options?)` 与其 options 契约。未提供 Environment 时必须（MUST）使用默认 Core Environment；提供 Environment 时必须（MUST）只消费该冻结 Environment。编译不得（MUST NOT）创建 `FormInstance`、读取或修改 global mutable state，或修改 Definition 与 Environment 输入。
 
 #### Scenario: 使用默认 Environment 编译
 - **GIVEN** 一个只使用 Core 内置逻辑 Widget 的合法 `FormDefinition`
@@ -144,30 +144,30 @@ Core 必须（SHALL）暴露 `CompileResult`，其中 `CompiledFormModel` 始终
 - **THEN** 抛出的 `CompileError` 按确定顺序包含两条 error diagnostics，且调用者得不到部分 `CompiledFormModel`
 
 ### Requirement: 受支持的 export 隔离内部模块
-`@form/core`必须（SHALL）从package根入口暴露面向应用的authoring、compile、instantiate与实例facade契约，包括`defineForm`、`compileForm`、`CompileResult`/`CompileError`、只读`CompiledFormModel`及其Data/UI/Rule/Validation/Schema Dynamics model view、`createForm`、`createFormEngine`、`FormEngine`、基础`FormInstance`/`FieldInstance`、`ArrayInstance`、`ScopedFormInstance`、`ArrayItemId`、effective state（含`required`）、View source state（`focused`、`collapsed`、`activeTab`）、`blur()`/`setCollapsed()`/`setActiveTab()`命令签名、`serialize()`及其readonly options/result、统一readonly `ValidationError`、validation/submit结果、`FormInstance.validate()`、`applyErrors()`、`submit()`、含errors/validating/valid/submitting/submitCount的readonly snapshots和结构化Runtime failure。只读selector、subscription、snapshot、array binding、`InstanceBinding`、`RenderScope`、`getRenderScope()`、effective-state selector、validation/presentable-error selector、Identity Resolver与Runtime diagnostic observation必须（MUST）从显式支持的`@form/core/runtime`子路径获得；`definePlugin`、`defineWidget`、`createFormEnvironment`、`defineRuleFunction`、`defineValidator`、`WidgetDefinition`、Rule Function/Serializer provider契约及Validator/Schema Adapter协议继续从`@form/core/extension`获得。Package export map必须（SHALL）拒绝未声明的deep import，并将可变Store/error writer、View state store、interaction event writer、Environment identity token、Compiler Context、Schema Frontend/Shape Analyzer implementation、Dependency Graph/Scheduler/ValidationScheduler、Transaction Manager、Change Queue、phase/RuleEngine/ValidationEngine/AST evaluator、activation writer、run generation、AbortController、adapter execution context、serializer execution context、array binding/cleanup writer、binding table、ID generator和`RuntimeNodeId` generation保持私有。
+`@xunserver-jsf/core`必须（SHALL）从package根入口暴露面向应用的authoring、compile、instantiate与实例facade契约，包括`defineForm`、`compileForm`、`CompileResult`/`CompileError`、只读`CompiledFormModel`及其Data/UI/Rule/Validation/Schema Dynamics model view、`createForm`、`createFormEngine`、`FormEngine`、基础`FormInstance`/`FieldInstance`、`ArrayInstance`、`ScopedFormInstance`、`ArrayItemId`、effective state（含`required`）、View source state（`focused`、`collapsed`、`activeTab`）、`blur()`/`setCollapsed()`/`setActiveTab()`命令签名、`serialize()`及其readonly options/result、统一readonly `ValidationError`、validation/submit结果、`FormInstance.validate()`、`applyErrors()`、`submit()`、含errors/validating/valid/submitting/submitCount的readonly snapshots和结构化Runtime failure。只读selector、subscription、snapshot、array binding、`InstanceBinding`、`RenderScope`、`getRenderScope()`、effective-state selector、validation/presentable-error selector、Identity Resolver与Runtime diagnostic observation必须（MUST）从显式支持的`@xunserver-jsf/core/runtime`子路径获得；`definePlugin`、`defineWidget`、`createFormEnvironment`、`defineRuleFunction`、`defineValidator`、`WidgetDefinition`、Rule Function/Serializer provider契约及Validator/Schema Adapter协议继续从`@xunserver-jsf/core/extension`获得。Package export map必须（SHALL）拒绝未声明的deep import，并将可变Store/error writer、View state store、interaction event writer、Environment identity token、Compiler Context、Schema Frontend/Shape Analyzer implementation、Dependency Graph/Scheduler/ValidationScheduler、Transaction Manager、Change Queue、phase/RuleEngine/ValidationEngine/AST evaluator、activation writer、run generation、AbortController、adapter execution context、serializer execution context、array binding/cleanup writer、binding table、ID generator和`RuntimeNodeId` generation保持私有。
 
 #### Scenario: 导入根入口公共契约
-- **GIVEN** 外部消费者从`@form/core`导入`compileForm`、`CompileResult`、create/instance/array/scope契约、Rule/Dynamics readonly Model、effective snapshot、serialization options、`ValidationError`、validation/submit result或Form/Node/Field snapshot
+- **GIVEN** 外部消费者从`@xunserver-jsf/core`导入`compileForm`、`CompileResult`、create/instance/array/scope契约、Rule/Dynamics readonly Model、effective snapshot、serialization options、`ValidationError`、validation/submit result或Form/Node/Field snapshot
 - **WHEN** 通过package exports解析fixture并执行类型检查
 - **THEN** Application API可与`defineForm`、`compileForm`及readonly Model共同使用，并可调用`array()`、`scope()`、`blur()`、`setCollapsed()`、`setActiveTab()`、`serialize()`、`validate()`、`applyErrors()`与`submit()`
 
 #### Scenario: 导入受支持的子路径
-- **GIVEN** Framework binding或高级消费者从`@form/core/runtime`导入readonly selector、subscription、array binding、`InstanceBinding`、`RenderScope`、`getRenderScope`、effective-state selector、validation selector、presentable-error selector、Identity Resolver或Runtime diagnostic observation
+- **GIVEN** Framework binding或高级消费者从`@xunserver-jsf/core/runtime`导入readonly selector、subscription、array binding、`InstanceBinding`、`RenderScope`、`getRenderScope`、effective-state selector、validation selector、presentable-error selector、Identity Resolver或Runtime diagnostic observation
 - **WHEN** 解析fixture并执行类型检查
 - **THEN** import仅通过该显式子路径成功，且返回契约不含mutation Store、error writer、Scheduler writer、run token、adapter context、Rule evaluator、activation writer或binding writer
 
 #### Scenario: 导入受支持的extension子路径
-- **GIVEN** extension author从`@form/core/extension`导入`defineRuleFunction`、`defineValidator`、Rule Function/Serializer provider contract、named Validator与Schema Adapter协议
+- **GIVEN** extension author从`@xunserver-jsf/core/extension`导入`defineRuleFunction`、`defineValidator`、Rule Function/Serializer provider contract、named Validator与Schema Adapter协议
 - **WHEN** 定义Plugin contribution并执行类型检查
 - **THEN** import成功且这些provider保持readonly，仍受frozen Environment、Registry conflict与compile/create identity约束
 
 #### Scenario: 从 Extension 子路径声明 Widget
-- **GIVEN** 扩展作者从`@form/core/extension`导入`defineWidget`、`WidgetDefinition`与Environment contract
+- **GIVEN** 扩展作者从`@xunserver-jsf/core/extension`导入`defineWidget`、`WidgetDefinition`与Environment contract
 - **WHEN** 通过package exports解析consumer fixture并执行类型检查
 - **THEN** identity-preserving Widget authoring与只读Extension类型可从该子路径使用，且不要求导入任何internal compiler/runtime文件
 
 #### Scenario: 根入口不重导出 Advanced 或 Extension factory
-- **GIVEN** 消费者尝试从`@form/core`导入selector factory、validation selector factory、`RenderScope`、`InstanceBinding`、`getRenderScope`、Identity Resolver、`definePlugin`、`defineWidget`、`createFormEnvironment`、`defineRuleFunction`或`defineValidator`
+- **GIVEN** 消费者尝试从`@xunserver-jsf/core`导入selector factory、validation selector factory、`RenderScope`、`InstanceBinding`、`getRenderScope`、Identity Resolver、`definePlugin`、`defineWidget`、`createFormEnvironment`、`defineRuleFunction`或`defineValidator`
 - **WHEN** 对consumer fixture执行类型检查
 - **THEN** import因角色级export不属于根入口而失败
 
@@ -177,7 +177,7 @@ Core 必须（SHALL）暴露 `CompileResult`，其中 `CompiledFormModel` 始终
 - **THEN** 即使内部源文件存在，解析仍然失败
 
 #### Scenario: 根导出不包含内部符号
-- **GIVEN** 外部消费者尝试从`@form/core`导入`RuntimeNodeId`、Compiler Context、`ArrayStateStore`、View state store、interaction event writer、`RuleEngine`、`ValidationEngine`、`ValidationScheduler`、`DependencyScheduler`、AST evaluator、activation writer、mutable error Store、run generation/token、AbortController、Adapter execution context、`TransactionManager`、`ChangeQueue`、mutable Store、phase implementation、Scheduler、subtree cleanup writer、array binding table、identity generator或Environment identity token
+- **GIVEN** 外部消费者尝试从`@xunserver-jsf/core`导入`RuntimeNodeId`、Compiler Context、`ArrayStateStore`、View state store、interaction event writer、`RuleEngine`、`ValidationEngine`、`ValidationScheduler`、`DependencyScheduler`、AST evaluator、activation writer、mutable error Store、run generation/token、AbortController、Adapter execution context、`TransactionManager`、`ChangeQueue`、mutable Store、phase implementation、Scheduler、subtree cleanup writer、array binding table、identity generator或Environment identity token
 - **WHEN** 对consumer fixture执行类型检查
 - **THEN** import因这些符号不属于根公共表面而失败
 

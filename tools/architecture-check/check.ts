@@ -39,7 +39,7 @@ export function checkArchitecture(workspaceRoot: string): ArchitectureDiagnostic
 
     diagnostics.push(...checkManifestPolicy(pkg));
     diagnostics.push(...checkSourceImports(pkg, packages, packagesByName));
-    if (pkg.name === "@form/core") {
+    if (pkg.name === "@xunserver-jsf/core") {
       diagnostics.push(...checkCoreLayout(pkg));
     }
   }
@@ -195,7 +195,7 @@ function checkExpectedPackageSet(packages: DiscoveredPackage[]): ArchitectureDia
         sourcePackage: pkg.name,
         targetPackage: "(workspace)",
         rule: RULE.forbiddenEdge,
-        message: "Unexpected package under packages/*; first-period workspace allows only the six @form packages.",
+        message: "Unexpected package under packages/*; first-period workspace allows only the nine @xunserver-jsf packages.",
       });
     }
   }
@@ -232,7 +232,7 @@ function checkManifestPolicy(pkg: DiscoveredPackage): ArchitectureDiagnostic[] {
   }
 
   for (const target of Object.keys(allListed)) {
-    if (pkg.name === "@form/core" && isCoreForbiddenPackage(target)) {
+    if (pkg.name === "@xunserver-jsf/core" && isCoreForbiddenPackage(target)) {
       diagnostics.push({
         sourcePackage: pkg.name,
         targetPackage: target,
@@ -242,22 +242,22 @@ function checkManifestPolicy(pkg: DiscoveredPackage): ArchitectureDiagnostic[] {
       });
     }
 
-    if (pkg.name !== "@form/validator-ajv" && (target === "ajv" || target === "ajv-formats")) {
+    if (pkg.name !== "@xunserver-jsf/validator-ajv" && (target === "ajv" || target === "ajv-formats")) {
       diagnostics.push({
         sourcePackage: pkg.name,
         targetPackage: target,
         rule: RULE.forbiddenCorePackage,
-        message: `Only @form/validator-ajv may depend on "${target}".`,
+        message: `Only @xunserver-jsf/validator-ajv may depend on "${target}".`,
         file: path.join(pkg.directory, "package.json"),
       });
     }
 
     if (
-      (pkg.name === "@form/react" ||
-        pkg.name === "@form/antd" ||
-        pkg.name === "@form/arco-react" ||
-        pkg.name === "@form/arco-vue" ||
-        pkg.name === "@form/shadcn") &&
+      (pkg.name === "@xunserver-jsf/react" ||
+        pkg.name === "@xunserver-jsf/antd" ||
+        pkg.name === "@xunserver-jsf/arco-react" ||
+        pkg.name === "@xunserver-jsf/arco-vue" ||
+        pkg.name === "@xunserver-jsf/shadcn") &&
       isMuiForbiddenPackage(target)
     ) {
       diagnostics.push({
@@ -325,7 +325,7 @@ function checkSourceImports(
         continue;
       }
 
-      if (pkg.name === "@form/core" && isCoreForbiddenPackage(targetName)) {
+      if (pkg.name === "@xunserver-jsf/core" && isCoreForbiddenPackage(targetName)) {
         diagnostics.push({
           sourcePackage: pkg.name,
           targetPackage: targetName,
@@ -337,12 +337,12 @@ function checkSourceImports(
         continue;
       }
 
-      if (pkg.name !== "@form/validator-ajv" && (targetName === "ajv" || targetName === "ajv-formats")) {
+      if (pkg.name !== "@xunserver-jsf/validator-ajv" && (targetName === "ajv" || targetName === "ajv-formats")) {
         diagnostics.push({
           sourcePackage: pkg.name,
           targetPackage: targetName,
           rule: RULE.forbiddenCorePackage,
-          message: `Only @form/validator-ajv may import "${targetName}".`,
+          message: `Only @xunserver-jsf/validator-ajv may import "${targetName}".`,
           file,
           specifier,
         });
@@ -350,11 +350,11 @@ function checkSourceImports(
       }
 
       if (
-        (pkg.name === "@form/react" ||
-          pkg.name === "@form/antd" ||
-          pkg.name === "@form/arco-react" ||
-          pkg.name === "@form/arco-vue" ||
-          pkg.name === "@form/shadcn") &&
+        (pkg.name === "@xunserver-jsf/react" ||
+          pkg.name === "@xunserver-jsf/antd" ||
+          pkg.name === "@xunserver-jsf/arco-react" ||
+          pkg.name === "@xunserver-jsf/arco-vue" ||
+          pkg.name === "@xunserver-jsf/shadcn") &&
         isMuiForbiddenPackage(targetName)
       ) {
         diagnostics.push({

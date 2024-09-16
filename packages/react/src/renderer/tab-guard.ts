@@ -1,7 +1,7 @@
 import type { LayoutBinding } from "../adapter/types.js";
 import { RENDERER_DIAGNOSTIC_CODES } from "../adapter/diagnostic-codes.js";
 import { freezeAdapterDiagnostic } from "../adapter/errors.js";
-import type { ViewNodeId } from "@form/core";
+import type { ViewNodeId } from "@xunserver-jsf/core";
 
 export interface TabGuardContext {
   readonly adapterId: string;

@@ -1,9 +1,9 @@
-import { createFormEnvironment, definePlugin, defineValidator, defineWidget } from "@form/core";
+import { createFormEnvironment, definePlugin, defineValidator, defineWidget } from "@xunserver-jsf/core";
 import type {
   SchemaDialectDefinition,
   SchemaExtensionDefinition,
   ValueInitializerDefinition,
-} from "@form/core";
+} from "@xunserver-jsf/core";
 
 export const leakedPlugin = definePlugin({ id: "leaked" });
 export const leakedWidget = defineWidget({

@@ -5,7 +5,7 @@
 ## Requirements
 
 ### Requirement: RendererEnvironment 与 FormEnvironment 严格分离
-`@form/react` 必须（SHALL）提供 `ReactRendererEnvironment` 与 `ReactUIAdapter` 公开契约。Renderer environment 只能保存 React component binding、props mapper、codec、interaction 和 layout/chrome 能力；不得（MUST NOT）注册或替代 `FormEnvironment` 中的 Schema/Widget Definition、Rule、Validator、Serializer 或 Compiler plugin。两类环境即使使用相同 logical key 也必须（MUST）保持不同类型与构建生命周期。
+`@xunserver-jsf/react` 必须（SHALL）提供 `ReactRendererEnvironment` 与 `ReactUIAdapter` 公开契约。Renderer environment 只能保存 React component binding、props mapper、codec、interaction 和 layout/chrome 能力；不得（MUST NOT）注册或替代 `FormEnvironment` 中的 Schema/Widget Definition、Rule、Validator、Serializer 或 Compiler plugin。两类环境即使使用相同 logical key 也必须（MUST）保持不同类型与构建生命周期。
 
 #### Scenario: Renderer adapter 不能注册 Core plugin
 - **GIVEN** 一个 React adapter 声明与 logical Widget key 对应的 binding

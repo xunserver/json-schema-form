@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { compileForm, createForm, createFormEngine, defineForm } from "@form/core";
-import { getRenderScope, subscribeRuntime, valueSelector } from "@form/core/runtime";
+import { compileForm, createForm, createFormEngine, defineForm } from "@xunserver-jsf/core";
+import { getRenderScope, subscribeRuntime, valueSelector } from "@xunserver-jsf/core/runtime";
 import { compileV1, fieldViewId } from "../fixtures/v1/index.js";
 
 describe("v1 public API composition", () => {

@@ -1,4 +1,4 @@
-import { defineVueUIAdapter, type VueAdapterContribution, type VueUIAdapter, type WidgetBinding, type LayoutBinding } from "@form/vue";
+import { defineVueUIAdapter, type VueAdapterContribution, type VueUIAdapter, type WidgetBinding, type LayoutBinding } from "@xunserver-jsf/vue";
 import { elementPlusFieldChrome } from "./field-chrome/field-chrome.js";
 import { elementPlusFormAdapter } from "./form/form-adapter.js";
 import { layoutBindings } from "./layouts/layouts.js";

@@ -1,6 +1,6 @@
-import { compileForm, createForm, defineForm } from "@form/core";
-import { createFormEnvironment, definePlugin, defineWidget } from "@form/core/extension";
-import { createVueRendererEnvironment } from "@form/vue";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
+import { createFormEnvironment, definePlugin, defineWidget } from "@xunserver-jsf/core/extension";
+import { createVueRendererEnvironment } from "@xunserver-jsf/vue";
 import { describe, expect, test } from "vitest";
 import { h } from "vue";
 import { ARCO_VUE_ADAPTER_ID, arcoVueAdapter, createArcoVueAdapter, extendArcoVueAdapter } from "./index.js";

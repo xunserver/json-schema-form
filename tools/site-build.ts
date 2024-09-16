@@ -26,7 +26,7 @@ const docsBase = normalizeBase(process.env.DOCS_BASE ?? "/json-schema-form/");
 const playgroundBase = `${docsBase}playground/`;
 
 run("pnpm", ["docs:build"], { DOCS_BASE: docsBase });
-run("pnpm", ["--filter", "@form/example-playground", "build"], {
+run("pnpm", ["--filter", "@xunserver-jsf/example-playground", "build"], {
   PLAYGROUND_BASE: playgroundBase,
 });
 

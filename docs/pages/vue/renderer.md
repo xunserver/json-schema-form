@@ -1,13 +1,13 @@
 # Vue Renderer
 
-`@form/vue` 只依赖 Core 与 Vue peer。它遍历已解析的 `CompiledFormModel.ui.viewTree`，读取 readonly snapshot，通过 Core command 写回。不要让 Vue 解释 Schema、Rule 或 Validation 来源。
+`@xunserver-jsf/vue` 只依赖 Core 与 Vue peer。它遍历已解析的 `CompiledFormModel.ui.viewTree`，读取 readonly snapshot，通过 Core command 写回。不要让 Vue 解释 Schema、Rule 或 Validation 来源。
 
 公开入口导出 `FormRenderer` / `ViewRenderer` / `FieldRenderer`、readonly composables，以及 `defineVueUIAdapter()` / `createVueRendererEnvironment()`。
 
 ```ts
-import { defineForm, compileForm, createForm } from "@form/core";
-import { FormRenderer } from "@form/vue";
-import { elementPlusAdapter } from "@form/element-plus";
+import { defineForm, compileForm, createForm } from "@xunserver-jsf/core";
+import { FormRenderer } from "@xunserver-jsf/vue";
+import { elementPlusAdapter } from "@xunserver-jsf/element-plus";
 
 const { model } = compileForm(defineForm({ schema }));
 const form = createForm(model, { initialValues });
@@ -22,8 +22,8 @@ const form = createForm(model, { initialValues });
 `defineVueUIAdapter()` 只规范化描述，不安装全局 Registry。`createVueRendererEnvironment()` 先校验 adapter ID、protocol、四类 role、registry key 与 override，再冻结发布。
 
 ```ts
-import { createVueRendererEnvironment } from "@form/vue";
-import { createElementPlusAdapter, extendElementPlusAdapter } from "@form/element-plus";
+import { createVueRendererEnvironment } from "@xunserver-jsf/vue";
+import { createElementPlusAdapter, extendElementPlusAdapter } from "@xunserver-jsf/element-plus";
 
 const environment = createVueRendererEnvironment({
   adapters: [createElementPlusAdapter()],
@@ -55,7 +55,7 @@ const environment = createVueRendererEnvironment({
 
 Custom Widget 只能拿到 readonly descriptor、snapshots、scope view 与 `setValue` / `touch` / `focus` / `blur`。不要传入 `FormInstance`、Store writer 或 native event。不要把 Vue component 写进 `defineWidget()` 或 Core `FormEnvironment`。
 
-`RenderScope` / `InstanceBinding` / `getRenderScope()` 从 `@form/core/runtime` 导入。Group 折叠与 Tab 只读写 Core `collapsed` / `activeTab`。
+`RenderScope` / `InstanceBinding` / `getRenderScope()` 从 `@xunserver-jsf/core/runtime` 导入。Group 折叠与 Tab 只读写 Core `collapsed` / `activeTab`。
 
 ## SSR 与 identity
 
@@ -65,4 +65,4 @@ Custom Widget 只能拿到 readonly descriptor、snapshots、scope view 与 `set
 
 ## 只读 composables
 
-`useFormSnapshot`、`useFieldSnapshot`、`useViewSnapshot`、`usePresentableErrors`、`useArraySnapshot` 等从 `@form/vue` 根入口导出，内部仍通过 Core runtime selector 订阅。
+`useFormSnapshot`、`useFieldSnapshot`、`useViewSnapshot`、`usePresentableErrors`、`useArraySnapshot` 等从 `@xunserver-jsf/vue` 根入口导出，内部仍通过 Core runtime selector 订阅。

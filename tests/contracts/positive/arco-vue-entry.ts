@@ -1,6 +1,6 @@
-import { FormRenderer } from "@form/vue";
-import { arcoVueAdapter, createArcoVueAdapter, extendArcoVueAdapter } from "@form/arco-vue";
-import { compileForm, createForm, defineForm } from "@form/core";
+import { FormRenderer } from "@xunserver-jsf/vue";
+import { arcoVueAdapter, createArcoVueAdapter, extendArcoVueAdapter } from "@xunserver-jsf/arco-vue";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { h } from "vue";
 
 const form = createForm(

@@ -1,5 +1,5 @@
-import type { EffectiveState, FormInstance, JsonValue, ValidationError } from "@form/core";
-import { currentBindingSelector, effectiveStateSelector, getRuntimeSnapshot, presentableErrorSelector } from "@form/core/runtime";
+import type { EffectiveState, FormInstance, JsonValue, ValidationError } from "@xunserver-jsf/core";
+import { currentBindingSelector, effectiveStateSelector, getRuntimeSnapshot, presentableErrorSelector } from "@xunserver-jsf/core/runtime";
 
 export interface ObservationRecord {
   readonly values: JsonValue;

@@ -1,5 +1,5 @@
-import type { ArrayView, GroupView, LayoutView, ObjectView } from "@form/core";
-import type { LayoutBinding } from "@form/vue";
+import type { ArrayView, GroupView, LayoutView, ObjectView } from "@xunserver-jsf/core";
+import type { LayoutBinding } from "@xunserver-jsf/vue";
 import { ElCol, ElCollapse, ElCollapseItem, ElRow } from "element-plus";
 import { h } from "vue";
 

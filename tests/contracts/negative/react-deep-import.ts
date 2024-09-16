@@ -1,2 +1,2 @@
-import { FormRenderer } from "@form/react/src/renderer/FormRenderer.js";
+import { FormRenderer } from "@xunserver-jsf/react/src/renderer/FormRenderer.js";
 void FormRenderer;

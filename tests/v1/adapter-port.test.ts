@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { compileV1, fieldViewId } from "../fixtures/v1/index.js";
-import { formSelector, subscribeRuntime } from "@form/core/runtime";
+import { formSelector, subscribeRuntime } from "@xunserver-jsf/core/runtime";
 
 describe("v1 adapter semantic ports", () => {
   test("V1-ADAPTER-PORT records only approved commands", () => {

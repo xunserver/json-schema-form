@@ -1,4 +1,4 @@
-import type { ViewNode } from "@form/core";
+import type { ViewNode } from "@xunserver-jsf/core";
 import { defineComponent, h, type PropType, type VNode } from "vue";
 import { viewRenderers } from "./registry.js";
 

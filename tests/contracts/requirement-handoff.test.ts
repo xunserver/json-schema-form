@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { compileForm, defineForm } from "@form/core";
-import type { FieldRequirementPresentation, SchemaPath } from "@form/core";
+import { compileForm, defineForm } from "@xunserver-jsf/core";
+import type { FieldRequirementPresentation, SchemaPath } from "@xunserver-jsf/core";
 
 function effectiveRequired(
   requirement: FieldRequirementPresentation | undefined,

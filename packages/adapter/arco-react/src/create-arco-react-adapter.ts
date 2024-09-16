@@ -4,7 +4,7 @@ import {
   type ReactUIAdapter,
   type WidgetBinding,
   type LayoutBinding,
-} from "@form/react";
+} from "@xunserver-jsf/react";
 import { arcoReactFieldChrome } from "./field-chrome/field-chrome.js";
 import { arcoReactFormAdapter } from "./form/form-adapter.js";
 import { layoutBindings } from "./layouts/layouts.js";

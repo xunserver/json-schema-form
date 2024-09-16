@@ -1,6 +1,6 @@
-import { FormRenderer } from "@form/react";
-import { createShadcnAdapter, extendShadcnAdapter, type ShadcnAdapterComponents } from "@form/shadcn";
-import { compileForm, createForm, defineForm } from "@form/core";
+import { FormRenderer } from "@xunserver-jsf/react";
+import { createShadcnAdapter, extendShadcnAdapter, type ShadcnAdapterComponents } from "@xunserver-jsf/shadcn";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { createElement, type ReactNode } from "react";
 
 const components = {

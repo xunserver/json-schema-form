@@ -6,12 +6,12 @@ import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { renderToString as renderReactToString } from "react-dom/server";
 import { act } from "@testing-library/react";
-import { FormRenderer as VueFormRenderer } from "@form/vue";
-import { FormRenderer as ReactFormRenderer } from "@form/react";
+import { FormRenderer as VueFormRenderer } from "@xunserver-jsf/vue";
+import { FormRenderer as ReactFormRenderer } from "@xunserver-jsf/react";
 import { compileV1 } from "../fixtures/v1/index.js";
 import { createDemoRendererEnvironment as createVueEnv } from "../lib/demo-element-plus-environment.ts";
 import { createRecordingAdapter } from "../../packages/react/src/test-utils/fake-adapter.tsx";
-import { subscribeRuntime, valueSelector } from "@form/core/runtime";
+import { subscribeRuntime, valueSelector } from "@xunserver-jsf/core/runtime";
 
 describe("v1 SSR and hydration", () => {
   test("V1-SSR-VUE server-renders a readonly snapshot", async () => {

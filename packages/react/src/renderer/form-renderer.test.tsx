@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
-import { getRuntimeSnapshot, subscribeRuntime, valueSelector } from "@form/core/runtime";
-import { compileForm, createForm, defineForm } from "@form/core";
+import { getRuntimeSnapshot, subscribeRuntime, valueSelector } from "@xunserver-jsf/core/runtime";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { cleanup, fireEvent, render, screen, act } from "@testing-library/react";
 import { StrictMode, useEffect, type ReactNode } from "react";
 import { afterEach, describe, expect, test } from "vitest";

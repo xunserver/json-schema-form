@@ -1,9 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { compileForm, createForm, createFormEngine, defineForm } from "@form/core";
-import { CompileError } from "@form/core";
-import { EnvironmentBuildError, createFormEnvironment, definePlugin, defineWidget } from "@form/core/extension";
-import { FormRuntimeError } from "@form/core";
-import { createVueRendererEnvironment } from "@form/vue";
+import { compileForm, createForm, createFormEngine, defineForm } from "@xunserver-jsf/core";
+import { CompileError } from "@xunserver-jsf/core";
+import { EnvironmentBuildError, createFormEnvironment, definePlugin, defineWidget } from "@xunserver-jsf/core/extension";
+import { FormRuntimeError } from "@xunserver-jsf/core";
+import { createVueRendererEnvironment } from "@xunserver-jsf/vue";
 import { createRecordingAdapter } from "../../packages/vue/src/test-utils/fake-adapter.js";
 
 function freezeMeta(diagnostics: readonly { readonly code: string; readonly source: string; readonly metadata?: Readonly<Record<string, unknown>> }[]) {

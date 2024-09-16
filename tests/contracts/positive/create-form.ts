@@ -1,5 +1,5 @@
-import { compileForm, createForm, createFormEngine, defineForm, FormRuntimeError } from "@form/core";
-import type { ArrayInstance, FormInstance, ScopedFormInstance } from "@form/core";
+import { compileForm, createForm, createFormEngine, defineForm, FormRuntimeError } from "@xunserver-jsf/core";
+import type { ArrayInstance, FormInstance, ScopedFormInstance } from "@xunserver-jsf/core";
 
 export const compiled = compileForm(
   defineForm({

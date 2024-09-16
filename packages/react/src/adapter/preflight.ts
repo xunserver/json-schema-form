@@ -1,5 +1,5 @@
-import type { ArrayView, Diagnostic, FieldDescriptor, ModelPath, ViewNode, ViewNodeId } from "@form/core";
-import type { FormInstance } from "@form/core";
+import type { ArrayView, Diagnostic, FieldDescriptor, ModelPath, ViewNode, ViewNodeId } from "@xunserver-jsf/core";
+import type { FormInstance } from "@xunserver-jsf/core";
 import { RENDERER_DIAGNOSTIC_CODES } from "./diagnostic-codes.js";
 import { freezeAdapterDiagnostic, RendererCapabilityError } from "./errors.js";
 import type { LayoutKind, ResolvedReactAdapter, WidgetBinding } from "./types.js";

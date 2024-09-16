@@ -1,5 +1,5 @@
 import { Form } from "@arco-design/web-react";
-import type { FieldChromeAdapter } from "@form/react";
+import type { FieldChromeAdapter } from "@xunserver-jsf/react";
 
 export const arcoReactFieldChrome: FieldChromeAdapter = {
   render(input) {

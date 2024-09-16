@@ -4,7 +4,7 @@ import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { StrictMode } from "react";
 import { act } from "@testing-library/react";
-import { FormRenderer } from "@form/react";
+import { FormRenderer } from "@xunserver-jsf/react";
 import { createRecordingAdapter } from "../../packages/react/src/test-utils/fake-adapter.tsx";
 import { createPersonForm } from "../../packages/react/src/test-utils/forms.ts";
 

@@ -1,6 +1,6 @@
 import { ElFormItem } from "element-plus";
 import { h } from "vue";
-import type { FieldChromeAdapter } from "@form/vue";
+import type { FieldChromeAdapter } from "@xunserver-jsf/vue";
 
 export const elementPlusFieldChrome: FieldChromeAdapter = {
   render(input) {

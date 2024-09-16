@@ -1,6 +1,6 @@
-import { valueSelector, subscribeRuntime } from "@form/core";
-import { getRenderScope } from "@form/core";
-import type { InstanceBinding, RenderScope } from "@form/core";
+import { valueSelector, subscribeRuntime } from "@xunserver-jsf/core";
+import { getRenderScope } from "@xunserver-jsf/core";
+import type { InstanceBinding, RenderScope } from "@xunserver-jsf/core";
 
 export const leaked = valueSelector("name");
 export const subscription = subscribeRuntime;

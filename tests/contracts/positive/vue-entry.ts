@@ -1,11 +1,11 @@
-import { compileForm, createForm, defineForm } from "@form/core";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import {
   FormRenderer,
   createVueRendererEnvironment,
   defineVueUIAdapter,
   useRuntimeSelector,
   type VueUIAdapter,
-} from "@form/vue";
+} from "@xunserver-jsf/vue";
 import { h } from "vue";
 
 const adapter: VueUIAdapter = defineVueUIAdapter({

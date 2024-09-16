@@ -10,8 +10,8 @@ describe("v1 shared fixture", () => {
       const source = fs.readFileSync(path.join(dir, file), "utf8");
       expect(source).not.toMatch(/from ["']vue["']/);
       expect(source).not.toMatch(/from ["']react["']/);
-      expect(source).not.toMatch(/from ["']@form\/vue["']/);
-      expect(source).not.toMatch(/from ["']@form\/react["']/);
+      expect(source).not.toMatch(/from ["']@xunserver-jsf\/vue["']/);
+      expect(source).not.toMatch(/from ["']@xunserver-jsf\/react["']/);
       expect(source).not.toMatch(/packages\/core\/src\//);
     }
   });

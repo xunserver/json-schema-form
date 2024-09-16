@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "architectureDigest": "1291e57d3e0432e59768c4c966bc523f9ee658dd67e436ce310cbc4142ece6c4",
+  "architectureDigest": "ade5b0af24c265ba97b604f2f086443efa9e9918d234198bd107381e565f7a1e",
   "catalogs": {
     "invariants": [
       {
@@ -635,7 +635,7 @@
         "id": "AC-02",
         "section": 21,
         "ordinal": 2,
-        "normalizedText": "`@form/core` 的依赖树中不存在 Vue、React、DOM UI library 和 AJV。",
+        "normalizedText": "`@xunserver-jsf/core` 的依赖树中不存在 Vue、React、DOM UI library 和 AJV。",
         "status": "covered",
         "owners": [
           {
@@ -830,7 +830,7 @@
         "id": "PKG-01",
         "section": 17,
         "ordinal": 1,
-        "normalizedText": "@form/core",
+        "normalizedText": "@xunserver-jsf/core",
         "status": "covered",
         "owners": [
           {
@@ -848,7 +848,7 @@
         "id": "PKG-02",
         "section": 17,
         "ordinal": 2,
-        "normalizedText": "@form/validator-ajv",
+        "normalizedText": "@xunserver-jsf/validator-ajv",
         "status": "covered",
         "owners": [
           {
@@ -866,7 +866,7 @@
         "id": "PKG-03",
         "section": 17,
         "ordinal": 3,
-        "normalizedText": "@form/vue",
+        "normalizedText": "@xunserver-jsf/vue",
         "status": "covered",
         "owners": [
           {
@@ -884,7 +884,7 @@
         "id": "PKG-04",
         "section": 17,
         "ordinal": 4,
-        "normalizedText": "@form/react",
+        "normalizedText": "@xunserver-jsf/react",
         "status": "covered",
         "owners": [
           {
@@ -902,7 +902,7 @@
         "id": "PKG-05",
         "section": 17,
         "ordinal": 5,
-        "normalizedText": "@form/element-plus",
+        "normalizedText": "@xunserver-jsf/element-plus",
         "status": "covered",
         "owners": [
           {
@@ -1122,7 +1122,7 @@
         "id": "EXP-CORE-ROOT",
         "section": 16,
         "ordinal": 1,
-        "normalizedText": "@form/core",
+        "normalizedText": "@xunserver-jsf/core",
         "status": "covered",
         "owners": [
           {
@@ -1141,7 +1141,7 @@
         "id": "EXP-CORE-RUNTIME",
         "section": 16,
         "ordinal": 2,
-        "normalizedText": "@form/core/runtime",
+        "normalizedText": "@xunserver-jsf/core/runtime",
         "status": "covered",
         "owners": [
           {
@@ -1160,7 +1160,7 @@
         "id": "EXP-CORE-EXTENSION",
         "section": 16,
         "ordinal": 3,
-        "normalizedText": "@form/core/extension",
+        "normalizedText": "@xunserver-jsf/core/extension",
         "status": "covered",
         "owners": [
           {
@@ -1179,7 +1179,7 @@
         "id": "EXP-VALIDATOR-AJV",
         "section": 17,
         "ordinal": 4,
-        "normalizedText": "@form/validator-ajv",
+        "normalizedText": "@xunserver-jsf/validator-ajv",
         "status": "covered",
         "owners": [
           {
@@ -1197,7 +1197,7 @@
         "id": "EXP-VUE",
         "section": 17,
         "ordinal": 5,
-        "normalizedText": "@form/vue",
+        "normalizedText": "@xunserver-jsf/vue",
         "status": "covered",
         "owners": [
           {
@@ -1215,7 +1215,7 @@
         "id": "EXP-REACT",
         "section": 17,
         "ordinal": 6,
-        "normalizedText": "@form/react",
+        "normalizedText": "@xunserver-jsf/react",
         "status": "covered",
         "owners": [
           {
@@ -1233,7 +1233,7 @@
         "id": "EXP-ELEMENT-PLUS",
         "section": 17,
         "ordinal": 7,
-        "normalizedText": "@form/element-plus",
+        "normalizedText": "@xunserver-jsf/element-plus",
         "status": "covered",
         "owners": [
           {
@@ -1251,7 +1251,7 @@
         "id": "EXP-ANTD",
         "section": 17,
         "ordinal": 8,
-        "normalizedText": "@form/antd",
+        "normalizedText": "@xunserver-jsf/antd",
         "status": "covered",
         "owners": [
           {
@@ -1269,7 +1269,7 @@
         "id": "EXP-SHADCN",
         "section": 17,
         "ordinal": 10,
-        "normalizedText": "@form/shadcn",
+        "normalizedText": "@xunserver-jsf/shadcn",
         "status": "covered",
         "owners": [
           {
@@ -1574,7 +1574,7 @@
         "requirement": "defineWidget 是无副作用的 Widget authoring helper",
         "scenario": "保留自定义 Widget identity 与 literal"
       },
-      "publicEntry": "@form/core/extension",
+      "publicEntry": "@xunserver-jsf/core/extension",
       "evidenceIds": [
         "V1-PRE-WIDGET-HELPER"
       ]
@@ -1588,7 +1588,7 @@
         "requirement": "RenderScope 是公开只读的实例定位契约",
         "scenario": "RenderScope 不提供 writer"
       },
-      "publicEntry": "@form/core/runtime",
+      "publicEntry": "@xunserver-jsf/core/runtime",
       "evidenceIds": [
         "V1-PRE-RENDER-BINDING"
       ]
@@ -1602,7 +1602,7 @@
         "requirement": "基础 value 与交互命令具有明确语义",
         "scenario": "blur 清除目标 View 的 focused"
       },
-      "publicEntry": "@form/core",
+      "publicEntry": "@xunserver-jsf/core",
       "evidenceIds": [
         "V1-PRE-BLUR-PORT"
       ]
@@ -1616,7 +1616,7 @@
         "requirement": "WidgetDefinition 声明框架无关的 semantic interaction contract",
         "scenario": "默认 Widget 提供完整 semantic action capability"
       },
-      "publicEntry": "@form/core/extension",
+      "publicEntry": "@xunserver-jsf/core/extension",
       "evidenceIds": [
         "V1-PRE-WIDGET-INTERACTION"
       ]
@@ -1630,7 +1630,7 @@
         "requirement": "effective状态具有固定组合优先级且active不等于visible",
         "scenario": "静态required直接投影"
       },
-      "publicEntry": "@form/core",
+      "publicEntry": "@xunserver-jsf/core",
       "evidenceIds": [
         "V1-PRE-REQUIRED-PRESENTATION"
       ]
@@ -1644,7 +1644,7 @@
         "requirement": "基础 value 与交互命令具有明确语义",
         "scenario": "collapsed 与 activeTab 属于具体 View"
       },
-      "publicEntry": "@form/core",
+      "publicEntry": "@xunserver-jsf/core",
       "evidenceIds": [
         "V1-PRE-VIEW-STATE"
       ]
@@ -1672,7 +1672,7 @@
         "requirement": "Rule Function 与Serializer provider是纯同步只读边界",
         "scenario": "Plugin注册dialect、extension与initializer providers"
       },
-      "publicEntry": "@form/core/extension",
+      "publicEntry": "@xunserver-jsf/core/extension",
       "evidenceIds": [
         "V1-PRE-CONTRIBUTION-PORTS"
       ]

@@ -5,8 +5,8 @@
 需要长期复用同一套 Plugin 时，使用 `createFormEngine({ plugins })`：`engine.compile()` 与 `engine.create()` 闭包持有同一个冻结 Environment。Engine 本身不保存实例 values 或 version。
 
 ```ts
-import { compileForm, createForm, createFormEngine, defineForm, FormRuntimeError } from "@form/core";
-import { formSelector, getRenderScope, subscribeRuntime, valueSelector } from "@form/core/runtime";
+import { compileForm, createForm, createFormEngine, defineForm, FormRuntimeError } from "@xunserver-jsf/core";
+import { formSelector, getRenderScope, subscribeRuntime, valueSelector } from "@xunserver-jsf/core/runtime";
 
 const definition = defineForm({
   schema: {
@@ -62,6 +62,6 @@ Renderer / FieldChrome 只读 snapshot，不读取 Schema 或 DataModel edge。`
 
 ## 只读 Runtime API
 
-selector / subscription / `RenderScope` / `InstanceBinding` 从 `@form/core/runtime` 导入，不从根入口重导出。
+selector / subscription / `RenderScope` / `InstanceBinding` 从 `@xunserver-jsf/core/runtime` 导入，不从根入口重导出。
 
 `getRenderScope(form | scoped)` 返回只读 `RenderScope`：可把相对或绝对模板 `ModelPath` 解析为当前 `InstancePath`。它没有 writer。不要把 `RenderScope` 当作 `FormInstance` 传给 Renderer 去绕过 command。

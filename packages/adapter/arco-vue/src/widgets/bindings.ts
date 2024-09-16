@@ -8,8 +8,8 @@ import {
   Textarea,
 } from "@arco-design/web-vue";
 import { h, type Component } from "vue";
-import type { WidgetBinding, WidgetRenderInput } from "@form/vue";
-import { FULL_WIDGET_INTERACTION } from "@form/core/extension";
+import type { WidgetBinding, WidgetRenderInput } from "@xunserver-jsf/vue";
+import { FULL_WIDGET_INTERACTION } from "@xunserver-jsf/core/extension";
 import {
   booleanCodec,
   dateCodec,

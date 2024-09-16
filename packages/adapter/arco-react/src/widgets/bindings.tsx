@@ -1,6 +1,6 @@
 import { Checkbox, Input, InputNumber, Select, Switch } from "@arco-design/web-react";
-import type { WidgetBinding, WidgetRenderInput } from "@form/react";
-import { FULL_WIDGET_INTERACTION } from "@form/core/extension";
+import type { WidgetBinding, WidgetRenderInput } from "@xunserver-jsf/react";
+import { FULL_WIDGET_INTERACTION } from "@xunserver-jsf/core/extension";
 import {
   createMultiSelectCodec,
   createSelectCodec,

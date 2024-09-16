@@ -1,5 +1,5 @@
 {
-  "name": "@form/example-shared",
+  "name": "@xunserver-jsf/example-shared",
   "private": true,
   "type": "module",
   "exports": {
@@ -22,7 +22,7 @@
     "typecheck": "tsc -p tsconfig.json --pretty false --noEmit"
   },
   "dependencies": {
-    "@form/core": "workspace:*",
-    "@form/validator-ajv": "workspace:*"
+    "@xunserver-jsf/core": "workspace:*",
+    "@xunserver-jsf/validator-ajv": "workspace:*"
   }
 }

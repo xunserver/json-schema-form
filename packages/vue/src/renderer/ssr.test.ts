@@ -1,4 +1,4 @@
-import { createSelector, subscribeRuntime, valueSelector } from "@form/core/runtime";
+import { createSelector, subscribeRuntime, valueSelector } from "@xunserver-jsf/core/runtime";
 import { describe, expect, test } from "vitest";
 import { createSSRApp, defineComponent, h } from "vue";
 import { renderToString } from "vue/server-renderer";

@@ -14,17 +14,17 @@ describe("v1 examples", () => {
       path.join(REPO_ROOT, "examples/shared/catalog/kitchen-sink.json"),
       "utf8",
     );
-    expect(playgroundPkg).toContain("@form/example-shared");
+    expect(playgroundPkg).toContain("@xunserver-jsf/example-shared");
     expect(playgroundPkg).not.toContain("@mui/");
-    expect(playgroundSrc).toContain("@form/example-shared");
-    expect(playgroundSrc).not.toMatch(/@form\/vue\/src/);
-    expect(playgroundSrc).not.toMatch(/@form\/react\/src/);
+    expect(playgroundSrc).toContain("@xunserver-jsf/example-shared");
+    expect(playgroundSrc).not.toMatch(/@xunserver-jsf\/vue\/src/);
+    expect(playgroundSrc).not.toMatch(/@xunserver-jsf\/react\/src/);
     expect(sharedEnv).toContain("company.currency");
     expect(kitchenSink).toContain("company.currency");
 
-    const shared = runNodeProcess("pnpm", ["--filter", "@form/example-shared", "typecheck"]);
+    const shared = runNodeProcess("pnpm", ["--filter", "@xunserver-jsf/example-shared", "typecheck"]);
     expect(shared.status, shared.stderr).toBe(0);
-    const playground = runNodeProcess("pnpm", ["--filter", "@form/example-playground", "typecheck"]);
+    const playground = runNodeProcess("pnpm", ["--filter", "@xunserver-jsf/example-playground", "typecheck"]);
     expect(playground.status, playground.stderr).toBe(0);
 
     const form = createDemoForm();

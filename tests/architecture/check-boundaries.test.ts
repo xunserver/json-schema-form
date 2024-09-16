@@ -34,13 +34,13 @@ describe("architecture checker", () => {
     const root = copyRepoPackages();
 
     const importFiles: Record<string, string> = {
-      "validator-ajv": 'import type { FormDefinition } from "@form/core";\nexport type Probe = FormDefinition;\n',
-      vue: 'import type { FormDefinition } from "@form/core";\nexport type Probe = FormDefinition;\n',
-      react: 'import type { FormDefinition } from "@form/core";\nexport type Probe = FormDefinition;\n',
+      "validator-ajv": 'import type { FormDefinition } from "@xunserver-jsf/core";\nexport type Probe = FormDefinition;\n',
+      vue: 'import type { FormDefinition } from "@xunserver-jsf/core";\nexport type Probe = FormDefinition;\n',
+      react: 'import type { FormDefinition } from "@xunserver-jsf/core";\nexport type Probe = FormDefinition;\n',
       "adapter/element-plus":
-        'import type { FormDefinition } from "@form/core";\nimport "@form/vue";\nexport type Probe = FormDefinition;\n',
+        'import type { FormDefinition } from "@xunserver-jsf/core";\nimport "@xunserver-jsf/vue";\nexport type Probe = FormDefinition;\n',
       "adapter/antd":
-        'import type { FormDefinition } from "@form/core";\nimport "@form/react";\nexport type Probe = FormDefinition;\n',
+        'import type { FormDefinition } from "@xunserver-jsf/core";\nimport "@xunserver-jsf/react";\nexport type Probe = FormDefinition;\n',
     };
 
     for (const [directory, source] of Object.entries(importFiles)) {
@@ -48,28 +48,28 @@ describe("architecture checker", () => {
     }
 
     expect(checkArchitecture(root)).toEqual([]);
-    expect(ALLOWED_EDGES["@form/validator-ajv"]).toEqual(["@form/core"]);
-    expect(ALLOWED_EDGES["@form/vue"]).toEqual(["@form/core"]);
-    expect(ALLOWED_EDGES["@form/react"]).toEqual(["@form/core"]);
-    expect(ALLOWED_EDGES["@form/element-plus"]).toEqual(["@form/core", "@form/vue"]);
-    expect(ALLOWED_EDGES["@form/antd"]).toEqual(["@form/core", "@form/react"]);
-    expect(ALLOWED_EDGES["@form/arco-vue"]).toEqual(["@form/core", "@form/vue"]);
-    expect(ALLOWED_EDGES["@form/arco-react"]).toEqual(["@form/core", "@form/react"]);
-    expect(ALLOWED_EDGES["@form/shadcn"]).toEqual(["@form/core", "@form/react"]);
+    expect(ALLOWED_EDGES["@xunserver-jsf/validator-ajv"]).toEqual(["@xunserver-jsf/core"]);
+    expect(ALLOWED_EDGES["@xunserver-jsf/vue"]).toEqual(["@xunserver-jsf/core"]);
+    expect(ALLOWED_EDGES["@xunserver-jsf/react"]).toEqual(["@xunserver-jsf/core"]);
+    expect(ALLOWED_EDGES["@xunserver-jsf/element-plus"]).toEqual(["@xunserver-jsf/core", "@xunserver-jsf/vue"]);
+    expect(ALLOWED_EDGES["@xunserver-jsf/antd"]).toEqual(["@xunserver-jsf/core", "@xunserver-jsf/react"]);
+    expect(ALLOWED_EDGES["@xunserver-jsf/arco-vue"]).toEqual(["@xunserver-jsf/core", "@xunserver-jsf/vue"]);
+    expect(ALLOWED_EDGES["@xunserver-jsf/arco-react"]).toEqual(["@xunserver-jsf/core", "@xunserver-jsf/react"]);
+    expect(ALLOWED_EDGES["@xunserver-jsf/shadcn"]).toEqual(["@xunserver-jsf/core", "@xunserver-jsf/react"]);
   });
 
   test("rejects a reverse Core -> Vue dependency", () => {
     const root = copyRepoPackages();
     mutateManifest(root, "core", (manifest) => {
-      manifest.dependencies = { "@form/vue": "workspace:*" };
+      manifest.dependencies = { "@xunserver-jsf/vue": "workspace:*" };
     });
-    writeText(path.join(root, "packages", "core", "src", "leak.ts"), 'import "@form/vue";\n');
+    writeText(path.join(root, "packages", "core", "src", "leak.ts"), 'import "@xunserver-jsf/vue";\n');
 
     const diagnostics = checkArchitecture(root);
     expect(diagnostics.some((diagnostic) => diagnostic.rule === RULE.reverseDependency)).toBe(true);
     expect(
       diagnostics.some(
-        (diagnostic) => diagnostic.sourcePackage === "@form/core" && diagnostic.targetPackage === "@form/vue",
+        (diagnostic) => diagnostic.sourcePackage === "@xunserver-jsf/core" && diagnostic.targetPackage === "@xunserver-jsf/vue",
       ),
     ).toBe(true);
   });
@@ -79,7 +79,7 @@ describe("architecture checker", () => {
     mutateManifest(root, "adapter/antd", (manifest) => {
       manifest.dependencies = {
         ...manifest.dependencies,
-        "@form/vue": "workspace:*",
+        "@xunserver-jsf/vue": "workspace:*",
       };
     });
 
@@ -87,7 +87,7 @@ describe("architecture checker", () => {
     expect(diagnostics.some((diagnostic) => diagnostic.rule === RULE.crossFrameworkDependency)).toBe(true);
     expect(
       diagnostics.some(
-        (diagnostic) => diagnostic.sourcePackage === "@form/antd" && diagnostic.targetPackage === "@form/vue",
+        (diagnostic) => diagnostic.sourcePackage === "@xunserver-jsf/antd" && diagnostic.targetPackage === "@xunserver-jsf/vue",
       ),
     ).toBe(true);
   });
@@ -95,11 +95,11 @@ describe("architecture checker", () => {
   test("rejects an undeclared but otherwise legal import", () => {
     const root = copyRepoPackages();
     mutateManifest(root, "adapter/element-plus", (manifest) => {
-      delete manifest.dependencies?.["@form/core"];
+      delete manifest.dependencies?.["@xunserver-jsf/core"];
     });
     writeText(
       path.join(root, "packages", "adapter", "element-plus", "src", "index.ts"),
-      'import type { FormDefinition } from "@form/core";\nexport type Probe = FormDefinition;\n',
+      'import type { FormDefinition } from "@xunserver-jsf/core";\nexport type Probe = FormDefinition;\n',
     );
 
     const diagnostics = checkArchitecture(root);
@@ -107,7 +107,7 @@ describe("architecture checker", () => {
     expect(
       diagnostics.some(
         (diagnostic) =>
-          diagnostic.sourcePackage === "@form/element-plus" && diagnostic.targetPackage === "@form/core",
+          diagnostic.sourcePackage === "@xunserver-jsf/element-plus" && diagnostic.targetPackage === "@xunserver-jsf/core",
       ),
     ).toBe(true);
   });
@@ -123,7 +123,7 @@ describe("architecture checker", () => {
     expect(diagnostics.some((diagnostic) => diagnostic.rule === RULE.relativeCrossPackageImport)).toBe(true);
     expect(
       diagnostics.some(
-        (diagnostic) => diagnostic.sourcePackage === "@form/vue" && diagnostic.targetPackage === "@form/core",
+        (diagnostic) => diagnostic.sourcePackage === "@xunserver-jsf/vue" && diagnostic.targetPackage === "@xunserver-jsf/core",
       ),
     ).toBe(true);
   });
@@ -140,7 +140,7 @@ describe("architecture checker", () => {
     const diagnostics = checkArchitecture(root);
     expect(diagnostics.some((diagnostic) => diagnostic.rule === RULE.hostPeerPlacement)).toBe(true);
     expect(
-      diagnostics.some((diagnostic) => diagnostic.sourcePackage === "@form/vue" && diagnostic.targetPackage === "vue"),
+      diagnostics.some((diagnostic) => diagnostic.sourcePackage === "@xunserver-jsf/vue" && diagnostic.targetPackage === "vue"),
     ).toBe(true);
   });
 
@@ -171,7 +171,7 @@ describe("architecture checker", () => {
       diagnostics.some(
         (diagnostic) =>
           diagnostic.rule === RULE.forbiddenCorePackage &&
-          diagnostic.sourcePackage === "@form/vue" &&
+          diagnostic.sourcePackage === "@xunserver-jsf/vue" &&
           diagnostic.targetPackage === "ajv",
       ),
     ).toBe(true);
@@ -179,7 +179,7 @@ describe("architecture checker", () => {
       diagnostics.some(
         (diagnostic) =>
           diagnostic.rule === RULE.forbiddenCorePackage &&
-          diagnostic.sourcePackage === "@form/react" &&
+          diagnostic.sourcePackage === "@xunserver-jsf/react" &&
           diagnostic.targetPackage === "ajv",
       ),
     ).toBe(true);

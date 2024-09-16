@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
-import { compileForm, createForm, defineForm, FormRuntimeError } from "@form/core";
-import { createFormEnvironment, definePlugin, defineRuleFunction } from "@form/core/extension";
-import { effectiveStateSelector, formSelector, subscribeRuntime } from "@form/core/runtime";
+import { compileForm, createForm, defineForm, FormRuntimeError } from "@xunserver-jsf/core";
+import { createFormEnvironment, definePlugin, defineRuleFunction } from "@xunserver-jsf/core/extension";
+import { effectiveStateSelector, formSelector, subscribeRuntime } from "@xunserver-jsf/core/runtime";
 
 describe("rules and schema dynamics end-to-end", () => {
   test("keeps values, effective state, version, and notifications atomic across branch and array edits", () => {

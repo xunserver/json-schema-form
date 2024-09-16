@@ -1,4 +1,4 @@
-import type { FieldChromeAdapter } from "@form/react";
+import type { FieldChromeAdapter } from "@xunserver-jsf/react";
 import type { ShadcnAdapterComponents } from "../components.js";
 
 export function createShadcnFieldChrome(components: ShadcnAdapterComponents): FieldChromeAdapter {

@@ -1,14 +1,14 @@
 # Element Plus Adapter
 
-`@form/element-plus` 位于 Vue Renderer 之上。默认 adapter ID 为 `element-plus`。Core `FormEnvironment` 仍是 Widget 定义、规则和校验的真相；Element Plus Form 的 `rules` / `validate` / `resetFields` 不得作为业务状态。
+`@xunserver-jsf/element-plus` 位于 Vue Renderer 之上。默认 adapter ID 为 `element-plus`。Core `FormEnvironment` 仍是 Widget 定义、规则和校验的真相；Element Plus Form 的 `rules` / `validate` / `resetFields` 不得作为业务状态。
 
 ```ts
-import { FormRenderer } from "@form/vue";
+import { FormRenderer } from "@xunserver-jsf/vue";
 import {
   elementPlusAdapter,
   createElementPlusAdapter,
   extendElementPlusAdapter,
-} from "@form/element-plus";
+} from "@xunserver-jsf/element-plus";
 ```
 
 ```vue

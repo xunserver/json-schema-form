@@ -25,7 +25,7 @@ Core 必须（SHALL）接受由必需 `schema` 与可选 `uiSchema`、`rules`、
 - **THEN** 公共类型契约接受该 Definition
 
 ### Requirement: defineForm 是无副作用 authoring helper
-Core 必须（SHALL）从 `@form/core` 根入口暴露 `defineForm()`。该 helper 必须（MUST）保留输入 Definition 的语义和具体类型信息，并且不得（MUST NOT）执行 Schema 编译、创建 `FormInstance`、安装 Plugin 或读取或修改 global mutable state。
+Core 必须（SHALL）从 `@xunserver-jsf/core` 根入口暴露 `defineForm()`。该 helper 必须（MUST）保留输入 Definition 的语义和具体类型信息，并且不得（MUST NOT）执行 Schema 编译、创建 `FormInstance`、安装 Plugin 或读取或修改 global mutable state。
 
 #### Scenario: 通过 defineForm 保留 Definition
 - **GIVEN** 调用者提供包含具体字段、Widget 名称、Rules 与 Config 的 Definition literal

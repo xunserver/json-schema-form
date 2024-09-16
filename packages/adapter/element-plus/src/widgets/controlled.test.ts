@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
-import type { WidgetRenderInput } from "@form/vue";
+import type { WidgetRenderInput } from "@xunserver-jsf/vue";
 import { applyCodecChange } from "./controlled.js";
 import { stringCodec } from "./codecs.js";
 import { selectBinding } from "./bindings.js";

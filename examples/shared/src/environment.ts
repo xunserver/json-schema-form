@@ -1,6 +1,6 @@
-import { createFormEnvironment, definePlugin, defineRuleFunction, defineWidget } from "@form/core/extension";
-import { AJV_VALIDATOR_KEY, createAjvValidator } from "@form/validator-ajv";
-import type { JsonValue } from "@form/core";
+import { createFormEnvironment, definePlugin, defineRuleFunction, defineWidget } from "@xunserver-jsf/core/extension";
+import { AJV_VALIDATOR_KEY, createAjvValidator } from "@xunserver-jsf/validator-ajv";
+import type { JsonValue } from "@xunserver-jsf/core";
 
 export const currencyWidget = defineWidget({
   name: "company.currency",

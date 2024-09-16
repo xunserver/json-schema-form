@@ -1,5 +1,5 @@
 import { Form } from "antd";
-import type { FieldChromeAdapter } from "@form/react";
+import type { FieldChromeAdapter } from "@xunserver-jsf/react";
 
 export const antdFieldChrome: FieldChromeAdapter = {
   render(input) {

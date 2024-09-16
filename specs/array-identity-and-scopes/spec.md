@@ -184,7 +184,7 @@ Advanced Runtime API 必须（SHALL）提供 readonly array order/item/current-b
 - **THEN** 公共类型与运行时只读边界拒绝该修改，Form values、identity 和 version 均不变化
 
 ### Requirement: RenderScope 是公开只读的实例定位契约
-Advanced Runtime API 必须（SHALL）从 `@form/core/runtime` 公开只读 `RenderScope` 契约与 `getRenderScope()`：可从 `FormInstance`（root scope）、`FormInstance.scope()` 及 `ArrayInstance.item()` 返回的 `ScopedFormInstance` 取得。`RenderScope` 必须（MUST）暴露自身 `InstanceBinding`、把相对或绝对 `ModelPathLike` 解析为当前 `InstancePath` 的只读解析能力，以及按当前 index 或 `ArrayItemId` 派生 array item scope 的能力；它不得（MUST NOT）暴露 values writer、command、Store、`RuntimeNodeId` 或可变 binding table。Root scope 的 binding 必须（MUST）以 root `InstancePath` 与空 `ArrayItemId` chain 表示且永不 stale。
+Advanced Runtime API 必须（SHALL）从 `@xunserver-jsf/core/runtime` 公开只读 `RenderScope` 契约与 `getRenderScope()`：可从 `FormInstance`（root scope）、`FormInstance.scope()` 及 `ArrayInstance.item()` 返回的 `ScopedFormInstance` 取得。`RenderScope` 必须（MUST）暴露自身 `InstanceBinding`、把相对或绝对 `ModelPathLike` 解析为当前 `InstancePath` 的只读解析能力，以及按当前 index 或 `ArrayItemId` 派生 array item scope 的能力；它不得（MUST NOT）暴露 values writer、command、Store、`RuntimeNodeId` 或可变 binding table。Root scope 的 binding 必须（MUST）以 root `InstancePath` 与空 `ArrayItemId` chain 表示且永不 stale。
 
 #### Scenario: 在 item scope 中解析模板 ModelPath
 - **GIVEN** 通过 `form.array("products").item({ id })` 取得 `RenderScope`

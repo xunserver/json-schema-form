@@ -77,42 +77,42 @@ const prerequisites: PrerequisiteRecord[] = [
     id: "PRE-WIDGET-HELPER",
     status: "resolved",
     owner: o("compile-static-form-model", "core-plugin-environment", "defineWidget 是无副作用的 Widget authoring helper", "保留自定义 Widget identity 与 literal"),
-    publicEntry: "@form/core/extension",
+    publicEntry: "@xunserver-jsf/core/extension",
     evidenceIds: ["V1-PRE-WIDGET-HELPER"],
   },
   {
     id: "PRE-RENDER-BINDING",
     status: "resolved",
     owner: o("add-renderer-interaction-and-binding-ports", "array-identity-and-scopes", "RenderScope 是公开只读的实例定位契约", "RenderScope 不提供 writer"),
-    publicEntry: "@form/core/runtime",
+    publicEntry: "@xunserver-jsf/core/runtime",
     evidenceIds: ["V1-PRE-RENDER-BINDING"],
   },
   {
     id: "PRE-BLUR-PORT",
     status: "resolved",
     owner: o("add-renderer-interaction-and-binding-ports", "transactional-form-runtime", "基础 value 与交互命令具有明确语义", "blur 清除目标 View 的 focused"),
-    publicEntry: "@form/core",
+    publicEntry: "@xunserver-jsf/core",
     evidenceIds: ["V1-PRE-BLUR-PORT"],
   },
   {
     id: "PRE-WIDGET-INTERACTION",
     status: "resolved",
     owner: o("compile-static-form-model", "core-plugin-environment", "WidgetDefinition 声明框架无关的 semantic interaction contract", "默认 Widget 提供完整 semantic action capability"),
-    publicEntry: "@form/core/extension",
+    publicEntry: "@xunserver-jsf/core/extension",
     evidenceIds: ["V1-PRE-WIDGET-INTERACTION"],
   },
   {
     id: "PRE-REQUIRED-PRESENTATION",
     status: "resolved",
     owner: o("add-renderer-interaction-and-binding-ports", "rules-and-schema-dynamics", "effective状态具有固定组合优先级且active不等于visible", "静态required直接投影"),
-    publicEntry: "@form/core",
+    publicEntry: "@xunserver-jsf/core",
     evidenceIds: ["V1-PRE-REQUIRED-PRESENTATION"],
   },
   {
     id: "PRE-VIEW-STATE",
     status: "resolved",
     owner: o("add-renderer-interaction-and-binding-ports", "transactional-form-runtime", "基础 value 与交互命令具有明确语义", "collapsed 与 activeTab 属于具体 View"),
-    publicEntry: "@form/core",
+    publicEntry: "@xunserver-jsf/core",
     evidenceIds: ["V1-PRE-VIEW-STATE"],
   },
   {
@@ -126,17 +126,17 @@ const prerequisites: PrerequisiteRecord[] = [
     id: "PRE-CONTRIBUTION-PORTS",
     status: "resolved",
     owner: o("align-core-contributions-and-layout", "core-plugin-environment", "Rule Function 与Serializer provider是纯同步只读边界", "Plugin注册dialect、extension与initializer providers"),
-    publicEntry: "@form/core/extension",
+    publicEntry: "@xunserver-jsf/core/extension",
     evidenceIds: ["V1-PRE-CONTRIBUTION-PORTS"],
   },
 ];
 
 const packages = [
-  "@form/core",
-  "@form/validator-ajv",
-  "@form/vue",
-  "@form/react",
-  "@form/element-plus",
+  "@xunserver-jsf/core",
+  "@xunserver-jsf/validator-ajv",
+  "@xunserver-jsf/vue",
+  "@xunserver-jsf/react",
+  "@xunserver-jsf/element-plus",
 ].map((name, index) =>
   e(`PKG-0${index + 1}`, 17, index + 1, name, "covered", [o("bootstrap-monorepo-and-contracts", "package-architecture", "首期工作区 package", "发现全部首期 package")], ["V1-WORKSPACE-LAYOUT"]),
 );
@@ -156,15 +156,15 @@ const directories: CatalogEntry[] = [
 ];
 
 const exportsCatalog: CatalogEntry[] = [
-  e("EXP-CORE-ROOT", 16, 1, "@form/core", "covered", [o("compile-static-form-model", "core-public-contracts", "受支持的 export 隔离内部模块", "导入根入口公共契约")], ["V1-EXPORT-SURFACE", "V1-PUBLIC-API-DEFAULT"]),
-  e("EXP-CORE-RUNTIME", 16, 2, "@form/core/runtime", "covered", [o("add-renderer-interaction-and-binding-ports", "core-public-contracts", "受支持的 export 隔离内部模块", "导入受支持的子路径")], ["V1-PRE-RENDER-BINDING", "V1-EXPORT-SURFACE"]),
-  e("EXP-CORE-EXTENSION", 16, 3, "@form/core/extension", "covered", [o("compile-static-form-model", "core-public-contracts", "受支持的 export 隔离内部模块", "导入受支持的extension子路径")], ["V1-PRE-WIDGET-HELPER", "V1-EXPORT-SURFACE"]),
-  e("EXP-VALIDATOR-AJV", 17, 4, "@form/validator-ajv", "covered", [o("add-validation-pipeline", "package-architecture", "AJV具体依赖与实现只属于validator package", "validator-ajv合法依赖AJV与Core")], ["V1-EXPORT-SURFACE"]),
-  e("EXP-VUE", 17, 5, "@form/vue", "covered", [o("add-vue-element-plus-rendering", "package-architecture", "Vue 与 Element Plus 只暴露受支持 Renderer 入口", "应用从根入口组合 Renderer")], ["V1-EXPORT-SURFACE"]),
-  e("EXP-REACT", 17, 6, "@form/react", "covered", [o("add-react-mui-rendering", "package-architecture", "React 与 UI adapter 渲染包只公开受支持入口", "消费者只使用根入口")], ["V1-EXPORT-SURFACE"]),
-  e("EXP-ELEMENT-PLUS", 17, 7, "@form/element-plus", "covered", [o("add-vue-element-plus-rendering", "package-architecture", "Vue 与 Element Plus 只暴露受支持 Renderer 入口", "应用从根入口组合 Renderer")], ["V1-EXPORT-SURFACE"]),
-  e("EXP-ANTD", 17, 8, "@form/antd", "covered", [o("add-react-mui-rendering", "package-architecture", "React 与 UI adapter 渲染包只公开受支持入口", "消费者只使用根入口")], ["V1-EXPORT-SURFACE"]),
-  e("EXP-SHADCN", 17, 10, "@form/shadcn", "covered", [o("add-react-shadcn-adapter", "package-architecture", "React 与 UI adapter 渲染包只公开受支持入口", "消费者只使用根入口")], ["V1-EXPORT-SURFACE"]),
+  e("EXP-CORE-ROOT", 16, 1, "@xunserver-jsf/core", "covered", [o("compile-static-form-model", "core-public-contracts", "受支持的 export 隔离内部模块", "导入根入口公共契约")], ["V1-EXPORT-SURFACE", "V1-PUBLIC-API-DEFAULT"]),
+  e("EXP-CORE-RUNTIME", 16, 2, "@xunserver-jsf/core/runtime", "covered", [o("add-renderer-interaction-and-binding-ports", "core-public-contracts", "受支持的 export 隔离内部模块", "导入受支持的子路径")], ["V1-PRE-RENDER-BINDING", "V1-EXPORT-SURFACE"]),
+  e("EXP-CORE-EXTENSION", 16, 3, "@xunserver-jsf/core/extension", "covered", [o("compile-static-form-model", "core-public-contracts", "受支持的 export 隔离内部模块", "导入受支持的extension子路径")], ["V1-PRE-WIDGET-HELPER", "V1-EXPORT-SURFACE"]),
+  e("EXP-VALIDATOR-AJV", 17, 4, "@xunserver-jsf/validator-ajv", "covered", [o("add-validation-pipeline", "package-architecture", "AJV具体依赖与实现只属于validator package", "validator-ajv合法依赖AJV与Core")], ["V1-EXPORT-SURFACE"]),
+  e("EXP-VUE", 17, 5, "@xunserver-jsf/vue", "covered", [o("add-vue-element-plus-rendering", "package-architecture", "Vue 与 Element Plus 只暴露受支持 Renderer 入口", "应用从根入口组合 Renderer")], ["V1-EXPORT-SURFACE"]),
+  e("EXP-REACT", 17, 6, "@xunserver-jsf/react", "covered", [o("add-react-mui-rendering", "package-architecture", "React 与 UI adapter 渲染包只公开受支持入口", "消费者只使用根入口")], ["V1-EXPORT-SURFACE"]),
+  e("EXP-ELEMENT-PLUS", 17, 7, "@xunserver-jsf/element-plus", "covered", [o("add-vue-element-plus-rendering", "package-architecture", "Vue 与 Element Plus 只暴露受支持 Renderer 入口", "应用从根入口组合 Renderer")], ["V1-EXPORT-SURFACE"]),
+  e("EXP-ANTD", 17, 8, "@xunserver-jsf/antd", "covered", [o("add-react-mui-rendering", "package-architecture", "React 与 UI adapter 渲染包只公开受支持入口", "消费者只使用根入口")], ["V1-EXPORT-SURFACE"]),
+  e("EXP-SHADCN", 17, 10, "@xunserver-jsf/shadcn", "covered", [o("add-react-shadcn-adapter", "package-architecture", "React 与 UI adapter 渲染包只公开受支持入口", "消费者只使用根入口")], ["V1-EXPORT-SURFACE"]),
   e("EXP-DEEP-IMPORT-DENY", 16, 9, "undeclared deep import deny", "covered", [o("compile-static-form-model", "core-public-contracts", "受支持的 export 隔离内部模块", "拒绝内部 deep import")], ["V1-EXPORT-DEEP-DENY"]),
 ];
 

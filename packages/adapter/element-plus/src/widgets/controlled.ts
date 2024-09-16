@@ -1,4 +1,4 @@
-import { FULL_WIDGET_INTERACTION, type WidgetCapabilities } from "@form/core/extension";
+import { FULL_WIDGET_INTERACTION, type WidgetCapabilities } from "@xunserver-jsf/core/extension";
 import {
   freezeAdapterDiagnostic,
   RENDERER_DIAGNOSTIC_CODES,
@@ -6,7 +6,7 @@ import {
   type ValueCodec,
   type WidgetBinding,
   type WidgetRenderInput,
-} from "@form/vue";
+} from "@xunserver-jsf/vue";
 import { h, type Component } from "vue";
 import { mapElementPlusProps } from "./mapper.js";
 

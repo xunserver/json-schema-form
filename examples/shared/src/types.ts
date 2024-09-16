@@ -1,4 +1,4 @@
-import type { Diagnostic, FormDefinition, FormInstance, JsonValue } from "@form/core";
+import type { Diagnostic, FormDefinition, FormInstance, JsonValue } from "@xunserver-jsf/core";
 
 export interface CatalogExampleMeta {
   readonly id: string;

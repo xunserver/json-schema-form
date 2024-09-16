@@ -1,13 +1,13 @@
 import { describe, expect, test } from "vitest";
-import { compileForm, createForm, createFormEngine, defineForm } from "@form/core";
-import { createFormEnvironment } from "@form/core/extension";
+import { compileForm, createForm, createFormEngine, defineForm } from "@xunserver-jsf/core";
+import { createFormEnvironment } from "@xunserver-jsf/core/extension";
 import {
   formSelector,
   getRuntimeSnapshot,
   observeRuntimeDiagnostics,
   subscribeRuntime,
   valueSelector,
-} from "@form/core/runtime";
+} from "@xunserver-jsf/core/runtime";
 
 const definition = defineForm({
   schema: {

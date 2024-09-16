@@ -10,9 +10,9 @@ import {
   presentableErrorSelector,
   subscribeRuntime,
   valueSelector,
-} from "@form/core/runtime";
-import type { ArrayIdentityResolver, InstanceBinding, RenderScope } from "@form/core/runtime";
-import { compileForm, createForm, defineForm } from "@form/core";
+} from "@xunserver-jsf/core/runtime";
+import type { ArrayIdentityResolver, InstanceBinding, RenderScope } from "@xunserver-jsf/core/runtime";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 
 const form = createForm(
   compileForm(

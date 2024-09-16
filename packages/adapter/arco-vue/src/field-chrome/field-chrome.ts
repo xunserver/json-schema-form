@@ -1,6 +1,6 @@
 import { FormItem } from "@arco-design/web-vue";
 import { h } from "vue";
-import type { FieldChromeAdapter } from "@form/vue";
+import type { FieldChromeAdapter } from "@xunserver-jsf/vue";
 
 export const arcoVueFieldChrome: FieldChromeAdapter = {
   render(input) {

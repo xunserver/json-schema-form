@@ -1,4 +1,4 @@
-import { defineValidator, type SchemaAdapterDefinition } from "@form/core/extension";
+import { defineValidator, type SchemaAdapterDefinition } from "@xunserver-jsf/core/extension";
 import { AjvValidatorAdapter } from "./ajv-validator-adapter.js";
 
 export const AJV_VALIDATOR_KEY = "ajv-2020";

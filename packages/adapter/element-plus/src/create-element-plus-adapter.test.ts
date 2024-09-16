@@ -1,6 +1,6 @@
-import { compileForm, createForm, defineForm } from "@form/core";
-import { createFormEnvironment, definePlugin, defineWidget } from "@form/core/extension";
-import { createVueRendererEnvironment } from "@form/vue";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
+import { createFormEnvironment, definePlugin, defineWidget } from "@xunserver-jsf/core/extension";
+import { createVueRendererEnvironment } from "@xunserver-jsf/vue";
 import { describe, expect, test } from "vitest";
 import { ELEMENT_PLUS_ADAPTER_ID, createElementPlusAdapter, elementPlusAdapter, extendElementPlusAdapter } from "./index.js";
 import { h } from "vue";

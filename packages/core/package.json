@@ -1,9 +1,29 @@
 {
-  "name": "@form/core",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@xunserver-jsf/core",
+  "version": "1.0.1",
+  "description": "Framework-agnostic JSON Schema form engine: definition, compile, transactional runtime, and validation.",
+  "keywords": [
+    "json-schema",
+    "form",
+    "compiler",
+    "runtime",
+    "validation"
+  ],
+  "license": "MIT",
+  "author": "xunserver",
+  "homepage": "https://xunserver.github.io/json-schema-form/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xunserver/json-schema-form.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/xunserver/json-schema-form/issues"
+  },
   "type": "module",
   "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -18,8 +38,14 @@
       "import": "./dist/extension/index.js"
     }
   },
-  "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false"

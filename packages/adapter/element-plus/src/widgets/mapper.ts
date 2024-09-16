@@ -1,5 +1,5 @@
-import type { Diagnostic } from "@form/core";
-import { RENDERER_DIAGNOSTIC_CODES, RendererAdapterError, type WidgetRenderInput } from "@form/vue";
+import type { Diagnostic } from "@xunserver-jsf/core";
+import { RENDERER_DIAGNOSTIC_CODES, RendererAdapterError, type WidgetRenderInput } from "@xunserver-jsf/vue";
 
 export const ELEMENT_PLUS_NAMESPACE = "element-plus";
 

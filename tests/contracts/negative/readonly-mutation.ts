@@ -1,4 +1,4 @@
-import type { CompiledFormModel } from "@form/core";
+import type { CompiledFormModel } from "@xunserver-jsf/core";
 
 declare const model: CompiledFormModel;
 

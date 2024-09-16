@@ -4,14 +4,14 @@ import {
   defineForm,
   type ValidationError,
   type ValidationResult,
-} from "@form/core";
+} from "@xunserver-jsf/core";
 import {
   createFormEnvironment,
   definePlugin,
   defineValidator,
-} from "@form/core/extension";
-import { presentableErrorSelector, subscribeRuntime } from "@form/core/runtime";
-import { AJV_VALIDATOR_KEY, createAjvValidator } from "@form/validator-ajv";
+} from "@xunserver-jsf/core/extension";
+import { presentableErrorSelector, subscribeRuntime } from "@xunserver-jsf/core/runtime";
+import { AJV_VALIDATOR_KEY, createAjvValidator } from "@xunserver-jsf/validator-ajv";
 
 const uniqueEmail = defineValidator({
   name: "company.unique-email",

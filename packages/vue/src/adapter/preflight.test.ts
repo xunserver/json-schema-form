@@ -1,4 +1,4 @@
-import { compileForm, createForm, defineForm } from "@form/core";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { describe, expect, test } from "vitest";
 import { createVueRendererEnvironment } from "./create-environment.js";
 import { RendererCapabilityError } from "./errors.js";

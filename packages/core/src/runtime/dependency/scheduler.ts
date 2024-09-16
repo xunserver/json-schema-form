@@ -21,7 +21,7 @@ export interface DependencyScheduleInput {
 
 /**
  * Transaction-owned dependency scheduler.
- * Internal only — must not be exported from @form/core public barrels.
+ * Internal only — must not be exported from @xunserver-jsf/core public barrels.
  */
 export class DependencyScheduler {
   private readonly rulesById: ReadonlyMap<string, CompiledRule>;

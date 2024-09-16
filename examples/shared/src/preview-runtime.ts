@@ -1,5 +1,5 @@
-import type { Diagnostic, FormInstance, JsonValue } from "@form/core";
-import { formSelector, observeRuntimeDiagnostics, subscribeRuntime } from "@form/core/runtime";
+import type { Diagnostic, FormInstance, JsonValue } from "@xunserver-jsf/core";
+import { formSelector, observeRuntimeDiagnostics, subscribeRuntime } from "@xunserver-jsf/core/runtime";
 import { createDemoEnvironment } from "./environment.js";
 import {
   isParentToPreviewMessage,

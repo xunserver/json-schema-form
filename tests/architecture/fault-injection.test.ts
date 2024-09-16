@@ -31,7 +31,7 @@ describe("fault injection commands", () => {
 
     const result = runBoundaryCheck(root);
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("@form/core");
+    expect(result.stderr).toContain("@xunserver-jsf/core");
     expect(result.stderr).toContain("ajv");
     expect(result.stderr).toContain(RULE.forbiddenCorePackage);
   });
@@ -39,13 +39,13 @@ describe("fault injection commands", () => {
   test("reverse dependency fails the boundary command", () => {
     const root = copyRepoPackages();
     mutateManifest(root, "core", (manifest) => {
-      manifest.dependencies = { "@form/vue": "workspace:*" };
+      manifest.dependencies = { "@xunserver-jsf/vue": "workspace:*" };
     });
 
     const result = runBoundaryCheck(root);
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("@form/core");
-    expect(result.stderr).toContain("@form/vue");
+    expect(result.stderr).toContain("@xunserver-jsf/core");
+    expect(result.stderr).toContain("@xunserver-jsf/vue");
     expect(result.stderr).toContain(RULE.reverseDependency);
   });
 
@@ -54,14 +54,14 @@ describe("fault injection commands", () => {
     mutateManifest(root, "adapter/antd", (manifest) => {
       manifest.dependencies = {
         ...manifest.dependencies,
-        "@form/element-plus": "workspace:*",
+        "@xunserver-jsf/element-plus": "workspace:*",
       };
     });
 
     const result = runBoundaryCheck(root);
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("@form/antd");
-    expect(result.stderr).toContain("@form/element-plus");
+    expect(result.stderr).toContain("@xunserver-jsf/antd");
+    expect(result.stderr).toContain("@xunserver-jsf/element-plus");
     expect(result.stderr).toContain(RULE.crossFrameworkDependency);
   });
 
@@ -76,7 +76,7 @@ describe("fault injection commands", () => {
 
     const result = runBoundaryCheck(root);
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("@form/react");
+    expect(result.stderr).toContain("@xunserver-jsf/react");
     expect(result.stderr).toContain("react");
     expect(result.stderr).toContain(RULE.hostPeerPlacement);
   });
@@ -92,7 +92,7 @@ describe("fault injection commands", () => {
 
     const result = runBoundaryCheck(root);
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("@form/antd");
+    expect(result.stderr).toContain("@xunserver-jsf/antd");
     expect(result.stderr).toContain("@mui/x-date-pickers");
     expect(result.stderr).toContain(RULE.forbiddenMuiXPackage);
   });

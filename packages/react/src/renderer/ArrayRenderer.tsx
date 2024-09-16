@@ -1,5 +1,5 @@
-import type { ArrayView } from "@form/core";
-import type { RenderScope } from "@form/core/runtime";
+import type { ArrayView } from "@xunserver-jsf/core";
+import type { RenderScope } from "@xunserver-jsf/core/runtime";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 import { wrapAdapterCall } from "../adapter/runtime-error.js";

@@ -1,6 +1,6 @@
 import { useId } from "vue";
 import { useRendererContext } from "../context/renderer-context.js";
-import type { ArrayItemId, ViewNodeId } from "@form/core";
+import type { ArrayItemId, ViewNodeId } from "@xunserver-jsf/core";
 import type { FieldDomIds } from "../adapter/types.js";
 
 export function useFormIdPrefix(explicit?: string): string {

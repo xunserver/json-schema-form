@@ -7,7 +7,7 @@
 ## Requirements
 
 ### Requirement: Plugin authoring 描述框架无关的逻辑贡献
-Core 必须（SHALL）从 `@form/core/extension` 暴露无副作用的 `definePlugin()` 与只读 Plugin contract。Plugin 必须（MUST）具有稳定 ID，并且可以声明 Widget、Schema Dialect、Schema Extension、Rule Function、Validator、Serializer、Value Initializer 和只读 Instrumentation contribution；这些 contribution 不得（MUST NOT）包含 framework component、DOM event、UI library 类型或 Runtime instance state。
+Core 必须（SHALL）从 `@xunserver-jsf/core/extension` 暴露无副作用的 `definePlugin()` 与只读 Plugin contract。Plugin 必须（MUST）具有稳定 ID，并且可以声明 Widget、Schema Dialect、Schema Extension、Rule Function、Validator、Serializer、Value Initializer 和只读 Instrumentation contribution；这些 contribution 不得（MUST NOT）包含 framework component、DOM event、UI library 类型或 Runtime instance state。
 
 #### Scenario: 声明包含多类 contribution 的 Plugin
 - **GIVEN** 扩展作者提供唯一 Plugin ID 以及 Widget、Rule Function 和 Validator contribution
@@ -20,7 +20,7 @@ Core 必须（SHALL）从 `@form/core/extension` 暴露无副作用的 `definePl
 - **THEN** Core Extension contract 不提供承载该 binding 的标准成员
 
 ### Requirement: Environment 通过显式输入构建
-Core 必须（SHALL）从 `@form/core/extension` 暴露 `createFormEnvironment()`，仅从本次调用的 Plugin 与配置构建 Core Registry，不得（MUST NOT）读取或修改 global singleton registry。Core 必须（SHALL）同时提供不安装用户 Plugin 的默认 Environment，以支持后续 Application API 短路径。
+Core 必须（SHALL）从 `@xunserver-jsf/core/extension` 暴露 `createFormEnvironment()`，仅从本次调用的 Plugin 与配置构建 Core Registry，不得（MUST NOT）读取或修改 global singleton registry。Core 必须（SHALL）同时提供不安装用户 Plugin 的默认 Environment，以支持后续 Application API 短路径。
 
 #### Scenario: 构建显式 Environment
 - **GIVEN** 调用者提供一组业务 Plugin
@@ -141,7 +141,7 @@ Environment build 成功后，Environment、Plugin 清单与所有公开 Registr
 - **THEN** metadata 可用于定位问题但不能通过公共类型被修改
 
 ### Requirement: defineRuleFunction 是无副作用authoring helper
-Core必须（SHALL）从`@form/core/extension`暴露`defineRuleFunction()`，保留Rule Function descriptor的name、同步provider和具体参数/结果类型。该helper必须（MUST）返回输入identity，不安装function、不构建Environment、不执行provider，也不得（MUST NOT）读写global Registry。
+Core必须（SHALL）从`@xunserver-jsf/core/extension`暴露`defineRuleFunction()`，保留Rule Function descriptor的name、同步provider和具体参数/结果类型。该helper必须（MUST）返回输入identity，不安装function、不构建Environment、不执行provider，也不得（MUST NOT）读写global Registry。
 
 #### Scenario: 声明named Rule Function
 - **GIVEN** extension author提供唯一name和同步pure provider
@@ -195,7 +195,7 @@ Environment build必须（MUST）校验`ruleFunctions`、`serializers`、`schema
 - **THEN** build以稳定Diagnostic失败并指出keyword与Plugin ID，Registry不发布该contribution
 
 ### Requirement: defineWidget 是无副作用的 Widget authoring helper
-Core 必须（SHALL）只从 `@form/core/extension` 暴露泛型 `defineWidget()`，并在保留输入对象 identity 与 literal inference 的同时返回同一个 `WidgetDefinition`。该 helper 不得（MUST NOT）安装、复制、冻结或执行 Widget，不得（MUST NOT）读取或修改 global Registry；Widget contribution 的安装、owned snapshot、冻结、显式 override 与 key 冲突必须（MUST）继续只发生在 `createFormEnvironment()` 构建阶段。
+Core 必须（SHALL）只从 `@xunserver-jsf/core/extension` 暴露泛型 `defineWidget()`，并在保留输入对象 identity 与 literal inference 的同时返回同一个 `WidgetDefinition`。该 helper 不得（MUST NOT）安装、复制、冻结或执行 Widget，不得（MUST NOT）读取或修改 global Registry；Widget contribution 的安装、owned snapshot、冻结、显式 override 与 key 冲突必须（MUST）继续只发生在 `createFormEnvironment()` 构建阶段。
 
 #### Scenario: 保留自定义 Widget identity 与 literal
 - **GIVEN** 扩展作者传入一个包含 literal name、value contract、interaction contract 与 matcher 的普通对象
@@ -231,7 +231,7 @@ Core 必须（SHALL）只从 `@form/core/extension` 暴露泛型 `defineWidget()
 - **THEN** 产生归 Adapter owner 的结构化 capability Diagnostic，且不得用 native event、直接 values 写入或省略动作来冒充兼容
 
 ### Requirement: defineValidator是无副作用authoring helper
-Core必须（SHALL）从`@form/core/extension`暴露`defineValidator()`，保留named Validator或Schema Validator Adapter descriptor的literal name、kind、capabilities与provider类型。该helper必须（MUST）返回输入identity，不执行provider、不安装contribution、不构建Environment，也不得（MUST NOT）读取或修改global Registry。
+Core必须（SHALL）从`@xunserver-jsf/core/extension`暴露`defineValidator()`，保留named Validator或Schema Validator Adapter descriptor的literal name、kind、capabilities与provider类型。该helper必须（MUST）返回输入identity，不执行provider、不安装contribution、不构建Environment，也不得（MUST NOT）读取或修改global Registry。
 
 #### Scenario: 声明named validator
 - **GIVEN** extension author提供唯一name、validator kind与对应provider

@@ -6,7 +6,7 @@ import {
   defineValidator,
   defineWidget,
   EnvironmentBuildError,
-} from "@form/core/extension";
+} from "@xunserver-jsf/core/extension";
 import type {
   DialectConvertResult,
   FormEnvironment,
@@ -17,7 +17,7 @@ import type {
   ValueInitializerDefinition,
   WidgetDefinition,
   WidgetInteractionContract,
-} from "@form/core/extension";
+} from "@xunserver-jsf/core/extension";
 
 export const dialect: SchemaDialectDefinition = {
   name: "draft-07",

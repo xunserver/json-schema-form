@@ -1,4 +1,4 @@
-import type { ObjectView } from "@form/core";
+import type { ObjectView } from "@xunserver-jsf/core";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
 import { wrapAdapterCall } from "../adapter/runtime-error.js";

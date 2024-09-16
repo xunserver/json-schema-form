@@ -1,16 +1,16 @@
 # Plugin 与扩展
 
-扩展通过冻结 Registry 注册能力，不得绕过 TransactionManager，也不得修改 Compiled Model。类型只从 `@form/core/extension` 导出。
+扩展通过冻结 Registry 注册能力，不得绕过 TransactionManager，也不得修改 Compiled Model。类型只从 `@xunserver-jsf/core/extension` 导出。
 
 ```ts
-import { compileForm, CompileError, defineForm } from "@form/core";
+import { compileForm, CompileError, defineForm } from "@xunserver-jsf/core";
 import {
   createFormEnvironment,
   definePlugin,
   defineRuleFunction,
   defineWidget,
   EnvironmentBuildError,
-} from "@form/core/extension";
+} from "@xunserver-jsf/core/extension";
 
 const definition = defineForm({
   schema: {

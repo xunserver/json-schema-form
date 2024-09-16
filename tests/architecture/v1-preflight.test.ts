@@ -1,12 +1,12 @@
 import { describe, expect, test } from "vitest";
-import { compileForm, createForm, createFormEngine, defineForm } from "@form/core";
+import { compileForm, createForm, createFormEngine, defineForm } from "@xunserver-jsf/core";
 import {
   BUILTIN_WIDGET_KEYS,
   FULL_WIDGET_INTERACTION,
   createFormEnvironment,
   defineWidget,
-} from "@form/core/extension";
-import { getRenderScope } from "@form/core/runtime";
+} from "@xunserver-jsf/core/extension";
+import { getRenderScope } from "@xunserver-jsf/core/runtime";
 import { checkArchitecture } from "../../tools/architecture-check/check.js";
 import { RULE } from "../../tools/architecture-check/policy.js";
 import { REPO_ROOT } from "../lib/fs.js";
@@ -87,7 +87,7 @@ describe("v1 blocking prerequisites", () => {
   });
 
   test("V1-PRE-CONTRIBUTION-PORTS dialect and initializer contracts are extension-owned", async () => {
-    const extension = await import("@form/core/extension");
+    const extension = await import("@xunserver-jsf/core/extension");
     expect("SchemaDialectDefinition" in extension || true).toBe(true);
     expect(typeof extension.definePlugin).toBe("function");
     const engine = createFormEngine();

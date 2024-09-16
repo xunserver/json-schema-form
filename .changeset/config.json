@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "fixed": [
+    [
+      "@xunserver-jsf/core",
+      "@xunserver-jsf/validator-ajv",
+      "@xunserver-jsf/vue",
+      "@xunserver-jsf/react",
+      "@xunserver-jsf/element-plus",
+      "@xunserver-jsf/antd",
+      "@xunserver-jsf/arco-vue",
+      "@xunserver-jsf/arco-react",
+      "@xunserver-jsf/shadcn"
+    ]
+  ],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "master",
+  "updateInternalDependencies": "patch",
+  "ignore": ["@xunserver-jsf/example-playground", "@xunserver-jsf/example-shared"]
+}

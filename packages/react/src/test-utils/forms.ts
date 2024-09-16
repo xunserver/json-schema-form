@@ -1,5 +1,5 @@
-import { compileForm, createForm, defineForm, type FormInstance } from "@form/core";
-import type { UISchema } from "@form/core";
+import { compileForm, createForm, defineForm, type FormInstance } from "@xunserver-jsf/core";
+import type { UISchema } from "@xunserver-jsf/core";
 
 export function createPersonForm(initialValues?: unknown, uiSchema?: UISchema): FormInstance {
   return createForm(

@@ -4,8 +4,8 @@ import type {
   Diagnostic,
   FormDefinition,
   JsonSchema,
-} from "@form/core";
-import { CompileError, defineForm } from "@form/core";
+} from "@xunserver-jsf/core";
+import { CompileError, defineForm } from "@xunserver-jsf/core";
 
 export const schema: JsonSchema = {
   type: "object",

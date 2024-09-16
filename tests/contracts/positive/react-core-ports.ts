@@ -9,11 +9,11 @@ import {
   presentableErrorSelector,
   subscribeRuntime,
   viewSelector,
-} from "@form/core/runtime";
-import type { InstanceBinding, RenderScope } from "@form/core/runtime";
-import { compileForm, createForm, defineForm } from "@form/core";
-import { defineWidget, FULL_WIDGET_INTERACTION } from "@form/core/extension";
-import type { SemanticActions, WidgetRenderInput } from "@form/react";
+} from "@xunserver-jsf/core/runtime";
+import type { InstanceBinding, RenderScope } from "@xunserver-jsf/core/runtime";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
+import { defineWidget, FULL_WIDGET_INTERACTION } from "@xunserver-jsf/core/extension";
+import type { SemanticActions, WidgetRenderInput } from "@xunserver-jsf/react";
 
 const form = createForm(
   compileForm(

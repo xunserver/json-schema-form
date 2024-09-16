@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { compileV1, fieldViewId } from "../fixtures/v1/index.js";
-import { getRenderScope, getRuntimeSnapshot, viewSelector } from "@form/core/runtime";
+import { getRenderScope, getRuntimeSnapshot, viewSelector } from "@xunserver-jsf/core/runtime";
 
 describe("v1 array identity across capabilities", () => {
   test("V1-ARRAY-MOVE-STATE follows ArrayItemId through move remove replace and reset", async () => {

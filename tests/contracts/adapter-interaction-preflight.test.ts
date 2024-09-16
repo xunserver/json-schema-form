@@ -1,13 +1,13 @@
 import { describe, expect, test } from "vitest";
-import { compileForm, defineForm } from "@form/core";
-import type { Diagnostic } from "@form/core";
+import { compileForm, defineForm } from "@xunserver-jsf/core";
+import type { Diagnostic } from "@xunserver-jsf/core";
 import {
   createFormEnvironment,
   definePlugin,
   defineWidget,
   FULL_WIDGET_INTERACTION,
-} from "@form/core/extension";
-import type { WidgetDefinition, WidgetInteractionContract, WidgetSemanticAction } from "@form/core/extension";
+} from "@xunserver-jsf/core/extension";
+import type { WidgetDefinition, WidgetInteractionContract, WidgetSemanticAction } from "@xunserver-jsf/core/extension";
 
 interface RecordingBinding {
   readonly widget: string;

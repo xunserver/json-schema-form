@@ -1,6 +1,6 @@
-import { createReactRendererEnvironment } from "@form/react";
-import { createShadcnAdapter, extendShadcnAdapter } from "@form/shadcn";
-import type { WidgetRenderInput } from "@form/react";
+import { createReactRendererEnvironment } from "@xunserver-jsf/react";
+import { createShadcnAdapter, extendShadcnAdapter } from "@xunserver-jsf/shadcn";
+import type { WidgetRenderInput } from "@xunserver-jsf/react";
 import { previewShadcnComponents } from "./components.js";
 
 export function createDemoRendererEnvironment() {

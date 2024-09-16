@@ -21,7 +21,7 @@ describe("consumer export isolation", () => {
       consumerOptions,
     );
     expect(diagnostics.length).toBeGreaterThan(0);
-    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@form\/core\/src\/compiler\/compile-form\.js'/);
+    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@xunserver-jsf\/core\/src\/compiler\/compile-form\.js'/);
   });
 
   test("rejects Advanced Runtime factories from the public root", () => {
@@ -42,7 +42,7 @@ describe("consumer export isolation", () => {
     );
     expect(diagnostics.length).toBeGreaterThan(0);
     expect(formatDiagnostics(diagnostics)).toMatch(
-      /Cannot find module '@form\/core\/src\/runtime\/form-runtime\.js'/,
+      /Cannot find module '@xunserver-jsf\/core\/src\/runtime\/form-runtime\.js'/,
     );
   });
   test("rejects contribution contracts from the runtime entry", () => {
@@ -126,7 +126,7 @@ describe("consumer export isolation", () => {
       consumerOptions,
     );
     expect(diagnostics.length).toBeGreaterThan(0);
-    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@form\/vue\/src\/renderer\/FormRenderer\.js'/);
+    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@xunserver-jsf\/vue\/src\/renderer\/FormRenderer\.js'/);
   });
 
   test("rejects Element Plus internal deep imports", () => {
@@ -136,7 +136,7 @@ describe("consumer export isolation", () => {
     );
     expect(diagnostics.length).toBeGreaterThan(0);
     expect(formatDiagnostics(diagnostics)).toMatch(
-      /Cannot find module '@form\/element-plus\/src\/widgets\/mapper\.js'/,
+      /Cannot find module '@xunserver-jsf\/element-plus\/src\/widgets\/mapper\.js'/,
     );
   });
 
@@ -146,7 +146,7 @@ describe("consumer export isolation", () => {
       consumerOptions,
     );
     expect(diagnostics.length).toBeGreaterThan(0);
-    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@form\/react\/src\/renderer\/FormRenderer\.js'/);
+    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@xunserver-jsf\/react\/src\/renderer\/FormRenderer\.js'/);
   });
 
   test("rejects Ant Design internal deep imports", () => {
@@ -155,7 +155,7 @@ describe("consumer export isolation", () => {
       consumerOptions,
     );
     expect(diagnostics.length).toBeGreaterThan(0);
-    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@form\/antd\/src\/widgets\/mapper\.js'/);
+    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@xunserver-jsf\/antd\/src\/widgets\/mapper\.js'/);
   });
 
   test("rejects shadcn internal deep imports", () => {
@@ -164,7 +164,7 @@ describe("consumer export isolation", () => {
       consumerOptions,
     );
     expect(diagnostics.length).toBeGreaterThan(0);
-    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@form\/shadcn\/src\/widgets\/mapper\.js'/);
+    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@xunserver-jsf\/shadcn\/src\/widgets\/mapper\.js'/);
   });
 
   test("rejects React types from Vue packages", () => {

@@ -1,10 +1,10 @@
-import type { FormInstance } from "@form/core";
+import type { FormInstance } from "@xunserver-jsf/core";
 import {
   getRuntimeSnapshot,
   subscribeRuntime,
   type RuntimeSelector,
   type Unsubscribe,
-} from "@form/core/runtime";
+} from "@xunserver-jsf/core/runtime";
 import { onMounted, onScopeDispose, shallowRef, watch, type ShallowRef } from "vue";
 
 const SELECTOR_CACHE = new WeakMap<FormInstance, Map<string, RuntimeSelector<unknown>>>();

@@ -1,4 +1,4 @@
-import type { FieldView } from "@form/core";
+import type { FieldView } from "@xunserver-jsf/core";
 import { useEffect, type ReactNode } from "react";
 import { wrapAdapterCall } from "../adapter/runtime-error.js";
 import type { SemanticActions, WidgetRenderInput } from "../adapter/types.js";

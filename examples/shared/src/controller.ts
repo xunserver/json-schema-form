@@ -1,4 +1,4 @@
-import type { Diagnostic, JsonValue } from "@form/core";
+import type { Diagnostic, JsonValue } from "@xunserver-jsf/core";
 import { exampleToDocument, getCatalogExample, readExampleFromUrl, writeExampleToUrl } from "./catalog.js";
 import { createDemoEnvironment } from "./environment.js";
 import type { PreviewId, WorkbenchDocument, WorkbenchFailureStage } from "./types.js";

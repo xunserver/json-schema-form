@@ -7,7 +7,7 @@
 ## Requirements
 
 ### Requirement: 首期工作区 package
-工作区必须（SHALL）以一个 pnpm/TypeScript monorepo 管理并暴露可构建的 `@form/core`、`@form/validator-ajv`、`@form/vue`、`@form/react` 和 `@form/element-plus` package。工作区可以（MAY）额外包含沿相同边界模式的 UI Adapter package（例如 `@form/antd`、`@form/arco-vue`、`@form/arco-react`），它们必须（MUST）出现在产品依赖 allowlist 中。
+工作区必须（SHALL）以一个 pnpm/TypeScript monorepo 管理并暴露可构建的 `@xunserver-jsf/core`、`@xunserver-jsf/validator-ajv`、`@xunserver-jsf/vue`、`@xunserver-jsf/react` 和 `@xunserver-jsf/element-plus` package。工作区可以（MAY）额外包含沿相同边界模式的 UI Adapter package（例如 `@xunserver-jsf/antd`、`@xunserver-jsf/arco-vue`、`@xunserver-jsf/arco-react`），它们必须（MUST）出现在产品依赖 allowlist 中。
 
 #### Scenario: 发现全部首期 package
 - **GIVEN** 一个已安装工作区依赖的干净 checkout
@@ -20,7 +20,7 @@
 - **THEN** 该 project 继承共享编译契约，并且只解析该 package 显式声明的输入
 
 ### Requirement: Package 依赖方向
-Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@form/validator-ajv` 指向 `@form/core`，`@form/vue` 指向 `@form/core`，`@form/react` 指向 `@form/core`，`@form/element-plus` 指向 `@form/vue` 与 `@form/core`，`@form/antd` 指向 `@form/react` 与 `@form/core`，`@form/arco-vue` 指向 `@form/vue` 与 `@form/core`，`@form/arco-react` 指向 `@form/react` 与 `@form/core`。任何首期或额外 UI Adapter package 都不得（SHALL NOT）引入反向或跨框架产品依赖。
+Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@xunserver-jsf/validator-ajv` 指向 `@xunserver-jsf/core`，`@xunserver-jsf/vue` 指向 `@xunserver-jsf/core`，`@xunserver-jsf/react` 指向 `@xunserver-jsf/core`，`@xunserver-jsf/element-plus` 指向 `@xunserver-jsf/vue` 与 `@xunserver-jsf/core`，`@xunserver-jsf/antd` 指向 `@xunserver-jsf/react` 与 `@xunserver-jsf/core`，`@xunserver-jsf/arco-vue` 指向 `@xunserver-jsf/vue` 与 `@xunserver-jsf/core`，`@xunserver-jsf/arco-react` 指向 `@xunserver-jsf/react` 与 `@xunserver-jsf/core`。任何首期或额外 UI Adapter package 都不得（SHALL NOT）引入反向或跨框架产品依赖。
 
 #### Scenario: 接受合法依赖图
 - **GIVEN** manifest 和 import 只包含允许的产品依赖边
@@ -28,17 +28,17 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **THEN** 依赖图通过检查
 
 #### Scenario: 拒绝反向依赖
-- **GIVEN** `@form/core` 从 `@form/vue` 导入内容或将其声明为依赖
+- **GIVEN** `@xunserver-jsf/core` 从 `@xunserver-jsf/vue` 导入内容或将其声明为依赖
 - **WHEN** 运行 package 边界检查
 - **THEN** 检查失败，并指出违规的源 package 和目标 package
 
 #### Scenario: 拒绝跨框架 Adapter 依赖
-- **GIVEN** `@form/antd` 依赖 `@form/vue` 或 `@form/element-plus`
+- **GIVEN** `@xunserver-jsf/antd` 依赖 `@xunserver-jsf/vue` 或 `@xunserver-jsf/element-plus`
 - **WHEN** 运行 package 边界检查
 - **THEN** 检查失败，并指出不受支持的依赖边
 
 ### Requirement: 框架宿主使用 peer dependency
-框架集成 package 必须（SHALL）将宿主框架和 UI library 要求表达为 peer dependency；工作区内的 `@form/*` 关系必须遵循允许的产品依赖图。
+框架集成 package 必须（SHALL）将宿主框架和 UI library 要求表达为 peer dependency；工作区内的 `@xunserver-jsf/*` 关系必须遵循允许的产品依赖图。
 
 #### Scenario: 检查框架 package manifest
 - **GIVEN** 五个首期 package 与已登记 UI Adapter package 的 manifest
@@ -51,7 +51,7 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **THEN** 检查失败，并指出相关 package 和放置错误的依赖
 
 ### Requirement: Core 独立于框架、DOM、UI library 和 AJV
-`@form/core` 必须（SHALL）能够在其依赖图和源码 import 图不包含 Vue、React、DOM 类型库、具体 UI library 或 AJV 的情况下完成构建和类型检查。
+`@xunserver-jsf/core` 必须（SHALL）能够在其依赖图和源码 import 图不包含 Vue、React、DOM 类型库、具体 UI library 或 AJV 的情况下完成构建和类型检查。
 
 #### Scenario: 在非 DOM 环境验证 Core
 - **GIVEN** Core TypeScript project 使用 ECMAScript library 且不包含 DOM library
@@ -100,10 +100,10 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **THEN** 命令以失败状态退出，并报告足以定位问题的 package、路径和规则信息
 
 ### Requirement: AJV具体依赖与实现只属于validator package
-`@form/validator-ajv`必须（SHALL）作为`@form/core` Validator Adapter协议的叶子实现持有AJV生产依赖，并且只能沿既有`@form/validator-ajv -> @form/core`产品依赖边消费公共契约。`@form/core`及Vue、React、Element Plus 与 UI Adapter package不得（MUST NOT）直接依赖、导入或在公共declaration中引用AJV类型；Core validation行为必须（MUST）在没有AJV package时仍可构建和类型检查。
+`@xunserver-jsf/validator-ajv`必须（SHALL）作为`@xunserver-jsf/core` Validator Adapter协议的叶子实现持有AJV生产依赖，并且只能沿既有`@xunserver-jsf/validator-ajv -> @xunserver-jsf/core`产品依赖边消费公共契约。`@xunserver-jsf/core`及Vue、React、Element Plus 与 UI Adapter package不得（MUST NOT）直接依赖、导入或在公共declaration中引用AJV类型；Core validation行为必须（MUST）在没有AJV package时仍可构建和类型检查。
 
 #### Scenario: validator-ajv合法依赖AJV与Core
-- **GIVEN** `@form/validator-ajv` manifest声明AJV和`@form/core`，源码只从Core受支持入口导入协议
+- **GIVEN** `@xunserver-jsf/validator-ajv` manifest声明AJV和`@xunserver-jsf/core`，源码只从Core受支持入口导入协议
 - **WHEN** 运行workspace build、typecheck和boundary checks
 - **THEN** package成功构建且既有产品依赖方向保持不变
 
@@ -113,10 +113,10 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **THEN** 检查失败并指出违规package、import或declaration边界
 
 ### Requirement: Vue 与 Element Plus 只暴露受支持 Renderer 入口
-`@form/vue` 根入口必须（SHALL）暴露 Vue Renderer components、readonly composables、VueUIAdapter/RendererEnvironment authoring与diagnostic contracts；`@form/element-plus` 根入口必须（SHALL）暴露标准 Element Plus adapter及显式组合/扩展入口。两包的 export map必须（MUST）拒绝未声明 deep import，并不得（MUST NOT）从公共 declarations 泄漏 Core mutable internals、Element Plus private types、React/Ant Design协议或 Universal Renderer抽象。
+`@xunserver-jsf/vue` 根入口必须（SHALL）暴露 Vue Renderer components、readonly composables、VueUIAdapter/RendererEnvironment authoring与diagnostic contracts；`@xunserver-jsf/element-plus` 根入口必须（SHALL）暴露标准 Element Plus adapter及显式组合/扩展入口。两包的 export map必须（MUST）拒绝未声明 deep import，并不得（MUST NOT）从公共 declarations 泄漏 Core mutable internals、Element Plus private types、React/Ant Design协议或 Universal Renderer抽象。
 
 #### Scenario: 应用从根入口组合 Renderer
-- **GIVEN** consumer从 `@form/vue` 导入 `FormRenderer` 和 Vue adapter contracts，并从 `@form/element-plus` 导入标准 adapter
+- **GIVEN** consumer从 `@xunserver-jsf/vue` 导入 `FormRenderer` 和 Vue adapter contracts，并从 `@xunserver-jsf/element-plus` 导入标准 adapter
 - **WHEN** 使用 `<FormRenderer :form="form" :adapter="elementPlusAdapter" />` 类型检查
 - **THEN** import与组件props成立且不需要Core/internal或package deep path
 
@@ -126,7 +126,7 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **THEN** import失败，批准的根入口仍可独立使用
 
 ### Requirement: Vue/Element Plus 依赖与集成验收可重复验证
-`@form/vue` 必须（MUST）只沿产品边依赖 `@form/core` 并把 Vue列为peer；`@form/element-plus` 必须（MUST）只沿产品边依赖 `@form/vue`/`@form/core` 并把 Vue与Element Plus列为peer。仓库验证必须（MUST）包含不依赖具体UI library的headless Vue Renderer contract tests、Element Plus adapter integration tests，以及 `examples/playground` 中使用同一Definition/Plugin/Compiled Model的 Vue + Element Plus 预览；这些验收不得（MUST NOT）要求或导入React/Ant Design实现。
+`@xunserver-jsf/vue` 必须（MUST）只沿产品边依赖 `@xunserver-jsf/core` 并把 Vue列为peer；`@xunserver-jsf/element-plus` 必须（MUST）只沿产品边依赖 `@xunserver-jsf/vue`/`@xunserver-jsf/core` 并把 Vue与Element Plus列为peer。仓库验证必须（MUST）包含不依赖具体UI library的headless Vue Renderer contract tests、Element Plus adapter integration tests，以及 `examples/playground` 中使用同一Definition/Plugin/Compiled Model的 Vue + Element Plus 预览；这些验收不得（MUST NOT）要求或导入React/Ant Design实现。
 
 #### Scenario: headless adapter验证 Renderer契约
 - **GIVEN** 测试提供一个记录调用的最小VueUIAdapter和事务Runtime
@@ -139,30 +139,30 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **THEN** UI只通过semantic commands更新Core，identity/presentable errors/ARIA正确，workspace build/typecheck/test/boundary checks均通过
 
 ### Requirement: React 与 UI adapter 渲染包只公开受支持入口
-`@form/react` 根入口必须（MUST）公开 React renderers、readonly hooks、`ReactUIAdapter` 与 `ReactRendererEnvironment` 的创建/组合契约及结构化 diagnostics。Ant Design 等 UI adapter 通过各自根入口公开冻结 adapter 及其受支持的组合/扩展入口。内部 Context、component factories、registry storage、mapper helpers 与 UI library implementation types 不得（MUST NOT）成为可依赖 deep import；`RenderScope`/`InstanceBinding` 等 Core-owned共享类型必须（MUST）从其 Core owning 入口导入，React包只消费而不得重新定义或建立第二个owner。
+`@xunserver-jsf/react` 根入口必须（MUST）公开 React renderers、readonly hooks、`ReactUIAdapter` 与 `ReactRendererEnvironment` 的创建/组合契约及结构化 diagnostics。Ant Design 等 UI adapter 通过各自根入口公开冻结 adapter 及其受支持的组合/扩展入口。内部 Context、component factories、registry storage、mapper helpers 与 UI library implementation types 不得（MUST NOT）成为可依赖 deep import；`RenderScope`/`InstanceBinding` 等 Core-owned共享类型必须（MUST）从其 Core owning 入口导入，React包只消费而不得重新定义或建立第二个owner。
 
 #### Scenario: 消费者只使用根入口
 - **GIVEN** 外部应用使用 TypeScript NodeNext 编译 React+Ant Design 表单
-- **WHEN** 它从 `@form/react` 与 `@form/antd` 根入口导入公开 API
+- **WHEN** 它从 `@xunserver-jsf/react` 与 `@xunserver-jsf/antd` 根入口导入公开 API
 - **THEN** declarations 与 runtime exports 一致且无需 deep import
 
 #### Scenario: 内部模块不可跨包导入
-- **GIVEN** 消费者或 `@form/antd` 尝试导入 `@form/react` 未导出的内部 Context/registry 文件
+- **GIVEN** 消费者或 `@xunserver-jsf/antd` 尝试导入 `@xunserver-jsf/react` 未导出的内部 Context/registry 文件
 - **WHEN** package exports resolution 执行
 - **THEN** 该 deep import 不可解析，而受支持公开 adapter types 可从根入口解析
 
 ### Requirement: React 与 UI adapter 依赖方向保持单向
-`@form/react` 必须（MUST）只依赖 `@form/core` 并把 React 声明为兼容 peer；`@form/antd` 必须（MUST）只依赖 `@form/core`、`@form/react` 并把 React 与 `antd` 声明为兼容 peer。React、React DOM、Ant Design 等 host runtime 不得（MUST NOT）被打包进库产物，Core 不得（MUST NOT）新增 React/Ant Design/DOM 依赖；默认 adapter 不得（MUST NOT）强制依赖日期对象库。
+`@xunserver-jsf/react` 必须（MUST）只依赖 `@xunserver-jsf/core` 并把 React 声明为兼容 peer；`@xunserver-jsf/antd` 必须（MUST）只依赖 `@xunserver-jsf/core`、`@xunserver-jsf/react` 并把 React 与 `antd` 声明为兼容 peer。React、React DOM、Ant Design 等 host runtime 不得（MUST NOT）被打包进库产物，Core 不得（MUST NOT）新增 React/Ant Design/DOM 依赖；默认 adapter 不得（MUST NOT）强制依赖日期对象库。
 
 #### Scenario: manifest 与产物边界通过
-- **GIVEN** workspace 构建 `@form/react` 与 `@form/antd`
+- **GIVEN** workspace 构建 `@xunserver-jsf/react` 与 `@xunserver-jsf/antd`
 - **WHEN** manifest-policy、bundle/external 与 dependency-boundary 检查运行
-- **THEN** 依赖方向符合白名单，host peers 保持 external，`@form/core` 仍可在无 DOM/React/Ant Design 环境导入
+- **THEN** 依赖方向符合白名单，host peers 保持 external，`@xunserver-jsf/core` 仍可在无 DOM/React/Ant Design 环境导入
 
 #### Scenario: React renderer 可 headless 测试
 - **GIVEN** 测试只提供 React、Core 与一个无 UI library 的 fake ReactUIAdapter
 - **WHEN** 渲染 resolved ViewTree 并驱动语义交互
-- **THEN** `@form/react` 不要求 Ant Design、Vue、Element Plus 或浏览器 validation store 即可工作
+- **THEN** `@xunserver-jsf/react` 不要求 Ant Design、Vue、Element Plus 或浏览器 validation store 即可工作
 
 ### Requirement: React 与 UI adapter 提供完整集成验收入口
 Workspace 必须（MUST）包含 React headless contract、StrictMode subscription cleanup、SSR/hydration、Ant Design 九种 Widget/codec/props/ARIA/layout 集成测试。公开消费者示例是 `examples/playground`；React/Ant Design 端到端行为由 integration tests 覆盖。跨栈验收必须（MUST）复用与 Vue/Element Plus 相同的 Core Definition/Plugin fixture 来比较 values、identity、effective state、validation 与 submit 结果，但不得（MUST NOT）让 React/Ant Design 包导入 Vue 协议或建立 Universal Renderer。
@@ -191,7 +191,7 @@ Workspace 必须（MUST）包含 React headless contract、StrictMode subscripti
 - **THEN** gate 以失败状态指出 package、路径与违反的架构条目，基础单元测试通过也不能覆盖该失败
 
 ### Requirement: v1 gate 保持产品依赖与宿主边界
-完整 v1 门禁必须（MUST）复用并加强既有产品依赖 allowlist：`@form/core` 保持无产品依赖，`@form/validator-ajv`、`@form/vue`、`@form/react` 只指向 Core，UI library package只指向各自 Renderer与Core；Vue、React及UI libraries继续作为对应集成包的 peer，AJV只属于 validator package。Example与test所需host dependencies可以（MAY）位于非发布工作区，但不得（MUST NOT）改变 package产物、declaration或产品依赖图。
+完整 v1 门禁必须（MUST）复用并加强既有产品依赖 allowlist：`@xunserver-jsf/core` 保持无产品依赖，`@xunserver-jsf/validator-ajv`、`@xunserver-jsf/vue`、`@xunserver-jsf/react` 只指向 Core，UI library package只指向各自 Renderer与Core；Vue、React及UI libraries继续作为对应集成包的 peer，AJV只属于 validator package。Example与test所需host dependencies可以（MAY）位于非发布工作区，但不得（MUST NOT）改变 package产物、declaration或产品依赖图。
 
 #### Scenario: 测试宿主依赖不污染发布包
 - **GIVEN** playground 与 SSR/browser tests安装Vue、React、Element Plus、Ant Design、Arco Design、AJV及测试宿主

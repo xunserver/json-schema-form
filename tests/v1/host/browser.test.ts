@@ -29,9 +29,9 @@ function startServer(): Promise<{ url: string; close: () => Promise<void> }> {
 <script type="importmap">
 {
   "imports": {
-    "@form/core": "/packages/core/dist/index.js",
-    "@form/core/runtime": "/packages/core/dist/runtime/index.js",
-    "@form/core/extension": "/packages/core/dist/extension/index.js"
+    "@xunserver-jsf/core": "/packages/core/dist/index.js",
+    "@xunserver-jsf/core/runtime": "/packages/core/dist/runtime/index.js",
+    "@xunserver-jsf/core/extension": "/packages/core/dist/extension/index.js"
   }
 }
 </script>

@@ -1,6 +1,6 @@
 import { useId } from "react";
 import { useRendererContext } from "../context/renderer-context.js";
-import type { ViewNodeId } from "@form/core";
+import type { ViewNodeId } from "@xunserver-jsf/core";
 import type { FieldDomIds } from "../adapter/types.js";
 
 export function useFormIdentifierPrefix(explicit?: string): string {

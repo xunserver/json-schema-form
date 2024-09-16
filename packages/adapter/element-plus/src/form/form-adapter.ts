@@ -1,6 +1,6 @@
 import { ElForm, ID_INJECTION_KEY, ZINDEX_INJECTION_KEY } from "element-plus";
 import { defineComponent, h, provide } from "vue";
-import type { FormAdapter } from "@form/vue";
+import type { FormAdapter } from "@xunserver-jsf/vue";
 
 const ElementPlusSsrBridge = defineComponent({
   name: "ElementPlusSsrBridge",

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
-import { compileForm, createForm, defineForm } from "@form/core";
-import { createFormEnvironment, definePlugin, defineValidator } from "@form/core/extension";
-import { AJV_VALIDATOR_KEY, createAjvValidator } from "@form/validator-ajv";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
+import { createFormEnvironment, definePlugin, defineValidator } from "@xunserver-jsf/core/extension";
+import { AJV_VALIDATOR_KEY, createAjvValidator } from "@xunserver-jsf/validator-ajv";
 
 function environment() {
   return createFormEnvironment({

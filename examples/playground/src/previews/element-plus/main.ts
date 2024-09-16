@@ -1,9 +1,9 @@
 import "element-plus/dist/index.css";
-import "@form/example-shared/preview.css";
+import "@xunserver-jsf/example-shared/preview.css";
 import { createApp, h } from "vue";
 import ElementPlus from "element-plus";
-import { FormRenderer } from "@form/vue";
-import { mountPreviewRuntime, type PreviewRender } from "@form/example-shared/preview-runtime";
+import { FormRenderer } from "@xunserver-jsf/vue";
+import { mountPreviewRuntime, type PreviewRender } from "@xunserver-jsf/example-shared/preview-runtime";
 import { createDemoRendererEnvironment } from "./renderer.js";
 
 const environment = createDemoRendererEnvironment();

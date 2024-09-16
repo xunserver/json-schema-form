@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import Editor, { loader } from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
-import type { EditorKey } from "@form/example-shared";
+import type { EditorKey } from "@xunserver-jsf/example-shared";
 import editorWorker from "monaco-editor/editor/editor.worker?worker";
 import jsonWorker from "monaco-editor/language/json/json.worker?worker";
 import { Skeleton } from "@/components/ui/skeleton";

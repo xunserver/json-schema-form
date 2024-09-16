@@ -2,9 +2,9 @@
 import { describe, expect, test } from "vitest";
 import { cleanup, render, act } from "@testing-library/react";
 import { afterEach } from "vitest";
-import { FormRenderer } from "@form/react";
-import { antdAdapter } from "@form/antd";
-import { compileForm, createForm, defineForm } from "@form/core";
+import { FormRenderer } from "@xunserver-jsf/react";
+import { antdAdapter } from "@xunserver-jsf/antd";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { createDemoForm } from "../../examples/shared/src/demo.ts";
 import { createDemoRendererEnvironment } from "../lib/demo-antd-environment.tsx";
 import { createRecordingAdapter } from "../../packages/react/src/test-utils/fake-adapter.tsx";

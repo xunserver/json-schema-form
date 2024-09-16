@@ -11,9 +11,9 @@ import type {
   ValidationError,
   ViewNode,
   ViewSnapshot,
-} from "@form/core";
-import type { RenderScope } from "@form/core/runtime";
-import type { WidgetCapabilities, WidgetInteractionContract } from "@form/core/extension";
+} from "@xunserver-jsf/core";
+import type { RenderScope } from "@xunserver-jsf/core/runtime";
+import type { WidgetCapabilities, WidgetInteractionContract } from "@xunserver-jsf/core/extension";
 import type { ReactNode } from "react";
 import type { ProtocolCompatibility, ProtocolVersion } from "./protocol.js";
 

@@ -13,7 +13,7 @@ describe("v1 documentation", () => {
     expect(readme).toContain("examples/playground");
     expect(readme).toContain("examples/shared");
     expect(workspace).toContain("verify:v1");
-    expect(workspace).toContain("@form/core/runtime");
+    expect(workspace).toContain("@xunserver-jsf/core/runtime");
     expect(workspace).toContain("deferred");
     const architecture = fs.readFileSync(path.join(REPO_ROOT, "docs/architecture.md"), "utf8");
     const loaded = loadCoverageMatrix(path.join(REPO_ROOT, "tests/architecture/v1-coverage.json"));

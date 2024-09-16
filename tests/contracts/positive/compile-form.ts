@@ -1,5 +1,5 @@
-import { compileForm, defineForm } from "@form/core";
-import { createFormEnvironment, definePlugin, defineWidget } from "@form/core/extension";
+import { compileForm, defineForm } from "@xunserver-jsf/core";
+import { createFormEnvironment, definePlugin, defineWidget } from "@xunserver-jsf/core/extension";
 
 export const defaultCompiled = compileForm(
   defineForm({

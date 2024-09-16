@@ -1,9 +1,9 @@
-import { defineForm, compileForm, createForm } from "@form/core";
-import { FormRenderer, createReactRendererEnvironment } from "@form/react";
-import { antdAdapter, createAntdAdapter, extendAntdAdapter } from "@form/antd";
+import { defineForm, compileForm, createForm } from "@xunserver-jsf/core";
+import { FormRenderer, createReactRendererEnvironment } from "@xunserver-jsf/react";
+import { antdAdapter, createAntdAdapter, extendAntdAdapter } from "@xunserver-jsf/antd";
 import { createElement } from "react";
-import type { FormInstance } from "@form/core";
-import type { ReactRendererEnvironment } from "@form/react";
+import type { FormInstance } from "@xunserver-jsf/core";
+import type { ReactRendererEnvironment } from "@xunserver-jsf/react";
 
 const { model } = compileForm(
   defineForm({ schema: { type: "object", properties: { name: { type: "string" } } } }),

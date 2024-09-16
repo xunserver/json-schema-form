@@ -2,7 +2,7 @@
 import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 import { describe, expect, test } from "vitest";
-import { FormRenderer } from "@form/vue";
+import { FormRenderer } from "@xunserver-jsf/vue";
 import { applySemanticSteps, compileV1, observeForm } from "../fixtures/v1/index.js";
 import { createDemoRendererEnvironment } from "../lib/demo-element-plus-environment.ts";
 

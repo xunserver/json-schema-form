@@ -1,5 +1,5 @@
-import { FULL_WIDGET_INTERACTION } from "@form/core/extension";
-import type { WidgetBinding, WidgetRenderInput } from "@form/react";
+import { FULL_WIDGET_INTERACTION } from "@xunserver-jsf/core/extension";
+import type { WidgetBinding, WidgetRenderInput } from "@xunserver-jsf/react";
 import type { ShadcnAdapterComponents } from "../components.js";
 import {
   createMultiSelectCodec,

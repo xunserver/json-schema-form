@@ -79,7 +79,7 @@ describe("v1 coverage matrix", () => {
           requirement: "none",
           scenario: "none",
         },
-        publicEntry: "@form/core/extension",
+        publicEntry: "@xunserver-jsf/core/extension",
         evidenceIds: [],
       },
     ];

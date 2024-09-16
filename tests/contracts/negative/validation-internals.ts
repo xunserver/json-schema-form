@@ -1,7 +1,7 @@
-import type { ValidationEngine } from "@form/core";
-import type { ErrorStore } from "@form/core";
+import type { ValidationEngine } from "@xunserver-jsf/core";
+import type { ErrorStore } from "@xunserver-jsf/core";
 import type { Ajv } from "ajv";
-import { createAjvValidator } from "@form/core";
+import { createAjvValidator } from "@xunserver-jsf/core";
 
 export type LeakedEngine = ValidationEngine;
 export type LeakedStore = ErrorStore;

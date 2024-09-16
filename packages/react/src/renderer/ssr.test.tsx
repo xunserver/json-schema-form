@@ -1,4 +1,4 @@
-import { createSelector, subscribeRuntime, valueSelector } from "@form/core/runtime";
+import { createSelector, subscribeRuntime, valueSelector } from "@xunserver-jsf/core/runtime";
 import { describe, expect, test } from "vitest";
 import { renderToString } from "react-dom/server";
 import { FormRenderer, useRuntimeSelector } from "../index.js";

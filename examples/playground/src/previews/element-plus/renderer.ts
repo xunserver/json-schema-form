@@ -1,7 +1,7 @@
-import { createVueRendererEnvironment } from "@form/vue";
-import { createElementPlusAdapter, extendElementPlusAdapter } from "@form/element-plus";
+import { createVueRendererEnvironment } from "@xunserver-jsf/vue";
+import { createElementPlusAdapter, extendElementPlusAdapter } from "@xunserver-jsf/element-plus";
 import { h } from "vue";
-import type { WidgetRenderInput } from "@form/vue";
+import type { WidgetRenderInput } from "@xunserver-jsf/vue";
 
 export function createDemoRendererEnvironment() {
   return createVueRendererEnvironment({

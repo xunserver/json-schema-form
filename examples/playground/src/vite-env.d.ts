@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-declare module "@form/example-shared/preview.css";
+declare module "@xunserver-jsf/example-shared/preview.css";
 
 declare module "*?worker" {
   const workerConstructor: {

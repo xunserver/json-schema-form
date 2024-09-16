@@ -6,7 +6,7 @@ import {
   type ReactUIAdapter,
   type WidgetBinding,
   type LayoutBinding,
-} from "@form/react";
+} from "@xunserver-jsf/react";
 import {
   REQUIRED_SHADCN_SLOTS,
   type RequiredShadcnSlot,

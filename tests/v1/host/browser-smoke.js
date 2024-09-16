@@ -1,4 +1,4 @@
-import { compileForm, createForm, defineForm } from "@form/core";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 
 const definition = defineForm({
   schema: { type: "object", properties: { name: { type: "string" } } },

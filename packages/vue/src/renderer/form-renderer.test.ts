@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { getRuntimeSnapshot, subscribeRuntime, valueSelector } from "@form/core/runtime";
+import { getRuntimeSnapshot, subscribeRuntime, valueSelector } from "@xunserver-jsf/core/runtime";
 import { describe, expect, test } from "vitest";
 import { defineComponent, h, nextTick } from "vue";
 import { mount } from "@vue/test-utils";
@@ -7,7 +7,7 @@ import { FormRenderer, useRuntimeSelector } from "../index.js";
 import { createRecordingAdapter } from "../test-utils/fake-adapter.js";
 import { createArrayForm, createPersonForm } from "../test-utils/forms.js";
 import { useRendererContext } from "../context/renderer-context.js";
-import { compileForm, createForm, defineForm } from "@form/core";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 
 describe("renderer context", () => {
   test("sibling commits do not replace context identity", async () => {

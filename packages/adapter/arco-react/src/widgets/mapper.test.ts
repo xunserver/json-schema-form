@@ -1,6 +1,6 @@
-import { compileForm, createForm, defineForm } from "@form/core";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { describe, expect, test } from "vitest";
-import { RENDERER_DIAGNOSTIC_CODES, RendererAdapterError, type WidgetRenderInput } from "@form/react";
+import { RENDERER_DIAGNOSTIC_CODES, RendererAdapterError, type WidgetRenderInput } from "@xunserver-jsf/react";
 import { mapArcoReactProps } from "./mapper.js";
 
 function input(overrides?: Partial<WidgetRenderInput>): WidgetRenderInput {

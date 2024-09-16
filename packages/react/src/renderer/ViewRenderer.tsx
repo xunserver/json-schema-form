@@ -1,4 +1,4 @@
-import type { ViewNode } from "@form/core";
+import type { ViewNode } from "@xunserver-jsf/core";
 import type { ReactNode } from "react";
 import { ArrayRenderer } from "./ArrayRenderer.js";
 import { FieldRenderer } from "./FieldRenderer.js";

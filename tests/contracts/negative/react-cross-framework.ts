@@ -1,2 +1,2 @@
-import type { VueUIAdapter } from "@form/react";
+import type { VueUIAdapter } from "@xunserver-jsf/react";
 void 0 as unknown as VueUIAdapter;

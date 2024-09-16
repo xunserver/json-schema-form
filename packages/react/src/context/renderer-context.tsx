@@ -1,5 +1,5 @@
-import type { Diagnostic, FormInstance, ViewNodeId } from "@form/core";
-import type { RenderScope } from "@form/core/runtime";
+import type { Diagnostic, FormInstance, ViewNodeId } from "@xunserver-jsf/core";
+import type { RenderScope } from "@xunserver-jsf/core/runtime";
 import { createContext, useContext, type ReactNode } from "react";
 import type { ResolvedReactAdapter } from "../adapter/types.js";
 

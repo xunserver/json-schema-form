@@ -10,7 +10,7 @@ import {
   WORKBENCH_EDITORS,
   type ParentToPreviewMessage,
   type PreviewId,
-} from "@form/example-shared";
+} from "@xunserver-jsf/example-shared";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardDescription, CardTitle } from "@/components/ui/card";

@@ -46,7 +46,7 @@ v1 门禁必须（MUST）在运行跨栈产品验收前检查版本化 prerequis
 - **THEN** v1 gate 失败并定位违规依赖，不能以共享 UI 实现换取结果一致
 
 ### Requirement: Core 可移植性与编译生命周期均有可执行证据
-v1 gate 必须（MUST）证明 `@form/core` 在 Browser、Node.js、SSR、Web Worker 和 test 环境可导入并执行适用的 Definition、compile、instantiate 与 readonly inspection 路径，且其生产依赖、源码和公开 declaration 不包含 Vue、React、DOM、UI library 或 AJV。相同 Definition 与 frozen Environment 的编译结果必须（MUST）具有可重复 inspection/cache 语义；从同一不可变 Model 创建的多个 `FormInstance` 必须（MUST）保持 values、source state、array identity、validation generations、version 与 subscriptions 隔离。
+v1 gate 必须（MUST）证明 `@xunserver-jsf/core` 在 Browser、Node.js、SSR、Web Worker 和 test 环境可导入并执行适用的 Definition、compile、instantiate 与 readonly inspection 路径，且其生产依赖、源码和公开 declaration 不包含 Vue、React、DOM、UI library 或 AJV。相同 Definition 与 frozen Environment 的编译结果必须（MUST）具有可重复 inspection/cache 语义；从同一不可变 Model 创建的多个 `FormInstance` 必须（MUST）保持 values、source state、array identity、validation generations、version 与 subscriptions 隔离。
 
 #### Scenario: 五类宿主环境加载 Core
 - **GIVEN** 分别代表 Browser、Node.js、SSR、Web Worker 与 test 的公开入口 fixtures

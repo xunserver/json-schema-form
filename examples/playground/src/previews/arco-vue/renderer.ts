@@ -1,7 +1,7 @@
-import { createVueRendererEnvironment } from "@form/vue";
-import { createArcoVueAdapter, extendArcoVueAdapter } from "@form/arco-vue";
+import { createVueRendererEnvironment } from "@xunserver-jsf/vue";
+import { createArcoVueAdapter, extendArcoVueAdapter } from "@xunserver-jsf/arco-vue";
 import { h } from "vue";
-import type { WidgetRenderInput } from "@form/vue";
+import type { WidgetRenderInput } from "@xunserver-jsf/vue";
 
 export function createDemoRendererEnvironment() {
   return createVueRendererEnvironment({

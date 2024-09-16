@@ -1,11 +1,11 @@
 import { describe, expect, test } from "vitest";
-import { compileForm, createForm, defineForm } from "@form/core";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import {
   arrayOrderSelector,
   getRuntimeSnapshot,
   itemValueSelector,
   subscribeRuntime,
-} from "@form/core/runtime";
+} from "@xunserver-jsf/core/runtime";
 
 describe("array identity e2e", () => {
   test("nested list commands, resolver, reset, and selectors stay consistent", () => {

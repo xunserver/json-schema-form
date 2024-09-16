@@ -1,10 +1,10 @@
 import { createSSRApp, h } from "vue";
 import { renderToString } from "vue/server-renderer";
 import { describe, expect, test } from "vitest";
-import { FormRenderer } from "@form/vue";
+import { FormRenderer } from "@xunserver-jsf/vue";
 import { createDemoForm } from "../../examples/shared/src/demo.ts";
 import { createDemoRendererEnvironment } from "../lib/demo-element-plus-environment.ts";
-import { subscribeRuntime, valueSelector } from "@form/core/runtime";
+import { subscribeRuntime, valueSelector } from "@xunserver-jsf/core/runtime";
 
 describe("vue + element-plus SSR", () => {
   test("server render is deterministic and does not leak listeners", async () => {

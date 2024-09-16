@@ -7,7 +7,7 @@
 ## Requirements
 
 ### Requirement: Element Plus Adapter 完整提供四类角色
-`@form/element-plus` 必须（SHALL）公开一个冻结且具有稳定 ID `element-plus` 的 VueUIAdapter，组合 FormAdapter、FieldChromeAdapter、WidgetAdapterRegistry 与 LayoutAdapterRegistry。FormAdapter 可以（MAY）使用 Element Plus Form 作为结构/样式容器，但不得（MUST NOT）把其 model、rules、validate、resetFields 或 error store 当作业务 values、validation 或 transaction 真相。
+`@xunserver-jsf/element-plus` 必须（SHALL）公开一个冻结且具有稳定 ID `element-plus` 的 VueUIAdapter，组合 FormAdapter、FieldChromeAdapter、WidgetAdapterRegistry 与 LayoutAdapterRegistry。FormAdapter 可以（MAY）使用 Element Plus Form 作为结构/样式容器，但不得（MUST NOT）把其 model、rules、validate、resetFields 或 error store 当作业务 values、validation 或 transaction 真相。
 
 #### Scenario: Form wrapper 不接管 Core 状态
 - **GIVEN** FormRenderer 使用 Element Plus adapter且 Core snapshot已有 values/errors

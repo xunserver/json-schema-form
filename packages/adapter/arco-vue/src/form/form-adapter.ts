@@ -1,6 +1,6 @@
 import { Form } from "@arco-design/web-vue";
 import { h, type Component } from "vue";
-import type { FormAdapter } from "@form/vue";
+import type { FormAdapter } from "@xunserver-jsf/vue";
 
 export const arcoVueFormAdapter: FormAdapter = {
   render(input) {

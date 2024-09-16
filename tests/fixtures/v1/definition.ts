@@ -1,6 +1,6 @@
-import { compileForm, createForm, createFormEngine, defineForm, type FormDefinition, type FormInstance, type JsonValue, type ViewNode, type ViewNodeId } from "@form/core";
-import { createFormEnvironment, definePlugin, defineRuleFunction, defineValidator, defineWidget } from "@form/core/extension";
-import { AJV_VALIDATOR_KEY, createAjvValidator } from "@form/validator-ajv";
+import { compileForm, createForm, createFormEngine, defineForm, type FormDefinition, type FormInstance, type JsonValue, type ViewNode, type ViewNodeId } from "@xunserver-jsf/core";
+import { createFormEnvironment, definePlugin, defineRuleFunction, defineValidator, defineWidget } from "@xunserver-jsf/core/extension";
+import { AJV_VALIDATOR_KEY, createAjvValidator } from "@xunserver-jsf/validator-ajv";
 
 export const currencyWidget = defineWidget({
   name: "company.currency",

@@ -1,5 +1,5 @@
-import type { Diagnostic, FormInstance, SubmitHandler } from "@form/core";
-import { getRenderScope } from "@form/core/runtime";
+import type { Diagnostic, FormInstance, SubmitHandler } from "@xunserver-jsf/core";
+import { getRenderScope } from "@xunserver-jsf/core/runtime";
 import { useMemo, useRef, type ReactElement } from "react";
 import { createReactRendererEnvironment } from "../adapter/create-environment.js";
 import { RENDERER_DIAGNOSTIC_CODES } from "../adapter/diagnostic-codes.js";

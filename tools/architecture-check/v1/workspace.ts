@@ -15,42 +15,42 @@ const TOP_DIRS = [
 ] as const;
 
 const PACKAGE_LAYOUT: Readonly<Record<string, { id: string; dirs: readonly string[]; files: readonly string[] }>> = {
-  "@form/validator-ajv": {
+  "@xunserver-jsf/validator-ajv": {
     id: "DIR-VALIDATOR",
     dirs: [],
     files: ["ajv-validator-adapter.ts", "ajv-error-normalizer.ts", "create-ajv-validator.ts", "index.ts"],
   },
-  "@form/vue": {
+  "@xunserver-jsf/vue": {
     id: "DIR-VUE",
     dirs: ["renderer", "context", "composables", "adapter"],
     files: ["index.ts"],
   },
-  "@form/react": {
+  "@xunserver-jsf/react": {
     id: "DIR-REACT",
     dirs: ["renderer", "context", "hooks", "adapter"],
     files: ["index.ts"],
   },
-  "@form/element-plus": {
+  "@xunserver-jsf/element-plus": {
     id: "DIR-ELEMENT-PLUS",
     dirs: ["widgets", "layouts", "field-chrome", "form"],
     files: ["create-element-plus-adapter.ts", "index.ts"],
   },
-  "@form/antd": {
+  "@xunserver-jsf/antd": {
     id: "DIR-ANTD",
     dirs: ["widgets", "layouts", "field-chrome", "form"],
     files: ["create-antd-adapter.ts", "index.ts"],
   },
-  "@form/arco-vue": {
+  "@xunserver-jsf/arco-vue": {
     id: "DIR-ARCO-VUE",
     dirs: ["widgets", "layouts", "field-chrome", "form"],
     files: ["create-arco-vue-adapter.ts", "index.ts"],
   },
-  "@form/arco-react": {
+  "@xunserver-jsf/arco-react": {
     id: "DIR-ARCO-REACT",
     dirs: ["widgets", "layouts", "field-chrome", "form"],
     files: ["create-arco-react-adapter.ts", "index.ts"],
   },
-  "@form/shadcn": {
+  "@xunserver-jsf/shadcn": {
     id: "DIR-SHADCN",
     dirs: ["widgets", "layouts", "field-chrome", "form"],
     files: ["create-shadcn-adapter.ts", "index.ts"],
@@ -58,15 +58,15 @@ const PACKAGE_LAYOUT: Readonly<Record<string, { id: string; dirs: readonly strin
 };
 
 const PACKAGE_DIRS: Readonly<Record<string, string>> = {
-  "@form/core": "core",
-  "@form/validator-ajv": "validator-ajv",
-  "@form/vue": "vue",
-  "@form/react": "react",
-  "@form/element-plus": "adapter/element-plus",
-  "@form/antd": "adapter/antd",
-  "@form/arco-vue": "adapter/arco-vue",
-  "@form/arco-react": "adapter/arco-react",
-  "@form/shadcn": "adapter/shadcn",
+  "@xunserver-jsf/core": "core",
+  "@xunserver-jsf/validator-ajv": "validator-ajv",
+  "@xunserver-jsf/vue": "vue",
+  "@xunserver-jsf/react": "react",
+  "@xunserver-jsf/element-plus": "adapter/element-plus",
+  "@xunserver-jsf/antd": "adapter/antd",
+  "@xunserver-jsf/arco-vue": "adapter/arco-vue",
+  "@xunserver-jsf/arco-react": "adapter/arco-react",
+  "@xunserver-jsf/shadcn": "adapter/shadcn",
 };
 
 export { PACKAGE_DIRS as FIRST_PARTY_PACKAGE_DIRS };
@@ -216,7 +216,7 @@ export function checkExportSurfaces(workspaceRoot: string): MatrixIssue[] {
         }
       }
     }
-    if (packageName === "@form/core") {
+    if (packageName === "@xunserver-jsf/core") {
       for (const required of [".", "./runtime", "./extension"]) {
         if (!(required in exportsMap)) {
           issues.push({
@@ -265,16 +265,16 @@ export function checkBundleGraph(workspaceRoot: string): MatrixIssue[] {
 }
 
 function exportCatalogId(packageName: string, exportKey: string): string {
-  if (packageName === "@form/core" && exportKey === ".") {
+  if (packageName === "@xunserver-jsf/core" && exportKey === ".") {
     return "EXP-CORE-ROOT";
   }
-  if (packageName === "@form/core" && exportKey === "./runtime") {
+  if (packageName === "@xunserver-jsf/core" && exportKey === "./runtime") {
     return "EXP-CORE-RUNTIME";
   }
-  if (packageName === "@form/core" && exportKey === "./extension") {
+  if (packageName === "@xunserver-jsf/core" && exportKey === "./extension") {
     return "EXP-CORE-EXTENSION";
   }
-  return `EXP-${packageName.replace("@form/", "").toUpperCase()}`;
+  return `EXP-${packageName.replace("@xunserver-jsf/", "").toUpperCase()}`;
 }
 
 function collectJsFiles(root: string): string[] {

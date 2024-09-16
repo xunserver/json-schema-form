@@ -1,2 +1,2 @@
-import { mapAntdProps } from "@form/antd/src/widgets/mapper.js";
+import { mapAntdProps } from "@xunserver-jsf/antd/src/widgets/mapper.js";
 void mapAntdProps;

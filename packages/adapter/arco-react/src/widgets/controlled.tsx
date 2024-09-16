@@ -1,4 +1,4 @@
-import { FULL_WIDGET_INTERACTION, type WidgetCapabilities } from "@form/core/extension";
+import { FULL_WIDGET_INTERACTION, type WidgetCapabilities } from "@xunserver-jsf/core/extension";
 import {
   freezeAdapterDiagnostic,
   RENDERER_DIAGNOSTIC_CODES,
@@ -6,7 +6,7 @@ import {
   type ValueCodec,
   type WidgetBinding,
   type WidgetRenderInput,
-} from "@form/react";
+} from "@xunserver-jsf/react";
 import { mapArcoReactProps } from "./mapper.js";
 import type { FocusEvent, InputHTMLAttributes, ReactElement } from "react";
 import { Checkbox, Input, Switch } from "@arco-design/web-react";

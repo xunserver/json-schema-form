@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import type { PlaygroundController, PlaygroundSnapshot } from "@form/example-shared";
+import type { PlaygroundController, PlaygroundSnapshot } from "@xunserver-jsf/example-shared";
 
 export function usePlaygroundSnapshot(controller: PlaygroundController): PlaygroundSnapshot {
   return useSyncExternalStore(

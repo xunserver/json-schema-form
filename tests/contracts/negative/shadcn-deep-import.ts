@@ -1,3 +1,3 @@
-import { mapShadcnProps } from "@form/shadcn/src/widgets/mapper.js";
+import { mapShadcnProps } from "@xunserver-jsf/shadcn/src/widgets/mapper.js";
 
 void mapShadcnProps;

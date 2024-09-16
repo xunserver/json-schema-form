@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import { compileForm, createForm, defineForm } from "@form/core";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { REPO_ROOT, readJson } from "../lib/fs.js";
 
 const FORBIDDEN = [
@@ -40,7 +40,7 @@ describe("v1 core portability", () => {
   });
 
   test("V1-PORTABILITY-NODE loads built Core exports without host libraries", async () => {
-    const core = await import("@form/core");
+    const core = await import("@xunserver-jsf/core");
     const form = core.createForm(
       core.compileForm(core.defineForm({ schema: { type: "object", properties: { name: { type: "string" } } } })).model,
       { initialValues: { name: "Ada" } },

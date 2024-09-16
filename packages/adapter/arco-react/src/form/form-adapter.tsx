@@ -1,4 +1,4 @@
-import type { FormAdapter } from "@form/react";
+import type { FormAdapter } from "@xunserver-jsf/react";
 import type { FormEvent } from "react";
 
 export const arcoReactFormAdapter: FormAdapter = {

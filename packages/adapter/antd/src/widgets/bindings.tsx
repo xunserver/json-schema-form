@@ -1,7 +1,7 @@
 import { InputNumber, Select } from "antd";
-import type { WidgetBinding, WidgetRenderInput } from "@form/react";
-import { FULL_WIDGET_INTERACTION } from "@form/core/extension";
-import type { CodecResult, ValueCodec } from "@form/react";
+import type { WidgetBinding, WidgetRenderInput } from "@xunserver-jsf/react";
+import { FULL_WIDGET_INTERACTION } from "@xunserver-jsf/core/extension";
+import type { CodecResult, ValueCodec } from "@xunserver-jsf/react";
 import {
   createMultiSelectCodec,
   createSelectCodec,

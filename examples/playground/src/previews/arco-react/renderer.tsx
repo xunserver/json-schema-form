@@ -1,6 +1,6 @@
-import { createReactRendererEnvironment } from "@form/react";
-import { createArcoReactAdapter, extendArcoReactAdapter } from "@form/arco-react";
-import type { WidgetRenderInput } from "@form/react";
+import { createReactRendererEnvironment } from "@xunserver-jsf/react";
+import { createArcoReactAdapter, extendArcoReactAdapter } from "@xunserver-jsf/arco-react";
+import type { WidgetRenderInput } from "@xunserver-jsf/react";
 
 export function createDemoRendererEnvironment() {
   return createReactRendererEnvironment({

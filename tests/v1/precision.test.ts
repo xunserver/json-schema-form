@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { compileV1 } from "../fixtures/v1/index.js";
-import { createSelector, subscribeRuntime, valueSelector } from "@form/core/runtime";
+import { createSelector, subscribeRuntime, valueSelector } from "@xunserver-jsf/core/runtime";
 
 describe("v1 selector precision", () => {
   test("V1-PRECISION-FIELD does not recompute an unrelated field selector", () => {

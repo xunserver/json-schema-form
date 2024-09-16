@@ -25,18 +25,18 @@ function resolveWithNode(specifier: string): { status: number; stdout: string; s
 
 describe("runtime export resolution", () => {
   test("resolves declared Core entries through package exports", () => {
-    expect(resolveWithNode("@form/core").stdout.trim()).toMatch(/packages\/core\/dist\/index\.js$/);
-    expect(resolveWithNode("@form/core/runtime").stdout.trim()).toMatch(
+    expect(resolveWithNode("@xunserver-jsf/core").stdout.trim()).toMatch(/packages\/core\/dist\/index\.js$/);
+    expect(resolveWithNode("@xunserver-jsf/core/runtime").stdout.trim()).toMatch(
       /packages\/core\/dist\/runtime\/index\.js$/,
     );
-    expect(resolveWithNode("@form/core/extension").stdout.trim()).toMatch(
+    expect(resolveWithNode("@xunserver-jsf/core/extension").stdout.trim()).toMatch(
       /packages\/core\/dist\/extension\/index\.js$/,
     );
   });
 
   test("imports application and extension factories through package exports", async () => {
-    const core = await import("@form/core");
-    const extension = await import("@form/core/extension");
+    const core = await import("@xunserver-jsf/core");
+    const extension = await import("@xunserver-jsf/core/extension");
 
     expect(typeof core.defineForm).toBe("function");
     expect(typeof core.compileForm).toBe("function");
@@ -57,13 +57,13 @@ describe("runtime export resolution", () => {
   });
 
   test("resolves validator-ajv through package exports", () => {
-    expect(resolveWithNode("@form/validator-ajv").stdout.trim()).toMatch(
+    expect(resolveWithNode("@xunserver-jsf/validator-ajv").stdout.trim()).toMatch(
       /packages\/validator-ajv\/dist\/index\.js$/,
     );
   });
 
   test("rejects an undeclared Core deep path at runtime", () => {
-    const result = resolveWithNode("@form/core/src/diagnostic/index.js");
+    const result = resolveWithNode("@xunserver-jsf/core/src/diagnostic/index.js");
     expect(result.status).not.toBe(0);
     expect(`${result.stdout}\n${result.stderr}`).toMatch(
       /Package subpath|ERR_PACKAGE_PATH_NOT_EXPORTED/,
@@ -71,28 +71,28 @@ describe("runtime export resolution", () => {
   });
 
   test("resolves Vue, React, and UI adapter root entries and rejects deep paths", () => {
-    expect(resolveWithNode("@form/vue").stdout.trim()).toMatch(/packages\/vue\/dist\/index\.js$/);
-    expect(resolveWithNode("@form/element-plus").stdout.trim()).toMatch(
+    expect(resolveWithNode("@xunserver-jsf/vue").stdout.trim()).toMatch(/packages\/vue\/dist\/index\.js$/);
+    expect(resolveWithNode("@xunserver-jsf/element-plus").stdout.trim()).toMatch(
       /packages\/adapter\/element-plus\/dist\/index\.js$/,
     );
-    expect(resolveWithNode("@form/react").stdout.trim()).toMatch(/packages\/react\/dist\/index\.js$/);
-    expect(resolveWithNode("@form/antd").stdout.trim()).toMatch(/packages\/adapter\/antd\/dist\/index\.js$/);
-    expect(resolveWithNode("@form/arco-vue").stdout.trim()).toMatch(/packages\/adapter\/arco-vue\/dist\/index\.js$/);
-    expect(resolveWithNode("@form/arco-react").stdout.trim()).toMatch(/packages\/adapter\/arco-react\/dist\/index\.js$/);
-    expect(resolveWithNode("@form/shadcn").stdout.trim()).toMatch(/packages\/adapter\/shadcn\/dist\/index\.js$/);
-    const vueDeep = resolveWithNode("@form/vue/src/renderer/FormRenderer.js");
+    expect(resolveWithNode("@xunserver-jsf/react").stdout.trim()).toMatch(/packages\/react\/dist\/index\.js$/);
+    expect(resolveWithNode("@xunserver-jsf/antd").stdout.trim()).toMatch(/packages\/adapter\/antd\/dist\/index\.js$/);
+    expect(resolveWithNode("@xunserver-jsf/arco-vue").stdout.trim()).toMatch(/packages\/adapter\/arco-vue\/dist\/index\.js$/);
+    expect(resolveWithNode("@xunserver-jsf/arco-react").stdout.trim()).toMatch(/packages\/adapter\/arco-react\/dist\/index\.js$/);
+    expect(resolveWithNode("@xunserver-jsf/shadcn").stdout.trim()).toMatch(/packages\/adapter\/shadcn\/dist\/index\.js$/);
+    const vueDeep = resolveWithNode("@xunserver-jsf/vue/src/renderer/FormRenderer.js");
     expect(vueDeep.status).not.toBe(0);
-    const plusDeep = resolveWithNode("@form/element-plus/src/widgets/mapper.js");
+    const plusDeep = resolveWithNode("@xunserver-jsf/element-plus/src/widgets/mapper.js");
     expect(plusDeep.status).not.toBe(0);
-    const reactDeep = resolveWithNode("@form/react/src/renderer/FormRenderer.js");
+    const reactDeep = resolveWithNode("@xunserver-jsf/react/src/renderer/FormRenderer.js");
     expect(reactDeep.status).not.toBe(0);
-    const antdDeep = resolveWithNode("@form/antd/src/widgets/mapper.js");
+    const antdDeep = resolveWithNode("@xunserver-jsf/antd/src/widgets/mapper.js");
     expect(antdDeep.status).not.toBe(0);
-    const arcoVueDeep = resolveWithNode("@form/arco-vue/src/widgets/mapper.js");
+    const arcoVueDeep = resolveWithNode("@xunserver-jsf/arco-vue/src/widgets/mapper.js");
     expect(arcoVueDeep.status).not.toBe(0);
-    const arcoReactDeep = resolveWithNode("@form/arco-react/src/widgets/mapper.js");
+    const arcoReactDeep = resolveWithNode("@xunserver-jsf/arco-react/src/widgets/mapper.js");
     expect(arcoReactDeep.status).not.toBe(0);
-    const shadcnDeep = resolveWithNode("@form/shadcn/src/widgets/mapper.js");
+    const shadcnDeep = resolveWithNode("@xunserver-jsf/shadcn/src/widgets/mapper.js");
     expect(shadcnDeep.status).not.toBe(0);
   });
 });

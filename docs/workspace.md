@@ -1,6 +1,6 @@
 # 工作区与公共边界
 
-本文记录仓库级命令、首期 package 的职责、允许的依赖图、`@form/core` 公共入口，以及新增公共 export 的规则。包边界、依赖方向和架构不变量以 [`architecture.md`](./architecture.md) 为准；本文只描述当前工作区如何执行这些约定。
+本文记录仓库级命令、首期 package 的职责、允许的依赖图、`@xunserver-jsf/core` 公共入口，以及新增公共 export 的规则。包边界、依赖方向和架构不变量以 [`architecture.md`](./architecture.md) 为准；本文只描述当前工作区如何执行这些约定。
 
 ## 工作区命令
 
@@ -18,6 +18,9 @@
 | `pnpm test:v1:docs` | README、workspace、generated coverage 与 deferred 声明审计。 |
 | `pnpm verify` | `build && typecheck && test && check:boundaries`。 |
 | `pnpm verify:v1` | 架构 v1 发布门禁。本地不重装依赖；证据写入 `artifacts/v1/`（该目录已 gitignore）。 |
+| `pnpm changeset` | 记录一次产品包版本变更；九个 `@xunserver-jsf/*` 产品包固定同一版本。 |
+| `pnpm pack:check` | 构建后对产品包执行 `npm pack --dry-run`，检查将上传的 tarball 内容。 |
+| `pnpm release` | `changeset publish`。CI 在 `verify:v1` 通过后调用。账号与 Trusted Publishing 见 [`release.md`](./release.md)。 |
 | `pnpm playground` | 启动单 Vite MPA 工作台（http://127.0.0.1:5173/）：React + shadcn + Monaco 编辑器，右侧 Adapter Tab 对照 Element Plus / Ant Design / Arco Vue / Arco React / shadcn。 |
 | `pnpm docs:dev` | 启动 VitePress 用户文档站（`docs/pages`）。贡献者 `architecture.md` / `workspace.md` / `generated/` 不进入该站点。 |
 | `pnpm docs:build` | 构建 VitePress 静态产物到 `docs/.vitepress/dist`。`DOCS_BASE` 默认 `/json-schema-form/`。 |
@@ -29,39 +32,39 @@
 
 | Package | 目录 | 职责 | 当前公共表面 |
 |---|---|---|---|
-| `@form/core` | `packages/core` | 框架无关的 authoring、静态编译与事务化 Runtime；提供 Extension Plugin/Environment | Path、ID、Diagnostic、Form Definition、`defineForm()`、`compileForm()`、`createForm()` / `createFormEngine()`、Compiled Model、CompileResult/CompileError、`FormInstance` / `ArrayInstance` / `ScopedFormInstance`、Rule AST / effective state（含 `required`）/ View source state（`focused`/`collapsed`/`activeTab`）/ `blur()` `setCollapsed()` `setActiveTab()` / `serialize()` / `validate()` / `applyErrors()` / `submit()` / `FormConfig.valueInitializer`；`@form/core/runtime` 导出只读 selector/subscription（含 `effectiveStateSelector`、`presentableErrorSelector`、`InstanceBinding`、`RenderScope`、`getRenderScope()`）与 array identity resolver；`@form/core/extension` 导出 Plugin/Environment/Widget/Registry 契约、`defineWidget()`、`defineRuleFunction()`、`defineValidator()`、`SchemaDialectDefinition` / `SchemaExtensionDefinition` / `ValueInitializerDefinition` 与 factory |
-| `@form/validator-ajv` | `packages/validator-ajv` | Draft 2020-12 Schema Validator Adapter | `createAjvValidator()` / `AJV_VALIDATOR_KEY`；生产依赖 `ajv` 与 `@form/core` |
-| `@form/vue` | `packages/vue` | Vue Renderer 边界 | `FormRenderer` / `ViewRenderer` / `FieldRenderer`、readonly composables、`defineVueUIAdapter()` / `createVueRendererEnvironment()` 与 adapter diagnostics；peer 为 `vue` |
-| `@form/react` | `packages/react` | React Renderer 边界 | `FormRenderer` / `ViewRenderer` / `FieldRenderer`、readonly hooks、`defineReactUIAdapter()` / `createReactRendererEnvironment()` 与 adapter diagnostics；peer 为 `react` |
-| `@form/element-plus` | `packages/adapter/element-plus` | Element Plus Adapter 边界 | `elementPlusAdapter` / `createElementPlusAdapter()` / `extendElementPlusAdapter()`；依赖 `@form/vue` 与 `@form/core`，peer 为 `vue` 与 `element-plus` |
-| `@form/antd` | `packages/adapter/antd` | Ant Design Adapter 边界 | `antdAdapter` / `createAntdAdapter()` / `extendAntdAdapter()`；依赖 `@form/react` 与 `@form/core`，peer 为 `react` 与 `antd` |
-| `@form/arco-vue` | `packages/adapter/arco-vue` | Arco Design Vue Adapter 边界 | `arcoVueAdapter` / `createArcoVueAdapter()` / `extendArcoVueAdapter()`；依赖 `@form/vue` 与 `@form/core`，peer 为 `vue` 与 `@arco-design/web-vue` |
-| `@form/arco-react` | `packages/adapter/arco-react` | Arco Design React Adapter 边界 | `arcoReactAdapter` / `createArcoReactAdapter()` / `extendArcoReactAdapter()`；依赖 `@form/react` 与 `@form/core`，peer 为 `react` 与 `@arco-design/web-react` |
-| `@form/shadcn` | `packages/adapter/shadcn` | shadcn UI Adapter 边界（组件由消费方注入） | `createShadcnAdapter({ components })` / `extendShadcnAdapter()`；依赖 `@form/react` 与 `@form/core`，peer 仅 `react` |
+| `@xunserver-jsf/core` | `packages/core` | 框架无关的 authoring、静态编译与事务化 Runtime；提供 Extension Plugin/Environment | Path、ID、Diagnostic、Form Definition、`defineForm()`、`compileForm()`、`createForm()` / `createFormEngine()`、Compiled Model、CompileResult/CompileError、`FormInstance` / `ArrayInstance` / `ScopedFormInstance`、Rule AST / effective state（含 `required`）/ View source state（`focused`/`collapsed`/`activeTab`）/ `blur()` `setCollapsed()` `setActiveTab()` / `serialize()` / `validate()` / `applyErrors()` / `submit()` / `FormConfig.valueInitializer`；`@xunserver-jsf/core/runtime` 导出只读 selector/subscription（含 `effectiveStateSelector`、`presentableErrorSelector`、`InstanceBinding`、`RenderScope`、`getRenderScope()`）与 array identity resolver；`@xunserver-jsf/core/extension` 导出 Plugin/Environment/Widget/Registry 契约、`defineWidget()`、`defineRuleFunction()`、`defineValidator()`、`SchemaDialectDefinition` / `SchemaExtensionDefinition` / `ValueInitializerDefinition` 与 factory |
+| `@xunserver-jsf/validator-ajv` | `packages/validator-ajv` | Draft 2020-12 Schema Validator Adapter | `createAjvValidator()` / `AJV_VALIDATOR_KEY`；生产依赖 `ajv` 与 `@xunserver-jsf/core` |
+| `@xunserver-jsf/vue` | `packages/vue` | Vue Renderer 边界 | `FormRenderer` / `ViewRenderer` / `FieldRenderer`、readonly composables、`defineVueUIAdapter()` / `createVueRendererEnvironment()` 与 adapter diagnostics；peer 为 `vue` |
+| `@xunserver-jsf/react` | `packages/react` | React Renderer 边界 | `FormRenderer` / `ViewRenderer` / `FieldRenderer`、readonly hooks、`defineReactUIAdapter()` / `createReactRendererEnvironment()` 与 adapter diagnostics；peer 为 `react` |
+| `@xunserver-jsf/element-plus` | `packages/adapter/element-plus` | Element Plus Adapter 边界 | `elementPlusAdapter` / `createElementPlusAdapter()` / `extendElementPlusAdapter()`；依赖 `@xunserver-jsf/vue` 与 `@xunserver-jsf/core`，peer 为 `vue` 与 `element-plus` |
+| `@xunserver-jsf/antd` | `packages/adapter/antd` | Ant Design Adapter 边界 | `antdAdapter` / `createAntdAdapter()` / `extendAntdAdapter()`；依赖 `@xunserver-jsf/react` 与 `@xunserver-jsf/core`，peer 为 `react` 与 `antd` |
+| `@xunserver-jsf/arco-vue` | `packages/adapter/arco-vue` | Arco Design Vue Adapter 边界 | `arcoVueAdapter` / `createArcoVueAdapter()` / `extendArcoVueAdapter()`；依赖 `@xunserver-jsf/vue` 与 `@xunserver-jsf/core`，peer 为 `vue` 与 `@arco-design/web-vue` |
+| `@xunserver-jsf/arco-react` | `packages/adapter/arco-react` | Arco Design React Adapter 边界 | `arcoReactAdapter` / `createArcoReactAdapter()` / `extendArcoReactAdapter()`；依赖 `@xunserver-jsf/react` 与 `@xunserver-jsf/core`，peer 为 `react` 与 `@arco-design/web-react` |
+| `@xunserver-jsf/shadcn` | `packages/adapter/shadcn` | shadcn UI Adapter 边界（组件由消费方注入） | `createShadcnAdapter({ components })` / `extendShadcnAdapter()`；依赖 `@xunserver-jsf/react` 与 `@xunserver-jsf/core`，peer 仅 `react` |
 
-叶子 package 中 `@form/vue` / `@form/element-plus` / `@form/arco-vue` 与 `@form/react` / `@form/antd` / `@form/arco-react` / `@form/shadcn` 分别提供框架渲染链路。`@form/core` 已提供 `defineForm()`、`compileForm()` 静态编译（含 Rule AST 与 Schema Dynamics）、事务 Runtime、array identity / `array()` / `scope()`、`blur()` / `setCollapsed()` / `setActiveTab()`、`RenderScope` / `InstanceBinding`、effective state（含 `required`）、`serialize()` 以及 Validation owner（`validate()` / `applyErrors()` / `submit()`）。AJV 只允许出现在 `@form/validator-ajv`。可浏览 playground 在 `examples/playground`（共享 catalog 在 `examples/shared`），复用 `tests/fixtures/v1/` 的业务 Definition/Plugin。用户文档站源在 [`pages/`](./pages/index.md)；Renderer 用法见该站点的 Vue / React 页面，仓库内 [`vue-element-plus.md`](./vue-element-plus.md) 等仅为短链。GitHub Pages 把文档放在站点根路径、playground 放在 `/playground/`；Pages source 必须设为 GitHub Actions。第 20 节 deferred 项不得作为产品入口出现。
+叶子 package 中 `@xunserver-jsf/vue` / `@xunserver-jsf/element-plus` / `@xunserver-jsf/arco-vue` 与 `@xunserver-jsf/react` / `@xunserver-jsf/antd` / `@xunserver-jsf/arco-react` / `@xunserver-jsf/shadcn` 分别提供框架渲染链路。`@xunserver-jsf/core` 已提供 `defineForm()`、`compileForm()` 静态编译（含 Rule AST 与 Schema Dynamics）、事务 Runtime、array identity / `array()` / `scope()`、`blur()` / `setCollapsed()` / `setActiveTab()`、`RenderScope` / `InstanceBinding`、effective state（含 `required`）、`serialize()` 以及 Validation owner（`validate()` / `applyErrors()` / `submit()`）。AJV 只允许出现在 `@xunserver-jsf/validator-ajv`。可浏览 playground 在 `examples/playground`（共享 catalog 在 `examples/shared`），复用 `tests/fixtures/v1/` 的业务 Definition/Plugin。用户文档站源在 [`pages/`](./pages/index.md)；Renderer 用法见该站点的 Vue / React 页面，仓库内 [`vue-element-plus.md`](./vue-element-plus.md) 等仅为短链。GitHub Pages 把文档放在站点根路径、playground 放在 `/playground/`；Pages source 必须设为 GitHub Actions。第 20 节 deferred 项不得作为产品入口出现。
 
 ## 允许的依赖图
 
 产品依赖只允许以下边，与架构文档第 17 节一致：
 
 ```text
-@form/validator-ajv ------> @form/core
-@form/vue ----------------> @form/core
-@form/react --------------> @form/core
-@form/element-plus -------> @form/vue + @form/core
-@form/antd ---------------> @form/react + @form/core
-@form/arco-vue -----------> @form/vue + @form/core
-@form/arco-react ---------> @form/react + @form/core
-@form/shadcn -------------> @form/react + @form/core
+@xunserver-jsf/validator-ajv ------> @xunserver-jsf/core
+@xunserver-jsf/vue ----------------> @xunserver-jsf/core
+@xunserver-jsf/react --------------> @xunserver-jsf/core
+@xunserver-jsf/element-plus -------> @xunserver-jsf/vue + @xunserver-jsf/core
+@xunserver-jsf/antd ---------------> @xunserver-jsf/react + @xunserver-jsf/core
+@xunserver-jsf/arco-vue -----------> @xunserver-jsf/vue + @xunserver-jsf/core
+@xunserver-jsf/arco-react ---------> @xunserver-jsf/react + @xunserver-jsf/core
+@xunserver-jsf/shadcn -------------> @xunserver-jsf/react + @xunserver-jsf/core
 ```
 
 强制规则：
 
-- 禁止反向依赖，例如 `@form/core` 依赖 `@form/vue`。
-- 禁止跨框架依赖，例如 `@form/antd` 依赖 `@form/vue` 或 `@form/element-plus`。
-- 禁止未声明的 `@form/*` import，以及跨 package 的 relative import。
-- `@form/core` 的依赖图和源码 import 不得包含 Vue、React、AJV、Element Plus、Ant Design。
+- 禁止反向依赖，例如 `@xunserver-jsf/core` 依赖 `@xunserver-jsf/vue`。
+- 禁止跨框架依赖，例如 `@xunserver-jsf/antd` 依赖 `@xunserver-jsf/vue` 或 `@xunserver-jsf/element-plus`。
+- 禁止未声明的 `@xunserver-jsf/*` import，以及跨 package 的 relative import。
+- `@xunserver-jsf/core` 的依赖图和源码 import 不得包含 Vue、React、AJV、Element Plus、Ant Design。
 - 宿主框架和 UI library 只能出现在对应集成 package 的 `peerDependencies` 中，不能放入会被打包的 `dependencies`。
 - Core production TypeScript project 只启用 ECMAScript `lib`，不包含 DOM 或 test runner ambient types。
 
@@ -69,15 +72,15 @@
 
 ## Core 公共入口
 
-`@form/core` 只通过 package `exports` 暴露三个入口：
+`@xunserver-jsf/core` 只通过 package `exports` 暴露三个入口：
 
 | 入口 | 用途 |
 |---|---|
-| `@form/core` | Application 契约：Path、公共 ID、Diagnostic、FormDefinition、`defineForm()`、`compileForm()` / `CompileOptions`、`createForm()` / `createFormEngine()`、FormInstance/FieldInstance/ArrayInstance/ScopedFormInstance、CompiledFormModel、CompileResult、CompileError、`FormRuntimeError`、RuleExpression、EffectiveState（含 `required`）、View source state（`focused`/`collapsed`/`activeTab`）、`blur()`/`setCollapsed()`/`setActiveTab()`、`serialize()`、`validate()`/`applyErrors()`/`submit()`、`ValidationError` |
-| `@form/core/runtime` | Advanced Runtime API：只读 selector factory（含 array order/item/binding、`effectiveStateSelector`、`presentableErrorSelector`）、`InstanceBinding`、`RenderScope`、`getRenderScope()`、`createSelector()`、snapshot read、subscription、Identity Resolver 类型与 Runtime diagnostic observation |
-| `@form/core/extension` | Extension API：`definePlugin()`、`defineWidget()`、`defineRuleFunction()`、`defineValidator()`、`createFormEnvironment()`、只读 Registry/Widget/Plugin/RuleFunction/Serializer/Validator/`SchemaDialectDefinition`/`SchemaExtensionDefinition`/`ValueInitializerDefinition` 与 Widget interaction 契约、protocol constant 与 `EnvironmentBuildError` |
+| `@xunserver-jsf/core` | Application 契约：Path、公共 ID、Diagnostic、FormDefinition、`defineForm()`、`compileForm()` / `CompileOptions`、`createForm()` / `createFormEngine()`、FormInstance/FieldInstance/ArrayInstance/ScopedFormInstance、CompiledFormModel、CompileResult、CompileError、`FormRuntimeError`、RuleExpression、EffectiveState（含 `required`）、View source state（`focused`/`collapsed`/`activeTab`）、`blur()`/`setCollapsed()`/`setActiveTab()`、`serialize()`、`validate()`/`applyErrors()`/`submit()`、`ValidationError` |
+| `@xunserver-jsf/core/runtime` | Advanced Runtime API：只读 selector factory（含 array order/item/binding、`effectiveStateSelector`、`presentableErrorSelector`）、`InstanceBinding`、`RenderScope`、`getRenderScope()`、`createSelector()`、snapshot read、subscription、Identity Resolver 类型与 Runtime diagnostic observation |
+| `@xunserver-jsf/core/extension` | Extension API：`definePlugin()`、`defineWidget()`、`defineRuleFunction()`、`defineValidator()`、`createFormEnvironment()`、只读 Registry/Widget/Plugin/RuleFunction/Serializer/Validator/`SchemaDialectDefinition`/`SchemaExtensionDefinition`/`ValueInitializerDefinition` 与 Widget interaction 契约、protocol constant 与 `EnvironmentBuildError` |
 
-根入口导出的是面向应用的只读契约与基础实例 factory，不导出 `RuntimeNodeId`、TransactionManager、ChangeQueue、CompilerContext、RuleEngine/DependencyScheduler、AST evaluator、可变 Store、ArrayStateStore、View state store、interaction event writer、binding table、Environment identity token、ValidationEngine/ErrorStore 或其他内部实现符号。未写入 `exports` 的 deep path 不是公共 API。`setValues()` 是 root replacement。数组 index 不是身份；结构变化走 `ArrayInstance`，越界 index 不能隐式创建 item。Identity Resolver 必须是纯同步函数，且只从 `@form/core/runtime` 取得类型。`RenderScope` / `InstanceBinding` / `getRenderScope()` 只从 `@form/core/runtime` 导出，根入口不重导出。`reset()` 会重建 array identity 并恢复 `focused`/`collapsed`/`activeTab` 默认值。固定 tuple 不支持 list 结构命令。AJV instance 与 Adapter factory 只从 `@form/validator-ajv` 取得。Core 不渲染 UI；两条 Renderer 链路分别由 `@form/vue` + `@form/element-plus` 与 `@form/react` + `@form/antd` 交付。`SchemaDialectDefinition` / `SchemaExtensionDefinition` / `ValueInitializerDefinition` 只从 `@form/core/extension` 导出；根入口只新增 `FormConfig.valueInitializer` 与 `CreateFormOptions.valueInitializer` 两个 string key。Core 不附带内置 dialect adapter 或 `x-*` 词汇。
+根入口导出的是面向应用的只读契约与基础实例 factory，不导出 `RuntimeNodeId`、TransactionManager、ChangeQueue、CompilerContext、RuleEngine/DependencyScheduler、AST evaluator、可变 Store、ArrayStateStore、View state store、interaction event writer、binding table、Environment identity token、ValidationEngine/ErrorStore 或其他内部实现符号。未写入 `exports` 的 deep path 不是公共 API。`setValues()` 是 root replacement。数组 index 不是身份；结构变化走 `ArrayInstance`，越界 index 不能隐式创建 item。Identity Resolver 必须是纯同步函数，且只从 `@xunserver-jsf/core/runtime` 取得类型。`RenderScope` / `InstanceBinding` / `getRenderScope()` 只从 `@xunserver-jsf/core/runtime` 导出，根入口不重导出。`reset()` 会重建 array identity 并恢复 `focused`/`collapsed`/`activeTab` 默认值。固定 tuple 不支持 list 结构命令。AJV instance 与 Adapter factory 只从 `@xunserver-jsf/validator-ajv` 取得。Core 不渲染 UI；两条 Renderer 链路分别由 `@xunserver-jsf/vue` + `@xunserver-jsf/element-plus` 与 `@xunserver-jsf/react` + `@xunserver-jsf/antd` 交付。`SchemaDialectDefinition` / `SchemaExtensionDefinition` / `ValueInitializerDefinition` 只从 `@xunserver-jsf/core/extension` 导出；根入口只新增 `FormConfig.valueInitializer` 与 `CreateFormOptions.valueInitializer` 两个 string key。Core 不附带内置 dialect adapter 或 `x-*` 词汇。
 
 ## Core 内部目录
 
@@ -109,6 +112,6 @@ Schema Frontend 消费点：`compiler/schema` 在 dialect detection 调用 `conv
 - Core 公共契约必须保持框架无关，不得引入 Vue、React、DOM、UI library 或 AJV 类型。
 - Compiled Model 必须保持只读，不得混入 FormInstance values 或可变 Runtime 状态。
 - `RuntimeNodeId` 以及可变 Store、Scheduler、Compiler Context 不得进入任何公共入口。
-- `defineWidget()` 与 `WidgetDefinition` interaction contract 只从 `@form/core/extension` 导出；根入口不重导出。
+- `defineWidget()` 与 `WidgetDefinition` interaction contract 只从 `@xunserver-jsf/core/extension` 导出；根入口不重导出。
 - Field `requirement` presentation source 由静态编译投影；effective `required`、`blur()`、`setCollapsed()` / `setActiveTab()` 与 `RenderScope` / `InstanceBinding` / `getRenderScope()` 由 Core Runtime 交付。Vue/Element Plus 与 React/Ant Design Renderer 都只消费这些公开端口。
 - 不要把 Plugin 可注册的 dialect adapter / `x-*` extension / value initializer 写成 Core 内置能力；也不要把本切片理解成 Validation pipeline 的实现来源。

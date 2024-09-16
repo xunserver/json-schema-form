@@ -1,24 +1,49 @@
 {
-  "name": "@form/arco-react",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@xunserver-jsf/arco-react",
+  "version": "1.0.1",
+  "description": "Arco Design React UI adapter for @xunserver-jsf/react.",
+  "keywords": [
+    "json-schema",
+    "form",
+    "react",
+    "arco-design"
+  ],
+  "license": "MIT",
+  "author": "xunserver",
+  "homepage": "https://xunserver.github.io/json-schema-form/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xunserver/json-schema-form.git",
+    "directory": "packages/adapter/arco-react"
+  },
+  "bugs": {
+    "url": "https://github.com/xunserver/json-schema-form/issues"
+  },
   "type": "module",
   "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     }
   },
-  "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -b --pretty false",
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
-    "@form/core": "workspace:*",
-    "@form/react": "workspace:*"
+    "@xunserver-jsf/core": "workspace:*",
+    "@xunserver-jsf/react": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0 || ^18.0.0",

@@ -6,8 +6,8 @@ import {
   formSelector,
   presentableErrorSelector,
   viewSelector,
-} from "@form/core/runtime";
-import type { ArrayItemId, InstancePathLike, ViewNodeId } from "@form/core";
+} from "@xunserver-jsf/core/runtime";
+import type { ArrayItemId, InstancePathLike, ViewNodeId } from "@xunserver-jsf/core";
 import { useRendererContext } from "../context/renderer-context.js";
 import { memoizeSelector, useRuntimeSelector } from "./use-runtime-selector.js";
 

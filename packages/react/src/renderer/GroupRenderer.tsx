@@ -1,4 +1,4 @@
-import type { GroupView } from "@form/core";
+import type { GroupView } from "@xunserver-jsf/core";
 import type { ReactNode } from "react";
 import { wrapAdapterCall } from "../adapter/runtime-error.js";
 import { useRendererContext } from "../context/renderer-context.js";

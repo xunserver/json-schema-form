@@ -1,10 +1,10 @@
-import type { FormInstance } from "@form/core";
+import type { FormInstance } from "@xunserver-jsf/core";
 import {
   getRuntimeSnapshot,
   subscribeRuntime,
   type RuntimeSelector,
   type Unsubscribe,
-} from "@form/core/runtime";
+} from "@xunserver-jsf/core/runtime";
 import { useCallback, useRef, useSyncExternalStore } from "react";
 
 const SELECTOR_CACHE = new WeakMap<FormInstance, Map<string, RuntimeSelector<unknown>>>();

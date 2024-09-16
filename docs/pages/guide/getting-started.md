@@ -6,23 +6,23 @@ JSON Schema Form 把 JSON Schema 当作数据契约，把 UI Schema 当作呈现
 defineForm() → compileForm() → createForm() → FormRenderer
 ```
 
-当前仓库是 pnpm / TypeScript monorepo。逻辑包名是 `@form/*`；正式发布前 npm scope 可以替换，职责边界不变。
+当前仓库是 pnpm / TypeScript monorepo。正式 npm 包名是 `@xunserver-jsf/*`；scope 从早期逻辑名 `@form/*` 替换而来，职责边界不变。
 
 ## 安装
 
-在已有 Vue 或 React 应用中安装对应 package。Core 始终需要；AJV 校验只通过 `@form/validator-ajv` 引入。
+在已有 Vue 或 React 应用中安装对应 package。Core 始终需要；AJV 校验只通过 `@xunserver-jsf/validator-ajv` 引入。
 
 Vue + Element Plus：
 
 ```bash
-pnpm add @form/core @form/vue @form/element-plus @form/validator-ajv
+pnpm add @xunserver-jsf/core @xunserver-jsf/vue @xunserver-jsf/element-plus @xunserver-jsf/validator-ajv
 pnpm add vue element-plus
 ```
 
 React + Ant Design：
 
 ```bash
-pnpm add @form/core @form/react @form/antd @form/validator-ajv
+pnpm add @xunserver-jsf/core @xunserver-jsf/react @xunserver-jsf/antd @xunserver-jsf/validator-ajv
 pnpm add react react-dom antd
 ```
 
@@ -39,9 +39,9 @@ pnpm playground
 ## 最短 Vue 示例
 
 ```ts
-import { defineForm, compileForm, createForm } from "@form/core";
-import { FormRenderer } from "@form/vue";
-import { elementPlusAdapter } from "@form/element-plus";
+import { defineForm, compileForm, createForm } from "@xunserver-jsf/core";
+import { FormRenderer } from "@xunserver-jsf/vue";
+import { elementPlusAdapter } from "@xunserver-jsf/element-plus";
 
 const definition = defineForm({
   schema: {
@@ -64,9 +64,9 @@ const form = createForm(model, { initialValues: { name: "Ada" } });
 ## 最短 React 示例
 
 ```tsx
-import { defineForm, compileForm, createForm } from "@form/core";
-import { FormRenderer } from "@form/react";
-import { antdAdapter } from "@form/antd";
+import { defineForm, compileForm, createForm } from "@xunserver-jsf/core";
+import { FormRenderer } from "@xunserver-jsf/react";
+import { antdAdapter } from "@xunserver-jsf/antd";
 
 const definition = defineForm({
   schema: {
@@ -93,4 +93,4 @@ export function App() {
 - [Runtime](./runtime.md)：`createForm()`、command 与 serialize
 - [Playground](./playground.md)：对照四套 Adapter
 
-公开入口只有 package `exports` 声明的路径：`@form/core`、`@form/core/runtime`、`@form/core/extension`，以及各 Renderer / Adapter 的根入口。未声明 deep import 会被拒绝。
+公开入口只有 package `exports` 声明的路径：`@xunserver-jsf/core`、`@xunserver-jsf/core/runtime`、`@xunserver-jsf/core/extension`，以及各 Renderer / Adapter 的根入口。未声明 deep import 会被拒绝。

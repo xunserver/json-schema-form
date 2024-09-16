@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { compileV1 } from "../fixtures/v1/index.js";
 import { semanticFingerprint } from "../fixtures/v1/fingerprint.js";
-import { subscribeRuntime, valueSelector } from "@form/core/runtime";
+import { subscribeRuntime, valueSelector } from "@xunserver-jsf/core/runtime";
 
 describe("v1 model reuse", () => {
   test("V1-MODEL-REUSE-FINGERPRINT keeps compile inspection deterministic", () => {

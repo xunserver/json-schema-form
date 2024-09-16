@@ -1,16 +1,16 @@
 # shadcn Adapter
 
-`@form/shadcn` 位于 React Renderer 之上。默认 adapter ID 为 `shadcn`。Core `FormEnvironment` 仍是 Widget、规则和校验的真相；shadcn 组件本地状态与 DOM validity 不得作为业务状态。
+`@xunserver-jsf/shadcn` 位于 React Renderer 之上。默认 adapter ID 为 `shadcn`。Core `FormEnvironment` 仍是 Widget、规则和校验的真相；shadcn 组件本地状态与 DOM validity 不得作为业务状态。
 
 shadcn/ui 以源码拷贝分发，因此本 adapter **不 vendor、不发布** UI 组件，也没有默认单例。消费方必须注入已有组件：
 
 ```tsx
-import { FormRenderer } from "@form/react";
+import { FormRenderer } from "@xunserver-jsf/react";
 import {
   createShadcnAdapter,
   extendShadcnAdapter,
   type ShadcnAdapterComponents,
-} from "@form/shadcn";
+} from "@xunserver-jsf/shadcn";
 
 const components: ShadcnAdapterComponents = {
   Input,

@@ -8,7 +8,7 @@
 
 本文档固化 JSON Schema Form Engine 的整体架构、职责边界、核心模型、运行时语义、扩展机制、公共 API、npm 包边界和目录约定。后续实现应以本文档为基线；如果实现需要突破其中的“架构不变量”，必须先形成新的架构决策并更新本文档。
 
-本文中的 `@form/*` 是逻辑包名。正式发布前可以替换 npm scope，但包的职责边界不随命名改变。
+本文中的 `@xunserver-jsf/*` 是正式 npm 包名。scope 从早期逻辑名 `@form/*` 替换而来，包的职责边界不随命名改变。
 
 ## 2. 目标与非目标
 
@@ -520,8 +520,8 @@ WidgetDefinition 不包含 Vue/React component、native props/events、UI librar
 
 ```text
 Core logical protocol
-  +-- @form/vue   -> VueUIAdapter   -> Element Plus / Ant Design Vue / ...
-  `-- @form/react -> ReactUIAdapter -> Ant Design React / Arco Design React / shadcn / ...
+  +-- @xunserver-jsf/vue   -> VueUIAdapter   -> Element Plus / Ant Design Vue / ...
+  `-- @xunserver-jsf/react -> ReactUIAdapter -> Ant Design React / Arco Design React / shadcn / ...
 ```
 
 VueRenderer 和 ReactRenderer 独立实现树遍历、生命周期和订阅，但共享 ViewTree、Runtime、Snapshot 和行为规范。
@@ -670,7 +670,7 @@ Extension API
   typed Registry contribution and Adapter protocols
 ```
 
-`@form/core` 主入口只导出 Application API、公共接口、readonly model 和 diagnostics。Advanced Runtime API 与 Extension API 从 `@form/core/runtime`、`@form/core/extension` 或等价 subpath export 导入，避免普通业务代码依赖内部概念。Framework package 对外提供语义对应的 renderer、hooks/composables 和 snapshot binding。
+`@xunserver-jsf/core` 主入口只导出 Application API、公共接口、readonly model 和 diagnostics。Advanced Runtime API 与 Extension API 从 `@xunserver-jsf/core/runtime`、`@xunserver-jsf/core/extension` 或等价 subpath export 导入，避免普通业务代码依赖内部概念。Framework package 对外提供语义对应的 renderer、hooks/composables 和 snapshot binding。
 
 以下实现细节不得从主入口公开：
 
@@ -688,37 +688,37 @@ Public object 优先暴露 interface + factory，不暴露可直接 `new` 的内
 首期发布包：
 
 ```text
-@form/core
-@form/validator-ajv
-@form/vue
-@form/react
-@form/element-plus
+@xunserver-jsf/core
+@xunserver-jsf/validator-ajv
+@xunserver-jsf/vue
+@xunserver-jsf/react
+@xunserver-jsf/element-plus
 ```
 
 已扩展的 UI Adapter 包：
 
 ```text
-@form/antd
-@form/arco-vue
-@form/arco-react
-@form/shadcn
+@xunserver-jsf/antd
+@xunserver-jsf/arco-vue
+@xunserver-jsf/arco-react
+@xunserver-jsf/shadcn
 ```
 
 后续可继续增加其他 framework/UI adapters。
 
-不拆分 `@form/compiler`、`@form/runtime`、`@form/schema`、`@form/rules`、`@form/validation`。它们是 Core 内部模块边界，不是独立使用或发布边界。AJV 独立成包，因为它是明确的第三方依赖和替换边界。
+不拆分 `@xunserver-jsf/compiler`、`@xunserver-jsf/runtime`、`@xunserver-jsf/schema`、`@xunserver-jsf/rules`、`@xunserver-jsf/validation`。它们是 Core 内部模块边界，不是独立使用或发布边界。AJV 独立成包，因为它是明确的第三方依赖和替换边界。
 
 包依赖方向：
 
 ```text
-@form/validator-ajv ------> @form/core
-@form/vue ----------------> @form/core
-@form/react --------------> @form/core
-@form/element-plus -------> @form/vue + @form/core
-@form/antd ---------------> @form/react + @form/core
-@form/arco-vue -----------> @form/vue + @form/core
-@form/arco-react ---------> @form/react + @form/core
-@form/shadcn -------------> @form/react + @form/core
+@xunserver-jsf/validator-ajv ------> @xunserver-jsf/core
+@xunserver-jsf/vue ----------------> @xunserver-jsf/core
+@xunserver-jsf/react --------------> @xunserver-jsf/core
+@xunserver-jsf/element-plus -------> @xunserver-jsf/vue + @xunserver-jsf/core
+@xunserver-jsf/antd ---------------> @xunserver-jsf/react + @xunserver-jsf/core
+@xunserver-jsf/arco-vue -----------> @xunserver-jsf/vue + @xunserver-jsf/core
+@xunserver-jsf/arco-react ---------> @xunserver-jsf/react + @xunserver-jsf/core
+@xunserver-jsf/shadcn -------------> @xunserver-jsf/react + @xunserver-jsf/core
 ```
 
 Vue/React 和 UI 库通过 peerDependencies 表达宿主依赖。
@@ -920,7 +920,7 @@ Schema Frontend、Compiler、Plugin installation、Adapter capability 和 Runtim
 实现达到以下条件时，说明分层成立：
 
 - 同一 FormDefinition 和业务 Plugin 可在 Vue/Element Plus 与 React/Ant Design 中复用。
-- `@form/core` 的依赖树中不存在 Vue、React、DOM UI library 和 AJV。
+- `@xunserver-jsf/core` 的依赖树中不存在 Vue、React、DOM UI library 和 AJV。
 - 编译结果可被检查和缓存，并且创建多个 FormInstance 时状态完全隔离。
 - 数组 move 后，业务 item 的 touched/error/view state 跟随 ArrayItemId，而不是旧 index。
 - 单字段更新只通知受影响 selector，不触发整表订阅者树重算/重渲染。

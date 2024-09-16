@@ -1,6 +1,6 @@
 import { Ajv2020, type ValidateFunction } from "ajv/dist/2020.js";
-import type { JsonSchema } from "@form/core";
-import type { SchemaAdapterIssue } from "@form/core/extension";
+import type { JsonSchema } from "@xunserver-jsf/core";
+import type { SchemaAdapterIssue } from "@xunserver-jsf/core/extension";
 import { normalizeAjvErrors } from "./ajv-error-normalizer.js";
 
 export class AjvValidatorAdapter {

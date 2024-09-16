@@ -1,4 +1,4 @@
-import type { Diagnostic, JsonValue } from "@form/core";
+import type { Diagnostic, JsonValue } from "@xunserver-jsf/core";
 import type { PreviewId, WorkbenchDocument } from "./types.js";
 
 export const PLAYGROUND_CHANNEL = "form-playground-v1";

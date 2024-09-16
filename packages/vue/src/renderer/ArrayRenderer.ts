@@ -1,5 +1,5 @@
-import type { ArrayView } from "@form/core";
-import type { RenderScope } from "@form/core/runtime";
+import type { ArrayView } from "@xunserver-jsf/core";
+import type { RenderScope } from "@xunserver-jsf/core/runtime";
 import { defineComponent, Fragment, h, type PropType, type VNode } from "vue";
 import { wrapAdapterCall } from "../adapter/runtime-error.js";
 import { provideChildScope, provideRendererContext, useRendererContext } from "../context/renderer-context.js";

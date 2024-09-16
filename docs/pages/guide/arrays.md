@@ -9,7 +9,7 @@
 - `setItemValue` 保留根 item ID
 - 未配置 Identity Resolver 时，有效的整个数组替换会重建全部 item ID，不会按 index 或业务字段猜测复用
 
-可在 `createForm` 选项中按数组 `ModelPath` 提供纯同步 `ArrayIdentityResolver`（类型从 `@form/core/runtime` 导入）做 key reconcile。重复 key 或抛错会使 transaction 回滚。
+可在 `createForm` 选项中按数组 `ModelPath` 提供纯同步 `ArrayIdentityResolver`（类型从 `@xunserver-jsf/core/runtime` 导入）做 key reconcile。重复 key 或抛错会使 transaction 回滚。
 
 固定 tuple 现存 slot 可 `setItemValue` / `replaceItem`，但不支持 append / insert / remove / move / clear。
 

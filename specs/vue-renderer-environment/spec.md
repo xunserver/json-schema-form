@@ -7,7 +7,7 @@
 ## Requirements
 
 ### Requirement: RendererEnvironment 与 FormEnvironment 严格分离
-`@form/vue` 必须（SHALL）让 Renderer binding 通过显式 Vue `RendererEnvironment`/`VueUIAdapter` 输入构建，不得（MUST NOT）注册进 Core `FormEnvironment`、修改 `WidgetDefinition`/`CompiledFormModel`，或读取 global mutable Registry。逻辑 Widget key 可以在两个 environment 中对应，但 Core environment identity 与 Renderer environment identity 不得互换或合并。
+`@xunserver-jsf/vue` 必须（SHALL）让 Renderer binding 通过显式 Vue `RendererEnvironment`/`VueUIAdapter` 输入构建，不得（MUST NOT）注册进 Core `FormEnvironment`、修改 `WidgetDefinition`/`CompiledFormModel`，或读取 global mutable Registry。逻辑 Widget key 可以在两个 environment 中对应，但 Core environment identity 与 Renderer environment identity 不得互换或合并。
 
 #### Scenario: 同一模型选择不同 Vue adapter
 - **GIVEN** 同一 `CompiledFormModel` 的逻辑 Widget 已解析，调用者分别提供两个独立 VueUIAdapter

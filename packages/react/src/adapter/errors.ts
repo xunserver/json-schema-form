@@ -1,4 +1,4 @@
-import type { Diagnostic } from "@form/core";
+import type { Diagnostic } from "@xunserver-jsf/core";
 
 function freezeDiagnostic(diagnostic: Diagnostic): Diagnostic {
   const frozen: Diagnostic = {

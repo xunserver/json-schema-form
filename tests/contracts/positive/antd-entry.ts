@@ -1,6 +1,6 @@
-import { FormRenderer } from "@form/react";
-import { antdAdapter, createAntdAdapter, extendAntdAdapter } from "@form/antd";
-import { compileForm, createForm, defineForm } from "@form/core";
+import { FormRenderer } from "@xunserver-jsf/react";
+import { antdAdapter, createAntdAdapter, extendAntdAdapter } from "@xunserver-jsf/antd";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { createElement } from "react";
 
 const form = createForm(

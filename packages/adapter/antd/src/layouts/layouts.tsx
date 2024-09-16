@@ -1,5 +1,5 @@
-import type { ArrayView, GroupView, LayoutView, ObjectView } from "@form/core";
-import type { LayoutBinding } from "@form/react";
+import type { ArrayView, GroupView, LayoutView, ObjectView } from "@xunserver-jsf/core";
+import type { LayoutBinding } from "@xunserver-jsf/react";
 import { Collapse } from "antd";
 import type { ReactNode } from "react";
 

@@ -1,14 +1,14 @@
 # Arco Design React Adapter
 
-`@form/arco-react` 位于 React Renderer 之上。默认 adapter ID 为 `arco-react`。Core `FormEnvironment` 仍是 Widget、规则和校验的真相；Arco Form 的 model / validate / DOM validity 不得作为业务状态。
+`@xunserver-jsf/arco-react` 位于 React Renderer 之上。默认 adapter ID 为 `arco-react`。Core `FormEnvironment` 仍是 Widget、规则和校验的真相；Arco Form 的 model / validate / DOM validity 不得作为业务状态。
 
 ```tsx
-import { FormRenderer } from "@form/react";
+import { FormRenderer } from "@xunserver-jsf/react";
 import {
   arcoReactAdapter,
   createArcoReactAdapter,
   extendArcoReactAdapter,
-} from "@form/arco-react";
+} from "@xunserver-jsf/arco-react";
 ```
 
 ```tsx

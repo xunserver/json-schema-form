@@ -1,5 +1,5 @@
 import type { WidgetRenderInput, SemanticActions } from "../src/index.js";
-import type { RenderScope } from "@form/core/runtime";
+import type { RenderScope } from "@xunserver-jsf/core/runtime";
 
 type InputKeys = keyof WidgetRenderInput;
 type ForbiddenInput = Extract<

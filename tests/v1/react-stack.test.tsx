@@ -2,7 +2,7 @@
 import { describe, expect, test } from "vitest";
 import { act, cleanup, render } from "@testing-library/react";
 import { afterEach } from "vitest";
-import { FormRenderer } from "@form/react";
+import { FormRenderer } from "@xunserver-jsf/react";
 import { applySemanticSteps, compileV1, observeForm } from "../fixtures/v1/index.js";
 import { createDemoRendererEnvironment } from "../lib/demo-antd-environment.tsx";
 
@@ -21,6 +21,6 @@ describe("v1 react stack", () => {
     const submitted = await act(async () => applySemanticSteps(form));
     const observation = observeForm(form, { previousIds, submitted });
     expect(observation.values).toMatchObject({ name: "Grace" });
-    expect(view.container.textContent).not.toContain("@form/vue");
+    expect(view.container.textContent).not.toContain("@xunserver-jsf/vue");
   });
 });

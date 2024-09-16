@@ -1,4 +1,4 @@
-import type { FieldView } from "@form/core";
+import type { FieldView } from "@xunserver-jsf/core";
 import { computed, defineComponent, onScopeDispose, type PropType, type VNode } from "vue";
 import { wrapAdapterCall } from "../adapter/runtime-error.js";
 import { createFieldDomIds } from "../composables/ids.js";

@@ -1,17 +1,17 @@
 # Validation
 
-Core 只通过 Registry key 引用 validator，不嵌入 AJV instance、callback 或 Runtime binding。AJV 只允许出现在 `@form/validator-ajv`。
+Core 只通过 Registry key 引用 validator，不嵌入 AJV instance、callback 或 Runtime binding。AJV 只允许出现在 `@xunserver-jsf/validator-ajv`。
 
 `defineValidator()` 是 Extension identity helper，必须注册进冻结 `FormEnvironment` 后才能被 `compileForm()` 解析。
 
 ```ts
-import { compileForm, createForm, defineForm } from "@form/core";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import {
   createFormEnvironment,
   definePlugin,
   defineValidator,
-} from "@form/core/extension";
-import { AJV_VALIDATOR_KEY, createAjvValidator } from "@form/validator-ajv";
+} from "@xunserver-jsf/core/extension";
+import { AJV_VALIDATOR_KEY, createAjvValidator } from "@xunserver-jsf/validator-ajv";
 
 const environment = createFormEnvironment({
   plugins: [

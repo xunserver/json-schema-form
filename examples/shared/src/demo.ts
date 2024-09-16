@@ -1,4 +1,4 @@
-import { compileForm, createForm, defineForm } from "@form/core";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { createDemoEnvironment } from "./environment.js";
 import { getDefaultCatalogExample } from "./catalog.js";
 import type { CatalogExample } from "./types.js";

@@ -1,5 +1,5 @@
-import type { JsonValue } from "@form/core";
-import type { CodecResult, ValueCodec } from "@form/react";
+import type { JsonValue } from "@xunserver-jsf/core";
+import type { CodecResult, ValueCodec } from "@xunserver-jsf/react";
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const RFC3339 =

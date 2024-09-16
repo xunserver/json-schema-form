@@ -1,6 +1,6 @@
-import { FormRenderer } from "@form/react";
-import { arcoReactAdapter, createArcoReactAdapter, extendArcoReactAdapter } from "@form/arco-react";
-import { compileForm, createForm, defineForm } from "@form/core";
+import { FormRenderer } from "@xunserver-jsf/react";
+import { arcoReactAdapter, createArcoReactAdapter, extendArcoReactAdapter } from "@xunserver-jsf/arco-react";
+import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { createElement } from "react";
 
 const form = createForm(
