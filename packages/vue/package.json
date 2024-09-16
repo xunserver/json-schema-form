@@ -1,6 +1,6 @@
 {
   "name": "@xunserver-jsf/vue",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Vue renderer for the JSON Schema form engine.",
   "keywords": [
     "json-schema",

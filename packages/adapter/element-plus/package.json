@@ -1,6 +1,6 @@
 {
   "name": "@xunserver-jsf/element-plus",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Element Plus UI adapter for @xunserver-jsf/vue.",
   "keywords": [
     "json-schema",

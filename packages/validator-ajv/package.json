@@ -1,6 +1,6 @@
 {
   "name": "@xunserver-jsf/validator-ajv",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "AJV Draft 2020-12 validator adapter for @xunserver-jsf/core.",
   "keywords": [
     "json-schema",

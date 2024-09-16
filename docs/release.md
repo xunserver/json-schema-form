@@ -68,7 +68,7 @@ pnpm release            # changeset publish（需已登录 npm 或 CI OIDC）
 
 ## 当前版本
 
-产品包当前是 `1.1.0`。之后只通过 changeset bump，再由 `master` 上的 `release.yml` 用 Trusted Publishing 发新版本。
+产品包当前是 `1.1.1`。之后只通过 changeset bump，再由 `master` 上的 `release.yml` 用 Trusted Publishing 发新版本。
 
 本地试打包（不上传）：
 

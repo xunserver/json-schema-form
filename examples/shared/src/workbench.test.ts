@@ -80,13 +80,19 @@ describe("playground workbench", () => {
         expect(result.form.getValue("meeting")).toBe("2026-09-15T12:00:00+00:00");
       }
       if (meta.id === "all-fields") {
-        expect(example.uiSchema).toBeDefined();
-        expect(example.uiSchema && "layout" in example.uiSchema).toBe(false);
+        const uiSchema = example.uiSchema;
+        expect(uiSchema).toBeDefined();
+        expect(
+          uiSchema !== null &&
+            typeof uiSchema === "object" &&
+            !Array.isArray(uiSchema) &&
+            !("layout" in uiSchema),
+        ).toBe(true);
         expect(result.definition.uiSchema?.layout).toBeUndefined();
         const widgets = new Set(
           [...result.form.model.ui.fields.values()].map((field) => field.widget),
         );
-        expect([...widgets].toSorted()).toEqual(
+        expect([...widgets].sort()).toEqual(
           [
             "checkbox",
             "company.currency",

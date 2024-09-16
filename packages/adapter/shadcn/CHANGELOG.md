@@ -1,5 +1,14 @@
 # @xunserver-jsf/shadcn
 
+## 1.1.1
+
+### Patch Changes
+
+- Default adapter chrome now uses top labels. Form.Item slots keep label/help/errors out of the control row, tuple arrays zip prefixItems instead of repeating the whole itemLayout, and presentable errors resubscribe after submit and reset.
+- Updated dependencies
+  - @xunserver-jsf/core@1.1.1
+  - @xunserver-jsf/react@1.1.1
+
 ## 1.1.0
 
 ### Minor Changes
