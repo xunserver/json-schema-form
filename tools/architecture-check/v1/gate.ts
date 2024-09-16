@@ -4,7 +4,12 @@ import { spawnSync } from "node:child_process";
 import { collectEvidence, gitRevision, toolVersions, type EvidenceCommandResult } from "./evidence.ts";
 import { loadCoverageMatrix, validateCoverageMatrix } from "./matrix.ts";
 import { checkArchitecture } from "../check.ts";
-import { checkV1Workspace } from "./workspace.ts";
+import {
+  checkBundleGraph,
+  checkCoreLayoutEvidence,
+  checkExportSurfaces,
+  checkWorkspaceLayout,
+} from "./workspace.ts";
 import type { MatrixIssue } from "./types.ts";
 
 export const GATE_STAGES = [
@@ -41,11 +46,15 @@ export function runV1Gate(workspaceRoot: string): { passed: boolean; issues: Mat
     return { passed: false, issues, exitCode: 1 };
   }
 
-  const workspaceIssues = [...checkArchitecture(workspaceRoot).map((diagnostic) => ({
-    code: diagnostic.rule,
-    message: diagnostic.message,
-    path: diagnostic.file,
-  })), ...checkV1Workspace(workspaceRoot)];
+  const workspaceIssues = [
+    ...checkArchitecture(workspaceRoot).map((diagnostic) => ({
+      code: diagnostic.rule,
+      message: diagnostic.message,
+      path: diagnostic.file,
+    })),
+    ...checkWorkspaceLayout(workspaceRoot),
+    ...checkCoreLayoutEvidence(workspaceRoot),
+  ];
   issues.push(...workspaceIssues);
   commands.push({
     id: "manifest-export",
@@ -72,6 +81,14 @@ export function runV1Gate(workspaceRoot: string): { passed: boolean; issues: Mat
       });
       finish(workspaceRoot, false, issues, commands, loaded.matrix.architectureDigest, loaded.matrix.tests.map((test) => test.id));
       return { passed: false, issues, exitCode: result.status ?? 1 };
+    }
+    if (stage.id === "build") {
+      const builtIssues = [...checkExportSurfaces(workspaceRoot), ...checkBundleGraph(workspaceRoot)];
+      issues.push(...builtIssues);
+      if (builtIssues.length > 0) {
+        finish(workspaceRoot, false, issues, commands, loaded.matrix.architectureDigest, loaded.matrix.tests.map((test) => test.id));
+        return { passed: false, issues, exitCode: 1 };
+      }
     }
   }
 
