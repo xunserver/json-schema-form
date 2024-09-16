@@ -1,5 +1,13 @@
 # @xunserver-jsf/element-plus
 
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @xunserver-jsf/core@1.0.2
+  - @xunserver-jsf/vue@1.0.2
+
 ## 1.0.1
 
 ### Patch Changes

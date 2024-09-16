@@ -1,6 +1,6 @@
 {
   "name": "@xunserver-jsf/shadcn",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "shadcn UI adapter for @xunserver-jsf/react. Host components are injected by the consumer.",
   "keywords": [
     "json-schema",

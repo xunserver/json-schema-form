@@ -1,5 +1,12 @@
 # @xunserver-jsf/validator-ajv
 
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @xunserver-jsf/core@1.0.2
+
 ## 1.0.1
 
 ### Patch Changes

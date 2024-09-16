@@ -1,5 +1,11 @@
 # @xunserver-jsf/core
 
+## 1.0.2
+
+### Patch Changes
+
+- Verify Trusted Publishing still works after disallowing npm tokens.
+
 ## 1.0.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@xunserver-jsf/core",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Framework-agnostic JSON Schema form engine: definition, compile, transactional runtime, and validation.",
   "keywords": [
     "json-schema",

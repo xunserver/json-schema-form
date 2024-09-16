@@ -1,6 +1,6 @@
 {
   "name": "@xunserver-jsf/arco-vue",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Arco Design Vue UI adapter for @xunserver-jsf/vue.",
   "keywords": [
     "json-schema",
