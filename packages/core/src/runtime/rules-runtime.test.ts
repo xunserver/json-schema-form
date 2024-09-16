@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { createForm } from "../index.js";
+import { compileForm, createForm, defineForm } from "../index.js";
 import { RUNTIME_DIAGNOSTIC_CODES } from "./diagnostic-codes.js";
 import { FormRuntimeError } from "./error.js";
 import {
@@ -8,7 +8,7 @@ import {
   valueSelector,
 } from "./index.js";
 import { createFormWithTestHooks, peekFormRuntime } from "./test-harness.js";
-import { compileRules, sampleProducts } from "./rules.test-utils.js";
+import { compileRules, sampleProducts, taxEnvironment } from "./rules.test-utils.js";
 import { expectRuntimeError } from "./runtime.test-utils.js";
 
 describe("rule scheduler and array lifecycle", () => {
@@ -273,5 +273,97 @@ describe("transaction phases and rule categories", () => {
     expect(form.getValue("region")).toBe("init");
     expect(form.getState().dirty).toBe(false);
     expect(form.getState().version).toBe(2);
+  });
+});
+
+describe("activation flip rescheduling", () => {
+  test("reactivating a branch reschedules computed and effect on preserved values", () => {
+    const environment = taxEnvironment();
+    const { model } = compileForm(
+      defineForm({
+        schema: {
+          type: "object",
+          properties: { kind: { type: "string" }, billing: { type: "string" }, region: { type: "string" } },
+          oneOf: [
+            {
+              properties: { kind: { const: "company" }, company: { type: "string" } },
+              required: ["kind"],
+            },
+            {
+              properties: { kind: { const: "person" }, person: { type: "string" } },
+              required: ["kind"],
+            },
+          ],
+        },
+        uiSchema: {
+          fields: {
+            kind: { field: false },
+            company: { field: false },
+            person: { field: false },
+            billing: { field: false },
+            region: { field: false },
+          },
+        },
+        rules: [
+          { kind: "computed", target: "company", action: { value: { field: "billing" } } },
+          {
+            kind: "effect",
+            target: "company",
+            action: {
+              actions: [{ type: "setValue", target: "region", value: "from-company" }],
+            },
+          },
+        ],
+      }),
+      { environment },
+    );
+    const form = createForm(model, {
+      environment,
+      initialValues: {
+        kind: "person",
+        person: "Ada",
+        company: "stale",
+        billing: "invoice-a",
+        region: "east",
+      },
+    });
+    expect(form.getField("company").getState().active).toBe(false);
+    expect(form.getValue("company")).toBe("stale");
+
+    form.setValue("billing", "invoice-b");
+    expect(form.getValue("company")).toBe("stale");
+    expect(form.getValue("region")).toBe("east");
+
+    const before = form.getState().version;
+    const versions: number[] = [];
+    subscribeRuntime(form, formSelector(), (snapshot) => {
+      versions.push(snapshot.version);
+    });
+    form.setValue("kind", "company");
+    expect(form.getField("company").getState().active).toBe(true);
+    expect(form.getValue("company")).toBe("invoice-b");
+    expect(form.getValue("region")).toBe("from-company");
+    expect(versions).toEqual([before + 1]);
+  });
+
+  test("sibling array item rules stay idle when another item changes", () => {
+    const { model, environment } = compileRules({
+      rules: [
+        {
+          kind: "computed",
+          target: "products[].total",
+          action: { value: { field: "products[].quantity" } },
+        },
+      ],
+    });
+    const form = createForm(model, { environment, initialValues: sampleProducts() });
+    let siblingRuns = 0;
+    subscribeRuntime(form, valueSelector("products[1].total"), () => {
+      siblingRuns += 1;
+    });
+    form.setValue("products[0].quantity", 9);
+    expect(form.getValue("products[0].total")).toBe(9);
+    expect(form.getValue("products[1].total")).toBe(1);
+    expect(siblingRuns).toBe(0);
   });
 });

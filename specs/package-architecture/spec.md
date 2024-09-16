@@ -64,7 +64,7 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **THEN** 至少一项检查失败，并指出禁止依赖或不可用的 DOM 契约
 
 ### Requirement: Core 内部目录按架构生命周期领域组织
-`packages/core/src/` 的顶层目录必须（SHALL）恰好为 `definition/`、`schema/`、`compiler/`、`model/`、`runtime/`、`widget/`、`rule/`、`validation/`、`extension/`、`diagnostic/`、`engine/` 与入口 `index.ts`；`compiler/` 必须（MUST）包含 `schema/`、`shape/`、`data/`、`ui/`、`rule/`、`validation/` 子领域，`model/` 必须（MUST）包含 `data/`、`ui/`、`rule/`、`validation/`、`schema-dynamics/`，`runtime/` 必须（MUST）包含 `form/`、`value/`、`state/`、`transaction/`、`array/`、`dependency/`、`subscription/`、`scope/`。领域内可以（MAY）存在内部 `index.ts` 与局部 helper 文件，测试必须（MUST）与其领域代码 colocate；不得（MUST NOT）建立顶层 `types/`、`services/`、`utils/` 目录。目录调整不得（MUST NOT）改变 package `exports`、公开 declarations 或运行时行为。
+`packages/core/src/` 的顶层目录必须（SHALL）恰好为 `definition/`、`schema/`、`compiler/`、`model/`、`runtime/`、`widget/`、`rule/`、`validation/`、`extension/`、`diagnostic/`、`engine/` 与入口 `index.ts`；`compiler/` 必须（MUST）包含 `schema/`、`shape/`、`data/`、`ui/`、`rule/`、`validation/`、`dynamics/` 子领域，`model/` 必须（MUST）包含 `data/`、`ui/`、`rule/`、`validation/`、`schema-dynamics/`、`path/`、`identity/`，`runtime/` 必须（MUST）包含 `form/`、`value/`、`state/`、`transaction/`、`array/`、`dependency/`、`subscription/`、`scope/`、`rule/`、`validation/`、`dynamics/`。领域内可以（MAY）存在内部 `index.ts` 与局部 helper 文件，测试必须（MUST）与其领域代码 colocate；不得（MUST NOT）建立顶层 `types/`、`services/`、`utils/` 目录。目录调整不得（MUST NOT）改变 package `exports`、公开 declarations 或运行时行为。
 
 #### Scenario: 顶层目录与架构一致
 - **GIVEN** 当前 `packages/core/src` 布局
@@ -74,7 +74,7 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 #### Scenario: 子领域目录存在且承载对应代码
 - **GIVEN** `compiler/`、`model/`、`runtime/` 三个领域
 - **WHEN** 检查其子目录
-- **THEN** 要求的子领域目录全部存在，Validation compiler/model/runtime 代码位于对应 `validation/` 子目录，array identity 与 scope facade 位于 `runtime/array/` 与 `runtime/scope/`
+- **THEN** 要求的子领域目录全部存在，Validation compiler/model/runtime 代码位于对应 `validation/` 子目录，Schema Dynamics 位于 `compiler/dynamics/` 与 `runtime/dynamics/`，array identity 与 scope facade 位于 `runtime/array/` 与 `runtime/scope/`，path/identity 类型位于 `model/path/` 与 `model/identity/`
 
 #### Scenario: 目录迁移不改变公共边界
 - **GIVEN** 目录按本要求调整前后的两次构建

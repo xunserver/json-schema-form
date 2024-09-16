@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
 import { loadCoverageMatrix } from "../../tools/architecture-check/v1/matrix.js";
+import { resolveChangeSpec } from "../../tools/architecture-check/v1/owner-resolver.js";
 import { REPO_ROOT } from "../lib/fs.js";
 
 const SCENARIO_TESTS: Readonly<Record<string, readonly string[]>> = {
@@ -41,10 +42,12 @@ describe("v1 delta spec coverage map", () => {
         }
       }
     }
-    const specFiles = [
-      path.join(REPO_ROOT, "openspec/changes/complete-v1-architecture-acceptance/specs/v1-architecture-acceptance/spec.md"),
-      path.join(REPO_ROOT, "openspec/changes/complete-v1-architecture-acceptance/specs/package-architecture/spec.md"),
+    const resolvedSpecs = [
+      resolveChangeSpec(REPO_ROOT, "complete-v1-architecture-acceptance", "v1-architecture-acceptance"),
+      resolveChangeSpec(REPO_ROOT, "complete-v1-architecture-acceptance", "package-architecture"),
     ];
+    expect(resolvedSpecs.flatMap((result) => result.issues)).toEqual([]);
+    const specFiles = resolvedSpecs.map((result) => result.resolved!.file);
     const specScenarios: string[] = [];
     for (const file of specFiles) {
       for (const line of fs.readFileSync(file, "utf8").split(/\r?\n/)) {

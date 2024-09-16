@@ -54,7 +54,7 @@ function selectProps(input: WidgetRenderInput, modelValue: unknown, multiple = f
     ...input.nativeProps,
     id: input.ids.control,
     modelValue,
-    disabled: input.fieldSnapshot.disabled,
+    disabled: input.fieldSnapshot.disabled || input.fieldSnapshot.readonly,
     "aria-labelledby": input.ids.label,
     "aria-invalid": input.presentableErrors.length > 0,
     "aria-required": input.fieldSnapshot.required,

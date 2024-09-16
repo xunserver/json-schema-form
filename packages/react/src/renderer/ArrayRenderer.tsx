@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { wrapAdapterCall } from "../adapter/runtime-error.js";
 import { RendererScopeProvider, useRendererContext } from "../context/renderer-context.js";
 import { useArrayOrder, useViewSnapshot } from "../hooks/snapshots.js";
+import { createGuardedSetActiveTab } from "./tab-guard.js";
 import { ViewRenderer } from "./ViewRenderer.js";
 
 export function ArrayRenderer({ node }: { readonly node: ArrayView }): ReactNode {
@@ -44,7 +45,14 @@ export function ArrayRenderer({ node }: { readonly node: ArrayView }): ReactNode
               children: itemNodes,
               actions: {
                 setCollapsed: (collapsed) => parent.form.setCollapsed(node.id, collapsed),
-                setActiveTab: (tabKey) => parent.form.setActiveTab(node.id, tabKey),
+                setActiveTab: createGuardedSetActiveTab({
+                  adapterId: parent.adapter.id,
+                  layoutKey: "array",
+                  viewId: node.id,
+                  tabs: binding.tabs,
+                  setActiveTab: (tabKey) => parent.form.setActiveTab(node.id, tabKey),
+                  reportDiagnostic: parent.reportDiagnostic,
+                }),
               },
               reportDiagnostic: parent.reportDiagnostic,
             }),

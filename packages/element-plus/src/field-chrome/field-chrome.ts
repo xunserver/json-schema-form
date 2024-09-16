@@ -16,9 +16,6 @@ export const elementPlusFieldChrome: FieldChromeAdapter = {
       required: input.fieldSnapshot.required,
       showMessage: false,
     };
-    if (label !== undefined) {
-      props.label = label;
-    }
     if (errorMessages[0] !== undefined) {
       props.error = errorMessages[0];
     }

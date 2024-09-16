@@ -4,6 +4,7 @@ import { defineComponent, Fragment, h, type PropType, type VNode } from "vue";
 import { wrapAdapterCall } from "../adapter/runtime-error.js";
 import { provideChildScope, provideRendererContext, useRendererContext } from "../context/renderer-context.js";
 import { useArrayOrder, useViewSnapshot } from "../composables/snapshots.js";
+import { createGuardedSetActiveTab } from "./tab-guard.js";
 import { ViewRenderer } from "./ViewRenderer.js";
 import { viewRenderers } from "./registry.js";
 
@@ -38,7 +39,14 @@ export const ArrayRenderer = defineComponent({
             children: itemNodes,
             actions: {
               setCollapsed: (collapsed) => parent.form.setCollapsed(props.node.id, collapsed),
-              setActiveTab: (tabKey) => parent.form.setActiveTab(props.node.id, tabKey),
+              setActiveTab: createGuardedSetActiveTab({
+                adapterId: parent.adapter.id,
+                layoutKey: "array",
+                viewId: props.node.id,
+                tabs: binding.tabs,
+                setActiveTab: (tabKey) => parent.form.setActiveTab(props.node.id, tabKey),
+                reportDiagnostic: parent.reportDiagnostic,
+              }),
             },
             reportDiagnostic: parent.reportDiagnostic,
           }),

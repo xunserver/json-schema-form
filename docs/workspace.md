@@ -18,6 +18,8 @@
 | `pnpm test:v1:docs` | README、workspace、generated coverage 与 deferred 声明审计。 |
 | `pnpm verify` | `build && typecheck && test && check:boundaries && example:vue && example:react`。 |
 | `pnpm verify:v1` | 架构 v1 发布门禁。本地不重装依赖；证据写入 `artifacts/v1/`（该目录已 gitignore）。 |
+| `pnpm playground:react` | 启动 React/MUI Vite 工作台（http://127.0.0.1:5173/）。 |
+| `pnpm playground:vue` | 启动 Vue/Element Plus Vite 工作台（http://127.0.0.1:5174/）。 |
 
 根 package 为 private，并通过 `packageManager` 固定 pnpm。共享语言设置在 `tsconfig.base.json`；各 package 使用自己的 composite project，不使用会绕过 package exports 的根级 `paths` alias。pnpm 11 需要在 `pnpm-workspace.yaml` 中允许 `esbuild` 的 `allowBuilds`，否则 vitest/tsx 无法安装其原生绑定。
 
@@ -32,7 +34,7 @@
 | `@form/element-plus` | `packages/element-plus` | Element Plus Adapter 边界 | `elementPlusAdapter` / `createElementPlusAdapter()` / `extendElementPlusAdapter()`；依赖 `@form/vue` 与 `@form/core`，peer 为 `vue` 与 `element-plus` |
 | `@form/mui` | `packages/mui` | MUI Adapter 边界 | `muiAdapter` / `createMuiAdapter()` / `extendMuiAdapter()`；依赖 `@form/react` 与 `@form/core`，peer 为 `react` 与 `@mui/material` |
 
-叶子 package 中 `@form/vue` / `@form/element-plus` 与 `@form/react` / `@form/mui` 分别提供两条框架渲染链路。`@form/core` 已提供 `defineForm()`、`compileForm()` 静态编译（含 Rule AST 与 Schema Dynamics）、事务 Runtime、array identity / `array()` / `scope()`、`blur()` / `setCollapsed()` / `setActiveTab()`、`RenderScope` / `InstanceBinding`、effective state（含 `required`）、`serialize()` 以及 Validation owner（`validate()` / `applyErrors()` / `submit()`）。AJV 只允许出现在 `@form/validator-ajv`。公开 example 为 `examples/vue-element-plus` 与 `examples/react-mui`，复用 `tests/fixtures/v1/` 的业务 Definition/Plugin。Renderer 用法见 [`vue-element-plus.md`](./vue-element-plus.md) 与 [`react-mui.md`](./react-mui.md)。第 20 节 deferred 项不得作为产品入口出现。
+叶子 package 中 `@form/vue` / `@form/element-plus` 与 `@form/react` / `@form/mui` 分别提供两条框架渲染链路。`@form/core` 已提供 `defineForm()`、`compileForm()` 静态编译（含 Rule AST 与 Schema Dynamics）、事务 Runtime、array identity / `array()` / `scope()`、`blur()` / `setCollapsed()` / `setActiveTab()`、`RenderScope` / `InstanceBinding`、effective state（含 `required`）、`serialize()` 以及 Validation owner（`validate()` / `applyErrors()` / `submit()`）。AJV 只允许出现在 `@form/validator-ajv`。公开 example 为 `examples/vue-element-plus` 与 `examples/react-mui`（含可浏览 playground；共享 catalog 在 `examples/shared`），复用 `tests/fixtures/v1/` 的业务 Definition/Plugin。Renderer 用法见 [`vue-element-plus.md`](./vue-element-plus.md) 与 [`react-mui.md`](./react-mui.md)。第 20 节 deferred 项不得作为产品入口出现。
 
 ## 允许的依赖图
 
@@ -74,13 +76,13 @@
 `packages/core/src/` 按架构第 18 节的生命周期领域组织，由 `pnpm check:boundaries` 的 `core-layout` 规则强制：
 
 ```text
-definition/   schema/   compiler/{schema,shape,data,ui,rule,validation}
-model/{data,ui,rule,validation,schema-dynamics}
-runtime/{form,value,state,transaction,array,dependency,subscription,scope}
+definition/   schema/   compiler/{schema,shape,data,ui,rule,validation,dynamics}
+model/{data,ui,rule,validation,schema-dynamics,path,identity}
+runtime/{form,value,state,transaction,array,dependency,subscription,scope,rule,validation,dynamics}
 widget/   rule/   validation/   extension/   diagnostic/   engine/   index.ts
 ```
 
-顶层不得出现 `types/`、`services/`、`utils/`。`path` / `identity` 编入 `model/`，Engine/Environment 生命周期编入 `engine/`，内置 Widget 编入 `widget/`。领域内可有内部 `index.ts` 与局部 helper；package 公共表面仍只由三个 `exports` 入口决定。
+顶层不得出现 `types/`、`services/`、`utils/`。`path` / `identity` 编入 `model/`，Schema Dynamics 编译与 Runtime activation 分别编入 `compiler/dynamics` 与 `runtime/dynamics`，Rule/Validation 引擎编入 `runtime/rule` 与 `runtime/validation`，Engine/Environment 生命周期编入 `engine/`，内置 Widget 编入 `widget/`。领域内可有内部 `index.ts` 与局部 helper；package 公共表面仍只由三个 `exports` 入口决定。Vue/React 的 `test-utils/` 可作为非导出测试辅助存在。
 
 Schema Frontend 消费点：`compiler/schema` 在 dialect detection 调用 `convert()`，在 Data Model 实例化后按 `SchemaPath -> ModelPath[]` 调用 `split()`，再把片段合并进 compiler 私有 effective authoring input（显式 UI Schema / Rules / Config 优先，重叠 key 只 warning）。Value Initializer 消费点：`compiler/rule` 校验 `FormConfig.valueInitializer` key，`runtime/form` 的 `createForm()` 在 identity materialization 之前执行 `initialize()`。
 

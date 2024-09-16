@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { wrapAdapterCall } from "../adapter/runtime-error.js";
 import { useRendererContext } from "../context/renderer-context.js";
 import { useViewSnapshot } from "../hooks/snapshots.js";
+import { createGuardedSetActiveTab } from "./tab-guard.js";
 import { ViewRenderer } from "./ViewRenderer.js";
 
 export function LayoutRenderer({ node }: { readonly node: LayoutView }): ReactNode {
@@ -24,7 +25,14 @@ export function LayoutRenderer({ node }: { readonly node: LayoutView }): ReactNo
         children,
         actions: {
           setCollapsed: (collapsed) => parent.form.setCollapsed(node.id, collapsed),
-          setActiveTab: (tabKey) => parent.form.setActiveTab(node.id, tabKey),
+          setActiveTab: createGuardedSetActiveTab({
+            adapterId: parent.adapter.id,
+            layoutKey: "layout",
+            viewId: node.id,
+            tabs: binding.tabs,
+            setActiveTab: (tabKey) => parent.form.setActiveTab(node.id, tabKey),
+            reportDiagnostic: parent.reportDiagnostic,
+          }),
         },
         reportDiagnostic: parent.reportDiagnostic,
       }),

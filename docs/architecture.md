@@ -74,11 +74,11 @@ CompiledFormModel (readonly)
           v
 FormInstance
   |- ValueStore
-  |- Node / Field / View State Stores
+  |- Field / View State Stores
   |- ArrayStateStore
-  |- TransactionManager
-  |- DependencyScheduler
-  |- RuleEngine
+  |- FormRuntime.dispatch (transaction phases)
+  |- DependencyScheduler (internal)
+  |- RuleDynamicsEngine
   |- ValidationEngine
   `- Selectors / Subscriptions
           |
@@ -110,7 +110,7 @@ interface FormDefinition {
 
 `defineForm()` 是无副作用的 authoring helper，只负责类型推导、输入规范化和 IDE 体验；它不编译、不创建 Runtime，也不注册全局状态。
 
-可选的 `x-*` 扩展只是一种输入语法糖。Schema Frontend 必须先将它拆分为标准 JSON Schema、UI Schema、Rules 和 Form Config；内部模型不以 `x-*` 为核心协议。
+可选的 `x-*` 扩展只是一种输入语法糖。Schema Frontend 必须识别已声明的 `x-*` occurrence；`split()` 在 DataModel 实例化之后应用，以便传入 `ModelPath`，再合并进 UI Schema、Rules 和 Form Config。内部模型不以 `x-*` 为核心协议。
 
 ### 5.2 JSON Schema 职责
 
@@ -187,6 +187,7 @@ Raw Form Definition
         v
 Schema Frontend
   dialect detection / meta validation / reference resolution
+  recognize declared x-* occurrences
         |
         v
 Canonical Schema Graph
@@ -203,6 +204,9 @@ Data Model Compiler
         v
 DataModel
         |
+        v
+Declared x-* Extension Apply (split + merge authoring)
+        |
         +-------- UI Compiler --------> UIModel
         +-------- Rule Compiler ------> RuleModel
         +-------- Validation Compiler -> ValidationModel
@@ -212,7 +216,7 @@ DataModel
               CompiledFormModel + Diagnostics
 ```
 
-`compileForm()` 具有纯函数语义：相同 Definition 和 Environment 应产生语义相同的结果，不访问或创建全局可变状态。
+`compileForm()` 具有纯函数语义：相同 Definition 和 Environment 应产生语义相同的结果；可复用共享默认 Environment 与 model provenance 记录，但不创建业务可变全局 Registry。
 
 ```ts
 interface CompileResult {
@@ -291,7 +295,7 @@ Field 生成规则：
 
 - Scalar 默认生成 FieldDescriptor。
 - Object/Array 默认作为 container，不生成 FieldDescriptor。
-- UI Schema 显式指定 widget 时，Object/Array 也可成为 atomic Field。
+- UI Schema 显式指定 `widget` **或** `field: true` 时，Object/Array 也可成为 atomic Field。
 - `field: false` 在 compile time 禁止该 DataNode 生成 Field。
 - `visible: false` 只表示运行时/展示状态，不能代替 `field: false`。
 
@@ -317,37 +321,38 @@ FormInstance
   |- ValueStore
   |    |- nested values (single source of truth)
   |    `- initial snapshot
-  |- NodeStateStore
-  |    |- direct errors
-  |    `- validating
   |- FieldStateStore
-  |    |- touched
-  |    `- explicit/rule overrides
+  |    `- touched
   |- ViewStateStore
   |    |- focused
   |    |- collapsed
   |    `- active tab
   |- ArrayStateStore
   |    `- stable ArrayItemId order
-  |- FormState
-  |    |- submitting
-  |    `- submitCount
+  |- RuleDynamicsEngine
+  |    |- schemaActive / rule-owned aspects
+  |    `- computed target tracking
+  |- ValidationEngine
+  |    |- direct errors / validating
+  |    `- submitting / submitCount
+  |- FormStateStore
+  |    `- version
   `- Selectors / Subscription
 ```
 
-Values 保持正常嵌套业务结构，也是 JSON Schema 所描述的 instance。对外只提供 readonly snapshot/view；写入必须使用 `setValue`、`setValues`、array commands 等命令。
+Values 保持正常嵌套业务结构，也是 JSON Schema 所描述的 instance。对外只提供 readonly snapshot/view；写入必须使用 `setValue`、`setValues`、array commands 等命令。`NodeStateStore` 可作为内部占位保留，但不作为 errors/validating 的权威存储。
 
 ### 8.2 Source State 与 Derived State
 
 | 状态 | 类型 | 归属 |
 |---|---|---|
 | value | Source | ValueStore |
-| direct errors / validating | Source | NodeState |
+| direct errors / validating | Source | ValidationEngine |
 | touched | Source | FieldState |
 | focused / collapsed / activeTab | Source | ViewState |
-| submitting / submitCount | Source | FormState |
+| submitting / submitCount | Source | ValidationEngine |
 | dirty / valid | Derived | Node、Field、Form selector |
-| effective active / visible / disabled / readonly | Derived | Selector |
+| effective active / visible / disabled / readonly | Derived | RuleDynamicsEngine + Selector |
 
 Object、Array 和 Form 的 dirty、touched、valid 主要由自身结构变化和 descendants 聚合，不复制一套容易失真的状态。Renderer 只能读取 readonly Effective Snapshot；所有修改通过 command 完成。
 
@@ -359,11 +364,12 @@ Object、Array 和 Form 的 dirty、touched、valid 主要由自身结构变化�
 
 ```text
 Mutation API
-    -> TransactionManager
+    -> FormRuntime.dispatch
     -> Value / Array Mutation
     -> Change Queue
-    -> Schema Activation + State/Computed Rules
-    -> declarative Value Effects
+    -> Schema Activation
+    -> DependencyScheduler (value changes + activation flips)
+    -> State/Computed Rules + declarative Value Effects
     -> repeat until stable
     -> Sync Validation
     -> Commit + runtime.version++
@@ -373,8 +379,10 @@ Mutation API
 
 核心语义：
 
+- 公共 mutation 经 `FormRuntime.dispatch` 进入事务；`TransactionManager` 与 `DependencyScheduler` 是内部实现，不进入公开 API。
 - `setValues()` 和多字段操作在一个 batch 中完成。
 - Rule 产生的新 mutation 加入当前 change queue，不递归开启无边界 transaction。
+- Schema activation `false→true` 翻转必须通过 DependencyScheduler 重新调度受影响 Rule 与 Validation plan。
 - no-op mutation 不进入后续流水线。
 - computed value graph 必须是 DAG；Runtime 同时设置迭代/命令上限防止 effect 不收敛。
 - Subscriber 只观察 commit 后的稳定状态；subscriber 异常不能回滚已完成 commit。
@@ -403,7 +411,7 @@ Rule 分为：
 
 Compiler 静态提取 dependencies，构建 `ModelPath -> RuleId[]` 索引，校验 target、function reference 和 cycle。数组 item rule 使用相对 ModelPath 语义，由 Runtime 的 instance binding 解析到同一 item scope。
 
-Runtime 中 Schema Dynamics、Rule Engine 和 Validation 共享 DependencyScheduler 与事务设施，但三者保留独立语义模型。首期规则同步、纯且可预测；远程 options、async data source 等后续通过专用 Resolver Registry 扩展，不让 Rule Engine 直接 fetch。
+Runtime 中 Schema Dynamics、Rule Engine 和 Validation 共享内部 DependencyScheduler 与事务设施，但三者保留独立语义模型。DependencyScheduler 根据 value/field change set、activation 翻转与 `forceAll`/`reset` 计算本轮 Rule instance 与 Validation plan binding，不对外导出。首期规则同步、纯且可预测；远程 options、async data source 等后续通过专用 Resolver Registry 扩展，不让 Rule Engine 直接 fetch。
 
 ## 10. Validation
 
@@ -722,8 +730,9 @@ repo/
   |    |- element-plus/
   |    `- mui/
   |- examples/
-  |    |- vue-element-plus/
-  |    `- react-mui/
+  |    |- shared/            # playground catalog 与框架无关编译管线（非 v1 必选验收目录）
+  |    |- vue-element-plus/  # smoke + 可浏览 Vite 工作台（Element Plus）
+  |    `- react-mui/         # smoke + 可浏览 Vite 工作台（MUI）
   |- tests/
   |- docs/
   |- package.json
@@ -743,13 +752,16 @@ packages/core/src/
   |    |- data/
   |    |- ui/
   |    |- rule/
-  |    `- validation/
+  |    |- validation/
+  |    `- dynamics/
   |- model/
   |    |- data/
   |    |- ui/
   |    |- rule/
   |    |- validation/
-  |    `- schema-dynamics/
+  |    |- schema-dynamics/
+  |    |- path/
+  |    `- identity/
   |- runtime/
   |    |- form/
   |    |- value/
@@ -758,7 +770,10 @@ packages/core/src/
   |    |- array/
   |    |- dependency/
   |    |- subscription/
-  |    `- scope/
+  |    |- scope/
+  |    |- rule/
+  |    |- validation/
+  |    `- dynamics/
   |- widget/
   |- rule/
   |- validation/
@@ -782,6 +797,7 @@ packages/react/src/
   |- context/        # stable Form and RenderScope context
   |- hooks/          # form/field/array/view snapshot bindings
   |- adapter/        # ReactUIAdapter protocols and factory
+  |- test-utils/     # non-exported test helpers
   `- index.ts
 
 packages/vue/src/
@@ -789,6 +805,7 @@ packages/vue/src/
   |- context/        # stable Form and RenderScope context
   |- composables/    # form/field/array/view snapshot bindings
   |- adapter/        # VueUIAdapter protocols and factory
+  |- test-utils/     # non-exported test helpers
   `- index.ts
 
 packages/element-plus/src/

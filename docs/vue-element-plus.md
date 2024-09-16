@@ -75,3 +75,11 @@ Custom Widget 只能拿到 readonly descriptor、snapshots、scope view 与 `set
 - `RenderScope` / `InstanceBinding` / `getRenderScope()` 从 `@form/core/runtime` 导入。
 - Group 折叠与 Tab 只读写 Core `collapsed` / `activeTab`。
 - 不要把 Vue component 写进 `defineWidget()` 或 Core `FormEnvironment`。
+
+## Playground
+
+```bash
+pnpm playground:vue
+```
+
+打开 http://127.0.0.1:5174/ 。左侧五个 JSON 编辑器对应 `FormDefinition` 的 `schema` / `uiSchema` / `rules` / `config` 以及 `createForm` 的 `initialValues`（formData）。右侧是 Element Plus `FormRenderer` 预览与 Inspector（诊断、live values、`serialize()`、submit payload）。顶栏 Example 切换共享 catalog；「MUI」链接跳到 React playground（默认 http://127.0.0.1:5173/?example=...），不会在同一页面挂载 React。

@@ -20,7 +20,11 @@ describe("v1 deferred absence", () => {
     expect(rootIndex).not.toMatch(/mutateCompiledModel|addLifecycleHook|createNestedStore|DevToolsGraph/);
     const readme = fs.readFileSync(path.join(REPO_ROOT, "README.md"), "utf8");
     expect(readme.toLowerCase()).not.toContain("universal renderer");
-    expect(readme).not.toMatch(/async rule/i);
+    // Allow naming deferred items (e.g. "async rule / 内置远程 DataSource") in the deferred list,
+    // but reject delivery-style claims that present them as shipped APIs.
+    expect(readme).not.toMatch(/provides?\s+async\s+rule/i);
+    expect(readme).not.toMatch(/supports?\s+async\s+rule/i);
+    expect(readme).not.toMatch(/delivered\s+async\s+rule/i);
     const workspace = fs.readFileSync(path.join(REPO_ROOT, "docs/workspace.md"), "utf8");
     expect(workspace).not.toContain("@form/compiler");
     for (const name of FORBIDDEN) {

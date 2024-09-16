@@ -8,6 +8,57 @@ export interface ResolvedOwner {
   readonly source: "active" | "archive" | "durable";
 }
 
+export interface ResolvedChangeSpec {
+  readonly changeId: string;
+  readonly capability: string;
+  readonly file: string;
+  readonly source: "active" | "archive";
+}
+
+export function resolveChangeSpec(
+  workspaceRoot: string,
+  changeId: string,
+  capability: string,
+): { resolved?: ResolvedChangeSpec; issues: MatrixIssue[] } {
+  const candidates = collectChangeSpecFiles(workspaceRoot, changeId, capability);
+  const active = candidates.find((candidate) => candidate.source === "active");
+  if (active !== undefined) {
+    return {
+      resolved: { changeId, capability, file: active.file, source: "active" },
+      issues: [],
+    };
+  }
+
+  const archived = candidates.filter((candidate) => candidate.source === "archive");
+
+  if (archived.length === 1) {
+    return {
+      resolved: { changeId, capability, file: archived[0]!.file, source: "archive" },
+      issues: [],
+    };
+  }
+  if (archived.length > 1) {
+    return {
+      issues: [
+        {
+          code: "ambiguous-change-spec",
+          message: `Multiple archived specs resolve ${changeId}/${capability}: ${archived
+            .map((candidate) => rel(workspaceRoot, candidate.file))
+            .join(", ")}`,
+        },
+      ],
+    };
+  }
+  return {
+    issues: [
+      {
+        code: "missing-change-spec",
+        message: `Cannot resolve active or archived spec for ${changeId}/${capability}`,
+      },
+    ],
+  };
+}
+
 export function resolveOwner(workspaceRoot: string, owner: OwnerRef): { resolved?: ResolvedOwner; issues: MatrixIssue[] } {
   const candidates = collectOwnerFiles(workspaceRoot, owner.changeId, owner.capability);
   const matches: ResolvedOwner[] = [];
@@ -63,14 +114,32 @@ function collectOwnerFiles(
   changeId: string,
   capability: string,
 ): readonly { file: string; source: ResolvedOwner["source"] }[] {
-  const files: { file: string; source: ResolvedOwner["source"] }[] = [];
+  const files: { file: string; source: ResolvedOwner["source"] }[] = [
+    ...collectChangeSpecFiles(workspaceRoot, changeId, capability),
+  ];
+  const durable = path.join(workspaceRoot, "openspec/specs", capability, "spec.md");
+  if (fs.existsSync(durable)) {
+    files.push({ file: durable, source: "durable" });
+  }
+  return files;
+}
+
+function collectChangeSpecFiles(
+  workspaceRoot: string,
+  changeId: string,
+  capability: string,
+): readonly { file: string; source: "active" | "archive" }[] {
+  const files: { file: string; source: "active" | "archive" }[] = [];
   const active = path.join(workspaceRoot, "openspec/changes", changeId, "specs", capability, "spec.md");
   if (fs.existsSync(active)) {
     files.push({ file: active, source: "active" });
   }
   const archiveRoot = path.join(workspaceRoot, "openspec/changes/archive");
   if (fs.existsSync(archiveRoot)) {
-    for (const entry of fs.readdirSync(archiveRoot, { withFileTypes: true })) {
+    const archiveEntries = fs
+      .readdirSync(archiveRoot, { withFileTypes: true })
+      .sort((left, right) => left.name.localeCompare(right.name));
+    for (const entry of archiveEntries) {
       if (!entry.isDirectory() || !entry.name.endsWith(`-${changeId}`)) {
         continue;
       }
@@ -79,10 +148,6 @@ function collectOwnerFiles(
         files.push({ file: archived, source: "archive" });
       }
     }
-  }
-  const durable = path.join(workspaceRoot, "openspec/specs", capability, "spec.md");
-  if (fs.existsSync(durable)) {
-    files.push({ file: durable, source: "durable" });
   }
   return files;
 }

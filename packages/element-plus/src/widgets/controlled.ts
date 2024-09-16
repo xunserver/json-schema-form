@@ -21,6 +21,9 @@ export function applyCodecChange<T>(
   codec: ValueCodec<T>,
   native: unknown,
 ): void {
+  if (input.fieldSnapshot.readonly || input.fieldSnapshot.disabled) {
+    return;
+  }
   const decoded = codec.decode(native) as CodecResult<T>;
   if (!decoded.ok) {
     input.reportDiagnostic(
@@ -63,7 +66,7 @@ export function controlledWidget(
         ...extraProps,
         id: input.ids.control,
         modelValue: encoded,
-        disabled: input.fieldSnapshot.disabled,
+        disabled: input.fieldSnapshot.disabled || input.fieldSnapshot.readonly,
         readonly: input.fieldSnapshot.readonly,
         "aria-labelledby": input.ids.label,
         "aria-invalid": input.presentableErrors.length > 0,

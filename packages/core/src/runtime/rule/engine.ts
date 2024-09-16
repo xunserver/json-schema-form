@@ -3,7 +3,7 @@ import type { CompiledFormModel } from "../../model/compiled-form-model.js";
 import type { CompiledRule } from "../../model/rule/rule.js";
 import type { StateRuleAspect } from "../../definition/rule-definition.js";
 import type { FormEnvironment } from "../../extension/environment.js";
-import { bindTemplatePath, modelPathListCount } from "../../model/path/bind-path.js";
+import { bindTemplatePath } from "../../model/path/bind-path.js";
 import {
   ROOT_INSTANCE_PATH,
   ROOT_MODEL_PATH,
@@ -26,6 +26,7 @@ import { pruneInactiveValues } from "../value/serialize.js";
 import type { RuntimeSubtreeOwner, SubtreeCleanupPlan, SubtreeDescriptor } from "../form/subtree-lifecycle.js";
 import { evaluateActivationPredicate } from "../dynamics/activation.js";
 import { evaluateRuleExpression } from "../../rule/evaluator.js";
+import { DependencyScheduler, instanceKey, splitInstanceKey } from "../dependency/scheduler.js";
 
 export interface AffectedValidationRuleBinding {
   readonly ruleId: string;
@@ -48,6 +49,8 @@ export interface RuleDraftState {
   derivedChanged: boolean;
   validationBindings: AffectedValidationRuleBinding[];
   oneOfDiagnostics: Diagnostic[];
+  /** Instance paths that flipped schemaActive from inactive to active in the latest activation phase. */
+  activationFlips: InstancePath[];
 }
 
 const ASPECTS: readonly StateRuleAspect[] = ["active", "visible", "disabled", "readonly"];
@@ -57,6 +60,7 @@ export class RuleDynamicsEngine implements RuntimeSubtreeOwner {
   readonly stats: RuleEngineStats = { evaluatedRules: 0, scheduledRules: 0 };
   private readonly rulesById: ReadonlyMap<string, CompiledRule>;
   private readonly computedTargets: ReadonlySet<ModelPath>;
+  private readonly scheduler: DependencyScheduler;
   private committed: RuleDraftState;
   private forgotten = new Set<string>();
 
@@ -68,6 +72,7 @@ export class RuleDynamicsEngine implements RuntimeSubtreeOwner {
     this.computedTargets = new Set(
       model.rule.rules.filter((rule) => rule.kind === "computed").map((rule) => rule.target),
     );
+    this.scheduler = new DependencyScheduler(model);
     this.committed = emptyState();
   }
 
@@ -154,6 +159,7 @@ export class RuleDynamicsEngine implements RuntimeSubtreeOwner {
     const previous = new Map(state.schemaActive);
     state.schemaActive = new Map();
     state.oneOfDiagnostics = [];
+    state.activationFlips = [];
     for (const record of draft.bindings.records.values()) {
       const path = draft.bindings.pathOf(record.runtimeId);
       if (path !== undefined) {
@@ -196,6 +202,7 @@ export class RuleDynamicsEngine implements RuntimeSubtreeOwner {
       }
     }
 
+    state.activationFlips = this.scheduler.collectActivationFlips(previous, state.schemaActive);
     if (!mapsEqualBool(previous, state.schemaActive)) {
       state.derivedChanged = true;
     }
@@ -209,14 +216,19 @@ export class RuleDynamicsEngine implements RuntimeSubtreeOwner {
     all: boolean,
   ): void {
     this.forgetDraft(draft, state);
-    const scheduled = all ? this.allInstances(draft) : this.schedule(draft, changePaths, state);
+    const scheduled = this.scheduler.schedule({
+      draft,
+      changePaths,
+      activationFlips: state.activationFlips,
+      forceAll: all,
+    });
     this.stats.scheduledRules += scheduled.size;
     const stateRules: string[] = [];
     const computed: string[] = [];
     const effects: string[] = [];
     const validations: string[] = [];
     for (const key of scheduled) {
-      const parsed = splitKey(key);
+      const parsed = splitInstanceKey(key);
       const rule = this.rulesById.get(parsed.ruleId);
       if (rule === undefined) {
         continue;
@@ -433,85 +445,6 @@ export class RuleDynamicsEngine implements RuntimeSubtreeOwner {
     }
   }
 
-  private schedule(draft: TransactionDraft, changePaths: readonly InstancePath[], state: RuleDraftState): Set<string> {
-    const scheduled = new Set<string>();
-    const modelPaths = new Map<string, ModelPath>();
-    for (const path of changePaths) {
-      const id = draft.bindings.idAt(path);
-      const record = id === undefined ? undefined : draft.bindings.records.get(id);
-      if (record !== undefined) {
-        modelPaths.set(path, record.modelPath);
-      }
-    }
-    for (const [instancePath, modelPath] of modelPaths) {
-      const ruleIds = new Set<string>(this.model.rule.byPath.get(modelPath) ?? []);
-      for (const rule of this.model.rule.rules) {
-        if (rule.target === modelPath || isModelDescendant(rule.target, modelPath)) {
-          ruleIds.add(rule.id);
-        }
-      }
-      for (const ruleId of ruleIds) {
-        const rule = this.rulesById.get(ruleId);
-        if (rule === undefined) {
-          continue;
-        }
-        if (modelPathListCount(modelPath) < modelPathListCount(rule.target)) {
-          for (const record of draft.bindings.records.values()) {
-            if (record.modelPath === rule.target) {
-              scheduled.add(instanceKey(rule.id, record.runtimeId));
-            }
-          }
-        } else {
-          const targetInstance = bindTemplatePath(rule.target, modelPath, instancePath as InstancePath);
-          const targetId = draft.bindings.idAt(targetInstance);
-          if (targetId !== undefined) {
-            scheduled.add(instanceKey(rule.id, targetId));
-          }
-        }
-      }
-    }
-    for (const plan of this.model.schemaDynamics.plans) {
-      void plan;
-      void state;
-    }
-    this.scheduleInactiveControl(draft, scheduled);
-    return scheduled;
-  }
-
-  private scheduleInactiveControl(draft: TransactionDraft, scheduled: Set<string>): void {
-    for (const rule of this.model.rule.rules) {
-      if (rule.kind !== "state" || rule.action.kind !== "state" || rule.action.aspects.active === undefined) {
-        continue;
-      }
-      for (const record of draft.bindings.records.values()) {
-        if (record.modelPath === rule.target) {
-          scheduled.add(instanceKey(rule.id, record.runtimeId));
-        }
-      }
-    }
-  }
-
-  private allInstances(draft: TransactionDraft): Set<string> {
-    const scheduled = new Set<string>();
-    for (const rule of this.model.rule.rules) {
-      const target = rule.target;
-      let found = false;
-      for (const record of draft.bindings.records.values()) {
-        if (record.modelPath === target) {
-          scheduled.add(instanceKey(rule.id, record.runtimeId));
-          found = true;
-        }
-      }
-      if (!found && (target === ROOT_MODEL_PATH || rule.kind === "effect")) {
-        const rootId = draft.bindings.idAt(ROOT_INSTANCE_PATH);
-        if (rootId !== undefined) {
-          scheduled.add(instanceKey(rule.id, rootId));
-        }
-      }
-    }
-    return scheduled;
-  }
-
   private evalState(draft: TransactionDraft, state: RuleDraftState, key: string): void {
     const { rule, targetPath } = this.context(draft, key);
     if (rule.action.kind !== "state" || targetPath === undefined) {
@@ -653,8 +586,8 @@ export class RuleDynamicsEngine implements RuntimeSubtreeOwner {
   private orderComputed(keys: readonly string[]): string[] {
     const index = new Map(this.model.rule.computedOrder.map((id, position) => [id, position]));
     return [...keys].sort((left, right) => {
-      const l = index.get(splitKey(left).ruleId) ?? 9999;
-      const r = index.get(splitKey(right).ruleId) ?? 9999;
+      const l = index.get(splitInstanceKey(left).ruleId) ?? 9999;
+      const r = index.get(splitInstanceKey(right).ruleId) ?? 9999;
       if (l !== r) {
         return l - r;
       }
@@ -737,7 +670,7 @@ export class RuleDynamicsEngine implements RuntimeSubtreeOwner {
   }
 
   private context(draft: TransactionDraft, key: string): { rule: CompiledRule; targetPath: InstancePath | undefined } {
-    const parsed = splitKey(key);
+    const parsed = splitInstanceKey(key);
     const rule = this.rulesById.get(parsed.ruleId);
     if (rule === undefined) {
       throw invalidResult("Unknown compiled rule");
@@ -776,7 +709,7 @@ export class RuleDynamicsEngine implements RuntimeSubtreeOwner {
 
   private dropRuntime(state: RuleDraftState, runtimeId: string): void {
     for (const key of [...state.instanceResults.keys()]) {
-      if (splitKey(key).runtimeId === runtimeId) {
+      if (splitInstanceKey(key).runtimeId === runtimeId) {
         state.instanceResults.delete(key);
       }
     }
@@ -791,6 +724,7 @@ function emptyState(): RuleDraftState {
     derivedChanged: false,
     validationBindings: [],
     oneOfDiagnostics: [],
+    activationFlips: [],
   };
 }
 
@@ -802,23 +736,8 @@ function cloneState(state: RuleDraftState): RuleDraftState {
     derivedChanged: false,
     validationBindings: [...state.validationBindings],
     oneOfDiagnostics: [...state.oneOfDiagnostics],
+    activationFlips: [...state.activationFlips],
   };
-}
-
-function instanceKey(ruleId: string, runtimeId: RuntimeNodeId | string): string {
-  return `${ruleId}::${String(runtimeId)}`;
-}
-
-function splitKey(key: string): { ruleId: string; runtimeId: string } {
-  const index = key.indexOf("::");
-  return { ruleId: key.slice(0, index), runtimeId: key.slice(index + 2) };
-}
-
-function isModelDescendant(path: ModelPath, ancestor: ModelPath): boolean {
-  if (ancestor === ROOT_MODEL_PATH) {
-    return false;
-  }
-  return path.startsWith(`${ancestor}.`) || path.startsWith(`${ancestor}[`);
 }
 
 function mapsEqualBool(left: Map<string, boolean>, right: Map<string, boolean>): boolean {

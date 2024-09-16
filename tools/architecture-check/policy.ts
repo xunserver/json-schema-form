@@ -80,8 +80,8 @@ export const CORE_TOP_LEVEL_DIRS = [
   "engine",
 ] as const;
 
-export const CORE_COMPILER_SUBDIRS = ["schema", "shape", "data", "ui", "rule", "validation"] as const;
-export const CORE_MODEL_SUBDIRS = ["data", "ui", "rule", "validation", "schema-dynamics"] as const;
+export const CORE_COMPILER_SUBDIRS = ["schema", "shape", "data", "ui", "rule", "validation", "dynamics"] as const;
+export const CORE_MODEL_SUBDIRS = ["data", "ui", "rule", "validation", "schema-dynamics", "path", "identity"] as const;
 export const CORE_RUNTIME_SUBDIRS = [
   "form",
   "value",
@@ -91,6 +91,9 @@ export const CORE_RUNTIME_SUBDIRS = [
   "dependency",
   "subscription",
   "scope",
+  "rule",
+  "validation",
+  "dynamics",
 ] as const;
 
 export const CORE_FORBIDDEN_TOP_LEVEL_DIRS = ["types", "services", "utils"] as const;

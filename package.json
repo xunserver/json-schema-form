@@ -21,7 +21,9 @@
     "verify:v1": "tsx tools/architecture-check/v1-cli.ts --mode gate",
     "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm check:boundaries && pnpm example:vue && pnpm example:react",
     "example:vue": "pnpm --filter @form/example-vue-element-plus typecheck && tsx examples/vue-element-plus/src/smoke.ts",
-    "example:react": "pnpm --filter @form/example-react-mui typecheck && tsx examples/react-mui/src/smoke.ts"
+    "example:react": "pnpm --filter @form/example-react-mui typecheck && tsx examples/react-mui/src/smoke.ts",
+    "playground:react": "pnpm --filter @form/example-react-mui playground",
+    "playground:vue": "pnpm --filter @form/example-vue-element-plus playground"
   },
   "devDependencies": {
     "@form/core": "workspace:*",

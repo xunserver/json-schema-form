@@ -38,11 +38,24 @@ pnpm check:boundaries
 pnpm check:v1-matrix
 pnpm verify
 pnpm verify:v1
+pnpm playground:react
+pnpm playground:vue
 ```
 
 `pnpm verify` 按依赖顺序构建六个 package，并执行类型检查、契约测试、跨 package 边界检查与两个 example smoke。`pnpm verify:v1` 是架构第 3/16–21 节的发布门禁：先核对 coverage matrix 与 prerequisite，再跑边界、build/typecheck/unit、跨栈集成、SSR/browser/examples 与文档证据。本地 `verify:v1` **不会**删除或重装开发者 workspace；干净 checkout 由 CI 执行 `pnpm install --frozen-lockfile` 后再跑同一门禁。覆盖索引见 [`docs/generated/v1-coverage.md`](docs/generated/v1-coverage.md)。
 
-公开入口：`@form/core`、`@form/core/runtime`、`@form/core/extension`，以及五个叶子 package 的根入口。未声明 deep import 会被拒绝。浏览器/Worker 宿主测试依赖根目录 dev-only `playwright`，不会进入六个发布 package。架构第 20 节列出的八项能力（完整 JSON Schema 自动 UI、运行时改 Model、内置远程 DataSource、万能 hooks、独立 nested store、DevTools mutable graph、compiler/runtime 拆包、一次性全 UI Adapter）保持 deferred / optional-unsupported，不作为 v1 产品 API。
+### Playground 工作台
+
+两个 example 各自提供可浏览的 Vite 工作台（互不混跑，避免 React/MUI 与 Vue/Element Plus 同页冲突）：
+
+| 命令 | 地址 | 栈 |
+|---|---|---|
+| `pnpm playground:react` | http://127.0.0.1:5173/ | React + MUI |
+| `pnpm playground:vue` | http://127.0.0.1:5174/ | Vue + Element Plus |
+
+左侧可编辑 `schema` / `uiSchema` / `rules` / `config` / `formData`（JSON 文本）；右侧实时预览本栈 `FormRenderer`，并展示编译诊断、Runtime 诊断、live values、`serialize()` 与最近一次 submit payload。顶栏可切换 catalog 例子；框架按钮是跨端口链接（带 `?example=`），需要两个 playground 都在跑才能跳转。共享例子与编译管线在 `examples/shared`。
+
+公开入口：`@form/core`、`@form/core/runtime`、`@form/core/extension`，以及五个叶子 package 的根入口。未声明 deep import 会被拒绝。浏览器/Worker 宿主测试依赖根目录 dev-only `playwright`，不会进入六个发布 package。架构第 20 节列出的八项能力（完整 JSON Schema 自动 UI、运行时改 Model、async rule / 内置远程 DataSource、万能 hooks、独立 nested store、DevTools mutable graph、compiler/runtime 拆包、一次性全 UI Adapter）保持 deferred / optional-unsupported，不作为 v1 产品 API。
 
 ## Definition 与编译
 
