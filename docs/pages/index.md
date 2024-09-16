@@ -10,7 +10,8 @@ hero:
       link: /guide/getting-started
     - theme: alt
       text: Playground
-      link: https://xunserver.github.io/json-schema-form/playground/
+      link: /playground/
+      target: _top
     - theme: alt
       text: GitHub
       link: https://github.com/xunserver/json-schema-form

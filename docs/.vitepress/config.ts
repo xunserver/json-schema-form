@@ -55,7 +55,7 @@ export default defineConfig({
       { text: "API", link: "/api/" },
       { text: "Vue", link: "/vue/renderer" },
       { text: "React", link: "/react/renderer" },
-      { text: "Playground", link: "/playground/" },
+      { text: "Playground", link: "/playground/", target: "_top" },
       { text: "仓库", link: "https://github.com/xunserver/json-schema-form" },
     ],
     socialLinks: [

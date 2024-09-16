@@ -2,8 +2,8 @@
 
 Playground 用来对照同一份 Form Definition 在多套 Adapter 上的渲染。它是非发布 example，不是产品 package。
 
-- 在线：https://xunserver.github.io/json-schema-form/playground/
-- 文档：https://xunserver.github.io/json-schema-form/
+- 在线：[Playground](/playground/)
+- 文档：[文档首页](/)
 - 仓库：https://github.com/xunserver/json-schema-form
 
 ## 本地
@@ -29,8 +29,6 @@ pnpm playground
 
 ## GitHub Pages
 
-```text
-https://xunserver.github.io/json-schema-form/playground/
-```
+线上地址与当前文档站点同源，路径为 `/playground/`。从文档站点击该链接会整页进入演练场，而不是走 VitePress 客户端路由。
 
 `pnpm docs:dev` 只预览文档。完整静态站点：`pnpm site:build`，产物在 `docs/.vitepress/dist`。
