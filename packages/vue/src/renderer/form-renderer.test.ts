@@ -85,6 +85,31 @@ describe("runtime selector bridge", () => {
     expect(adapter.widgetRenders.filter((name) => name === "number")).toEqual([]);
     wrapper.unmount();
   });
+
+  test("value edits rerender the control without rebuilding field chrome", async () => {
+    const form = createPersonForm();
+    const adapter = createRecordingAdapter();
+    const chromeViews: string[] = [];
+    const wrapped = {
+      ...adapter,
+      fieldChrome: {
+        render(input: Parameters<typeof adapter.fieldChrome.render>[0]) {
+          chromeViews.push(input.view.id);
+          return adapter.fieldChrome.render(input);
+        },
+      },
+    };
+    const wrapper = mount(FormRenderer, { props: { form, adapter: wrapped } });
+    await nextTick();
+    adapter.widgetRenders.length = 0;
+    chromeViews.length = 0;
+    form.setValue("name", "Grace");
+    await nextTick();
+    expect(adapter.widgetRenders.filter((name) => name === "text")).toHaveLength(1);
+    expect(adapter.widgetRenders.filter((name) => name === "number")).toEqual([]);
+    expect(chromeViews).toEqual([]);
+    wrapper.unmount();
+  });
 });
 
 describe("form renderer traversal", () => {
@@ -222,6 +247,38 @@ describe("form renderer traversal", () => {
     await nextTick();
     expect(form.model.ui.fields.has("secret")).toBe(false);
     expect(wrapper.html()).not.toContain("secret");
+    wrapper.unmount();
+  });
+});
+
+describe("tuple array views", () => {
+  test("renders each prefix slot once instead of repeating the whole itemLayout", async () => {
+    const form = createForm(
+      compileForm(
+        defineForm({
+          schema: {
+            type: "object",
+            properties: {
+              span: {
+                type: "array",
+                prefixItems: [{ type: "integer" }, { type: "integer" }],
+              },
+            },
+          },
+          uiSchema: {
+            fields: {
+              "span[#0]": { display: { label: "下限" } },
+              "span[#1]": { display: { label: "上限" } },
+            },
+          },
+        }),
+      ).model,
+      { initialValues: { span: [1, 5] } },
+    );
+    const wrapper = mount(FormRenderer, { props: { form, adapter: createRecordingAdapter() } });
+    await nextTick();
+    expect(wrapper.findAll("label").map((node) => node.text())).toEqual(["下限", "上限"]);
+    expect(wrapper.findAll("input")).toHaveLength(2);
     wrapper.unmount();
   });
 });

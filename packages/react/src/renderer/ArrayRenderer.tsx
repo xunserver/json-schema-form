@@ -1,4 +1,4 @@
-import type { ArrayView } from "@xunserver-jsf/core";
+import type { ArrayView, DataNode, ViewNode } from "@xunserver-jsf/core";
 import type { RenderScope } from "@xunserver-jsf/core/runtime";
 import type { ReactNode } from "react";
 import { useMemo } from "react";
@@ -29,9 +29,14 @@ export function ArrayRenderer({ node }: { readonly node: ArrayView }): ReactNode
   if (parent.scope.binding.stale || !viewSnapshot.active || !viewSnapshot.visible) {
     return null;
   }
-  const itemNodes = order.map((itemId) => {
+  const dataNode = parent.form.model.data.nodes.get(node.path);
+  const itemNodes = order.flatMap((itemId, index) => {
+    const layouts = itemLayoutsAtIndex(node, dataNode, index);
+    if (layouts.length === 0) {
+      return [];
+    }
     const itemScope = arrayScope.item(itemId, node.path);
-    return <ArrayItemScope key={itemId} scope={itemScope} node={node} />;
+    return [<ArrayItemScope key={itemId} scope={itemScope} layouts={layouts} />];
   });
   const binding = parent.adapter.layouts.get("array");
   const content =
@@ -64,16 +69,38 @@ export function ArrayRenderer({ node }: { readonly node: ArrayView }): ReactNode
 
 function ArrayItemScope({
   scope,
-  node,
+  layouts,
 }: {
   readonly scope: RenderScope;
-  readonly node: ArrayView;
+  readonly layouts: readonly ViewNode[];
 }): ReactNode {
   return (
     <RendererScopeProvider scope={scope}>
-      {node.itemLayout.map((child) => (
+      {layouts.map((child) => (
         <ViewRenderer key={child.id} node={child} />
       ))}
     </RendererScopeProvider>
   );
+}
+
+function itemLayoutsAtIndex(
+  view: ArrayView,
+  dataNode: DataNode | undefined,
+  index: number,
+): readonly ViewNode[] {
+  if (dataNode === undefined || dataNode.kind !== "array") {
+    return view.itemLayout;
+  }
+  const prefixCount = dataNode.prefixItems?.length ?? 0;
+  if (prefixCount === 0) {
+    return view.itemLayout;
+  }
+  if (index < prefixCount) {
+    const slot = view.itemLayout[index];
+    return slot === undefined ? [] : [slot];
+  }
+  if (dataNode.items === undefined) {
+    return [];
+  }
+  return view.itemLayout.slice(prefixCount);
 }

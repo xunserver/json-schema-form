@@ -57,7 +57,7 @@ export const gridLayout: LayoutBinding = {
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-          gap: "0.5rem",
+          gap: 16,
         }}
       >
         {input.children.map((child, index) => (

@@ -16,6 +16,14 @@ export const EDITABLE_CAPABILITIES: WidgetCapabilities = Object.freeze({
   clearable: true,
 });
 
+export function fullWidthStyle(nativeProps: Readonly<Record<string, unknown>>): Record<string, unknown> {
+  const extra = nativeProps.style;
+  if (extra !== null && typeof extra === "object" && !Array.isArray(extra)) {
+    return { width: "100%", ...(extra as Record<string, unknown>) };
+  }
+  return { width: "100%" };
+}
+
 export function applyCodecChange<T>(
   input: WidgetRenderInput,
   codec: ValueCodec<T>,
@@ -75,6 +83,9 @@ export function controlledWidget(
         onFocus: () => input.actions.focus(),
         onBlur: () => input.actions.blur(),
       };
+      if (capabilities.inlineLabel !== true) {
+        props.style = fullWidthStyle({ ...input.nativeProps, ...extraProps });
+      }
       if (described !== undefined) {
         props["aria-describedby"] = described;
       }

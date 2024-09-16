@@ -15,6 +15,7 @@ import {
   checkboxBinding as defineCheckboxBinding,
   describedBy,
   EDITABLE_CAPABILITIES,
+  fullWidthStyle,
   inputBinding,
   nativeInputBinding,
   switchBinding as defineSwitchBinding,
@@ -82,6 +83,7 @@ export const numberBinding: WidgetBinding = {
     return (
       <InputNumber
         {...input.nativeProps}
+        style={fullWidthStyle(input.nativeProps)}
         id={input.ids.control}
         value={typeof encoded === "number" ? encoded : null}
         disabled={input.fieldSnapshot.disabled || input.fieldSnapshot.readonly}
@@ -112,6 +114,7 @@ export const selectBinding: WidgetBinding = {
     return (
       <Select
         {...input.nativeProps}
+        style={fullWidthStyle(input.nativeProps)}
         id={input.ids.control}
         value={typeof encoded === "string" && encoded !== "" ? encoded : null}
         disabled={input.fieldSnapshot.disabled || input.fieldSnapshot.readonly}
@@ -147,6 +150,7 @@ export const multiSelectBinding: WidgetBinding = {
       <Select
         {...input.nativeProps}
         mode="multiple"
+        style={fullWidthStyle(input.nativeProps)}
         id={input.ids.control}
         value={Array.isArray(encoded) ? encoded : []}
         disabled={input.fieldSnapshot.disabled || input.fieldSnapshot.readonly}

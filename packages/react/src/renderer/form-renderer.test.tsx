@@ -347,3 +347,33 @@ describe("custom render least privilege", () => {
     );
   });
 });
+
+describe("tuple array views", () => {
+  test("renders each prefix slot once instead of repeating the whole itemLayout", () => {
+    const form = createForm(
+      compileForm(
+        defineForm({
+          schema: {
+            type: "object",
+            properties: {
+              span: {
+                type: "array",
+                prefixItems: [{ type: "integer" }, { type: "integer" }],
+              },
+            },
+          },
+          uiSchema: {
+            fields: {
+              "span[#0]": { display: { label: "下限" } },
+              "span[#1]": { display: { label: "上限" } },
+            },
+          },
+        }),
+      ).model,
+      { initialValues: { span: [1, 5] } },
+    );
+    const { container } = render(<FormRenderer form={form} adapter={createRecordingAdapter()} />);
+    expect([...container.querySelectorAll("label")].map((node) => node.textContent)).toEqual(["下限", "上限"]);
+    expect(container.querySelectorAll("input")).toHaveLength(2);
+  });
+});

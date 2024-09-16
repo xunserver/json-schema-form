@@ -2,7 +2,7 @@
 import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { createFormEnvironment, definePlugin, defineWidget } from "@xunserver-jsf/core/extension";
 import { createReactRendererEnvironment } from "@xunserver-jsf/react";
-import { cleanup, fireEvent, render } from "@testing-library/react";
+import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
 import { FormRenderer } from "@xunserver-jsf/react";
 import {
@@ -147,5 +147,54 @@ describe("arco-react adapter skeleton", () => {
     fireEvent.submit(formEl);
     expect(coreSubmit).toBe(1);
     expect(form.getState().errors).toEqual([]);
+  });
+
+  test("uses vertical form layout matching label-on-top chrome", () => {
+    const form = createForm(
+      compileForm(
+        defineForm({
+          schema: { type: "object", properties: { name: { type: "string" } } },
+          uiSchema: { fields: { name: { display: { label: "姓名", help: "string + text" } } } },
+        }),
+      ).model,
+      { initialValues: { name: "Ada" } },
+    );
+    const { container } = render(<FormRenderer form={form} adapter={arcoReactAdapter} />);
+    expect(container.querySelector("form")).not.toBeNull();
+    expect(container.querySelector(".arco-form-vertical")).not.toBeNull();
+    expect(container.querySelector(".arco-form-layout-vertical")).not.toBeNull();
+    expect(container.querySelector(".arco-form-layout-horizontal")).toBeNull();
+    const extra = container.querySelector(".arco-form-extra");
+    expect(extra?.textContent).toBe("string + text");
+    const labeled = container.querySelector('[aria-labelledby*="field:name"]');
+    expect(labeled).not.toBeNull();
+    const nameItem = labeled?.closest(".arco-form-item");
+    expect(nameItem?.querySelector(".arco-form-label-item")?.textContent).toContain("姓名");
+    expect(labeled?.closest(".arco-form-extra")).toBeNull();
+    expect(nameItem?.querySelector(".arco-form-label-item")?.querySelector("span")?.id).toBe(
+      labeled?.getAttribute("aria-labelledby"),
+    );
+  });
+
+  test("presentable required errors render in Form.Item help", () => {
+    const form = createForm(
+      compileForm(
+        defineForm({
+          schema: { type: "object", properties: { name: { type: "string" } }, required: ["name"] },
+          uiSchema: { fields: { name: { display: { label: "姓名" } } } },
+        }),
+      ).model,
+      { initialValues: { name: "Ada" } },
+    );
+    const { container } = render(<FormRenderer form={form} adapter={arcoReactAdapter} />);
+    act(() => {
+      form.applyErrors([{ code: "required", instancePath: "name", message: "必须填写姓名" }]);
+      form.touch("name");
+    });
+    const alert = container.querySelector("[role=alert]");
+    expect(alert?.textContent).toBe("必须填写姓名");
+    expect(container.querySelector(".arco-form-item-error")).not.toBeNull();
+    expect(container.querySelector(".arco-form-message")).not.toBeNull();
+    expect(alert?.closest(".arco-form-message")).not.toBeNull();
   });
 });

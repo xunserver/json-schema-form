@@ -24,6 +24,7 @@ import {
   controlledWidget,
   describedBy,
   EDITABLE_CAPABILITIES,
+  fullWidthStyle,
 } from "./controlled.js";
 import { mapArcoVueProps } from "./mapper.js";
 
@@ -80,6 +81,7 @@ function selectProps(input: WidgetRenderInput, modelValue: unknown, multiple = f
   if (described !== undefined) {
     props["aria-describedby"] = described;
   }
+  props.style = fullWidthStyle(input.nativeProps);
   return props;
 }
 
@@ -112,6 +114,7 @@ function nativeInputBinding(codec: typeof dateCodec | typeof datetimeCodec, type
       if (described !== undefined) {
         props["aria-describedby"] = described;
       }
+      props.style = fullWidthStyle(input.nativeProps);
       return h("input", props);
     },
   };

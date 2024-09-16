@@ -9,7 +9,15 @@ import {
 } from "@xunserver-jsf/react";
 import { Checkbox, Input, Switch } from "antd";
 import { mapAntdProps } from "./mapper.js";
-import type { ChangeEvent, FocusEvent, ReactElement } from "react";
+import type { CSSProperties, ChangeEvent, FocusEvent, ReactElement } from "react";
+
+export function fullWidthStyle(nativeProps: Readonly<Record<string, unknown>>): CSSProperties {
+  const extra = nativeProps.style;
+  if (extra !== null && typeof extra === "object" && !Array.isArray(extra)) {
+    return { width: "100%", ...(extra as CSSProperties) };
+  }
+  return { width: "100%" };
+}
 
 export const EDITABLE_CAPABILITIES: WidgetCapabilities = Object.freeze({
   readonly: true,
@@ -72,6 +80,7 @@ export function inputBinding(
         <Input
           {...input.nativeProps}
           {...extraProps}
+          style={fullWidthStyle(input.nativeProps)}
           id={input.ids.control}
           value={typeof encoded === "string" || typeof encoded === "number" ? encoded : ""}
           disabled={input.fieldSnapshot.disabled}
@@ -103,6 +112,7 @@ export function textareaBinding(codec: ValueCodec): WidgetBinding {
       return (
         <Input.TextArea
           {...input.nativeProps}
+          style={fullWidthStyle(input.nativeProps)}
           id={input.ids.control}
           value={typeof encoded === "string" || typeof encoded === "number" ? encoded : ""}
           disabled={input.fieldSnapshot.disabled}
@@ -134,9 +144,10 @@ export function nativeInputBinding(codec: ValueCodec, type: "date" | "text"): Wi
       const described = describedBy(input);
       const stringValue = typeof encoded === "string" ? encoded : "";
       return (
-        <input
+        <Input
           {...input.nativeProps}
           type={type}
+          style={fullWidthStyle(input.nativeProps)}
           id={input.ids.control}
           value={stringValue}
           disabled={input.fieldSnapshot.disabled}

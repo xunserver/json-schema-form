@@ -1,4 +1,4 @@
-import type { ArrayView } from "@xunserver-jsf/core";
+import type { ArrayView, DataNode, ViewNode } from "@xunserver-jsf/core";
 import type { RenderScope } from "@xunserver-jsf/core/runtime";
 import { defineComponent, Fragment, h, type PropType, type VNode } from "vue";
 import { wrapAdapterCall } from "../adapter/runtime-error.js";
@@ -23,9 +23,14 @@ export const ArrayRenderer = defineComponent({
       if (!viewSnapshot.value.active || !viewSnapshot.value.visible) {
         return null;
       }
-      const itemNodes = order.value.map((itemId) => {
+      const dataNode = parent.form.model.data.nodes.get(props.node.path);
+      const itemNodes = order.value.flatMap((itemId, index) => {
+        const layouts = itemLayoutsAtIndex(props.node, dataNode, index);
+        if (layouts.length === 0) {
+          return [];
+        }
         const itemScope = arrayScope.item(itemId, props.node.path);
-        return h(ArrayItemScope, { key: itemId, scope: itemScope, node: props.node });
+        return [h(ArrayItemScope, { key: itemId, scope: itemScope, layouts })];
       });
       const binding = parent.adapter.layouts.get("array");
       if (binding === undefined) {
@@ -61,7 +66,7 @@ const ArrayItemScope = defineComponent({
   name: "ArrayItemScope",
   props: {
     scope: { type: Object as PropType<RenderScope>, required: true },
-    node: { type: Object as PropType<ArrayView>, required: true },
+    layouts: { type: Array as PropType<readonly ViewNode[]>, required: true },
   },
   setup(props) {
     const parent = useRendererContext();
@@ -76,9 +81,31 @@ const ArrayItemScope = defineComponent({
     });
     return (): VNode => h(
       Fragment,
-      props.node.itemLayout.map((child) => h(ViewRenderer, { node: child, key: child.id })),
+      props.layouts.map((child) => h(ViewRenderer, { node: child, key: child.id })),
     );
   },
 });
+
+function itemLayoutsAtIndex(
+  view: ArrayView,
+  dataNode: DataNode | undefined,
+  index: number,
+): readonly ViewNode[] {
+  if (dataNode === undefined || dataNode.kind !== "array") {
+    return view.itemLayout;
+  }
+  const prefixCount = dataNode.prefixItems?.length ?? 0;
+  if (prefixCount === 0) {
+    return view.itemLayout;
+  }
+  if (index < prefixCount) {
+    const slot = view.itemLayout[index];
+    return slot === undefined ? [] : [slot];
+  }
+  if (dataNode.items === undefined) {
+    return [];
+  }
+  return view.itemLayout.slice(prefixCount);
+}
 
 viewRenderers.array = ArrayRenderer;

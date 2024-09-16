@@ -93,6 +93,8 @@ export function viewSelector(id: ViewNodeId): RuntimeSelector<ViewSnapshot> {
   });
 }
 
+export const PRESENTATION_SELECTOR_KEY = "presentation";
+
 export function formSelector(): RuntimeSelector<FormSnapshot> {
   return makeSelector({
     deps: Object.freeze(["form"]),
@@ -103,7 +105,11 @@ export function formSelector(): RuntimeSelector<FormSnapshot> {
 export function presentableErrorSelector(path?: InstancePathLike): RuntimeSelector<readonly import("../../validation/error.js").ValidationError[]> {
   const canonical = path === undefined ? "" : requireCanonicalPath(path, "presentable");
   return makeSelector({
-    deps: Object.freeze(canonical === "" ? ["form"] : [`validation:${canonical}`, `field:${canonical}`, "form"]),
+    deps: Object.freeze(
+      canonical === ""
+        ? ["form", PRESENTATION_SELECTOR_KEY]
+        : [`validation:${canonical}`, `field:${canonical}`, PRESENTATION_SELECTOR_KEY],
+    ),
     project: (host) => host.presentableErrors(canonical),
   });
 }

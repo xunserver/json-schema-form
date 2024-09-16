@@ -15,6 +15,7 @@ import {
   booleanControlBinding,
   describedBy,
   EDITABLE_CAPABILITIES,
+  fullWidthStyle,
   nativeInputBinding,
 } from "./controlled.js";
 import { mapArcoReactProps } from "./mapper.js";
@@ -61,6 +62,7 @@ export const numberBinding: WidgetBinding = {
     return (
       <InputNumber
         {...input.nativeProps}
+        style={fullWidthStyle(input.nativeProps)}
         id={input.ids.control}
         value={numericValue}
         disabled={input.fieldSnapshot.disabled || input.fieldSnapshot.readonly}
@@ -92,6 +94,7 @@ export const selectBinding: WidgetBinding = {
     return (
       <Select
         {...input.nativeProps}
+        style={fullWidthStyle(input.nativeProps)}
         id={input.ids.control}
         value={selectValue}
         disabled={input.fieldSnapshot.disabled || input.fieldSnapshot.readonly}
@@ -128,6 +131,7 @@ export const multiSelectBinding: WidgetBinding = {
     return (
       <Select
         {...input.nativeProps}
+        style={fullWidthStyle(input.nativeProps)}
         id={input.ids.control}
         mode="multiple"
         value={Array.isArray(encoded) ? encoded : []}

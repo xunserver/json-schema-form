@@ -57,6 +57,7 @@ import {
 import {
   getSelectorRecord,
   isRuntimeSelector,
+  PRESENTATION_SELECTOR_KEY,
   type RuntimeDiagnosticEvent,
   type RuntimeSelector,
   type SelectorHost,
@@ -1028,6 +1029,9 @@ export class FormRuntime implements SelectorHost {
       this.values.initial = draft.values;
     }
     this.extraSelectorKeys = new Set();
+    if (changeSet.reset) {
+      this.extraSelectorKeys.add(PRESENTATION_SELECTOR_KEY);
+    }
     if (this.validationChanged) {
       for (const key of this.validation.selectorKeysForDirty()) {
         this.extraSelectorKeys.add(key);
@@ -1598,7 +1602,7 @@ export class FormRuntime implements SelectorHost {
 
   async submit(handler: SubmitHandler): Promise<SubmitResult> {
     this.validation.beginSubmit();
-    this.publishValidationState(new Set(["form"]), true);
+    this.publishValidationState(new Set(["form", PRESENTATION_SELECTOR_KEY]), true);
     try {
       this.validationIntent = "submit";
       try {

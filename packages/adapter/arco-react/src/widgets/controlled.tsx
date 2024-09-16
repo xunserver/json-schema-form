@@ -8,8 +8,16 @@ import {
   type WidgetRenderInput,
 } from "@xunserver-jsf/react";
 import { mapArcoReactProps } from "./mapper.js";
-import type { FocusEvent, InputHTMLAttributes, ReactElement } from "react";
+import type { CSSProperties, FocusEvent, InputHTMLAttributes, ReactElement } from "react";
 import { Checkbox, Input, Switch } from "@arco-design/web-react";
+
+export function fullWidthStyle(nativeProps: Readonly<Record<string, unknown>>): CSSProperties {
+  const extra = nativeProps.style;
+  if (extra !== null && typeof extra === "object" && !Array.isArray(extra)) {
+    return { width: "100%", ...(extra as CSSProperties) };
+  }
+  return { width: "100%" };
+}
 
 export const EDITABLE_CAPABILITIES: WidgetCapabilities = Object.freeze({
   readonly: true,
@@ -73,6 +81,7 @@ export function arcoInputBinding(
         <Component
           {...input.nativeProps}
           {...extraProps}
+          style={fullWidthStyle({ ...input.nativeProps, ...extraProps })}
           id={input.ids.control}
           value={typeof encoded === "string" ? encoded : ""}
           disabled={input.fieldSnapshot.disabled}
@@ -109,6 +118,7 @@ export function nativeInputBinding(
         <input
           {...input.nativeProps}
           {...extraProps}
+          style={fullWidthStyle({ ...input.nativeProps, ...extraProps })}
           id={input.ids.control}
           value={typeof encoded === "string" ? encoded : ""}
           disabled={input.fieldSnapshot.disabled}

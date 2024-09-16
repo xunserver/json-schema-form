@@ -1,5 +1,5 @@
 import { FormItem } from "@arco-design/web-vue";
-import { h } from "vue";
+import { h, type VNode } from "vue";
 import type { FieldChromeAdapter } from "@xunserver-jsf/vue";
 
 export const arcoVueFieldChrome: FieldChromeAdapter = {
@@ -14,17 +14,35 @@ export const arcoVueFieldChrome: FieldChromeAdapter = {
     const props: Record<string, unknown> = {
       required: input.fieldSnapshot.required,
       feedback: false,
+      showColon: false,
+      labelAttrs: { for: input.ids.control },
     };
+    if (label !== undefined && label !== "") {
+      props.label = label;
+    }
     if (status !== undefined) {
       props.validateStatus = status;
     }
-    return h(FormItem, props, () => [
-      h("span", { id: input.ids.label }, label ?? ""),
-      input.control,
-      help === undefined ? null : h("p", { id: input.ids.help }, help),
-      ...input.presentableErrors.map((error, index) =>
-        h("p", { id: input.ids.errors[index], role: "alert" }, error.message ?? error.code),
-      ),
-    ]);
+    const slots: Record<string, () => VNode | VNode[]> = {
+      label: () => h("span", { id: input.ids.label }, label ?? ""),
+      default: () => (input.control === null ? [] : [input.control]),
+    };
+    if (help !== undefined) {
+      slots.extra = () => h("div", { id: input.ids.help }, help);
+    }
+    if (input.presentableErrors.length > 0) {
+      slots.help = () =>
+        input.presentableErrors.map((error, index) =>
+          h(
+            "div",
+            {
+              id: input.ids.errors[index],
+              role: "alert",
+            },
+            error.message ?? error.code,
+          ),
+        );
+    }
+    return h(FormItem, props, slots);
   },
 };

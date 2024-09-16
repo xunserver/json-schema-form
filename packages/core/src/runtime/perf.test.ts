@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { compileForm, createForm, defineForm } from "../index.js";
-import { createSelector, fieldSelector, subscribeRuntime, valueSelector } from "./index.js";
+import { compileForm, createForm, defineForm, FormRuntimeError } from "../index.js";
+import { createSelector, fieldSelector, presentableErrorSelector, subscribeRuntime, valueSelector } from "./index.js";
 import { peekFormRuntime } from "./test-harness.js";
 
 describe("selector invalidation scaling", () => {
@@ -226,6 +226,81 @@ describe("validation selector scaling", () => {
     expect(runs.get("field0")).toBe(1);
     expect(runs.get("field1")).toBe(0);
     expect(runs.get("field39")).toBe(0);
+  });
+
+  test("a single-field update does not evaluate unrelated presentable error selectors", () => {
+    const properties: Record<string, { type: "string" }> = {};
+    const initialValues: Record<string, string> = {};
+    for (let index = 0; index < 40; index += 1) {
+      const key = `field${index}`;
+      properties[key] = { type: "string" };
+      initialValues[key] = "x";
+    }
+    const form = createForm(
+      compileForm(
+        defineForm({
+          schema: { type: "object", properties },
+        }),
+      ).model,
+      { initialValues },
+    );
+    const runs = new Map<string, number>();
+    for (const key of Object.keys(properties)) {
+      subscribeRuntime(
+        form,
+        createSelector([presentableErrorSelector(key)], (errors) => {
+          runs.set(key, (runs.get(key) ?? 0) + 1);
+          return errors;
+        }),
+        () => undefined,
+      );
+    }
+    for (const key of Object.keys(properties)) {
+      runs.set(key, 0);
+    }
+    form.setValue("field0", "y");
+    expect(runs.get("field0")).toBe(1);
+    expect(runs.get("field1")).toBe(0);
+    expect(runs.get("field39")).toBe(0);
+    expect([...runs.values()].filter((count) => count > 0)).toHaveLength(1);
+  });
+
+  test("submit re-evaluates presentable error selectors so presentation can change", async () => {
+    const properties: Record<string, { type: "string" }> = {};
+    const initialValues: Record<string, string> = {};
+    for (let index = 0; index < 40; index += 1) {
+      const key = `field${index}`;
+      properties[key] = { type: "string" };
+      initialValues[key] = "x";
+    }
+    const form = createForm(
+      compileForm(
+        defineForm({
+          schema: { type: "object", properties },
+        }),
+      ).model,
+      { initialValues },
+    );
+    const runs = new Map<string, number>();
+    for (const key of Object.keys(properties)) {
+      subscribeRuntime(
+        form,
+        createSelector([presentableErrorSelector(key)], (errors) => {
+          runs.set(key, (runs.get(key) ?? 0) + 1);
+          return errors;
+        }),
+        () => undefined,
+      );
+    }
+    for (const key of Object.keys(properties)) {
+      runs.set(key, 0);
+    }
+    try {
+      await form.submit(async () => undefined);
+    } catch (error) {
+      expect(error).toBeInstanceOf(FormRuntimeError);
+    }
+    expect([...runs.values()].filter((count) => count > 0)).toHaveLength(40);
   });
 });
 
