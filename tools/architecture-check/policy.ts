@@ -4,7 +4,10 @@ export const FIRST_PARTY_PACKAGES = [
   "@form/vue",
   "@form/react",
   "@form/element-plus",
-  "@form/mui",
+  "@form/antd",
+  "@form/arco-vue",
+  "@form/arco-react",
+  "@form/shadcn",
 ] as const;
 
 export type FirstPartyPackage = (typeof FIRST_PARTY_PACKAGES)[number];
@@ -15,14 +18,20 @@ export const ALLOWED_EDGES: Readonly<Record<FirstPartyPackage, readonly FirstPar
   "@form/vue": ["@form/core"],
   "@form/react": ["@form/core"],
   "@form/element-plus": ["@form/core", "@form/vue"],
-  "@form/mui": ["@form/core", "@form/react"],
+  "@form/antd": ["@form/core", "@form/react"],
+  "@form/arco-vue": ["@form/core", "@form/vue"],
+  "@form/arco-react": ["@form/core", "@form/react"],
+  "@form/shadcn": ["@form/core", "@form/react"],
 };
 
 export const REQUIRED_PEERS: Readonly<Partial<Record<FirstPartyPackage, readonly string[]>>> = {
   "@form/vue": ["vue"],
   "@form/react": ["react"],
   "@form/element-plus": ["vue", "element-plus"],
-  "@form/mui": ["react", "@mui/material"],
+  "@form/antd": ["react", "antd"],
+  "@form/arco-vue": ["vue", "@arco-design/web-vue"],
+  "@form/arco-react": ["react", "@arco-design/web-react"],
+  "@form/shadcn": ["react"],
 };
 
 export const HOST_PACKAGES = [
@@ -30,10 +39,10 @@ export const HOST_PACKAGES = [
   "react",
   "react-dom",
   "element-plus",
-  "@mui/material",
-  "@mui/system",
-  "@emotion/react",
-  "@emotion/styled",
+  "antd",
+  "@ant-design/icons",
+  "@arco-design/web-vue",
+  "@arco-design/web-react",
 ] as const;
 
 export const MUI_FORBIDDEN_PACKAGES = [
@@ -111,11 +120,20 @@ export function isReverseEdge(source: FirstPartyPackage, target: FirstPartyPacka
 }
 
 export function frameworkFamily(packageName: string): "vue" | "react" | undefined {
-  if (packageName === "@form/vue" || packageName === "@form/element-plus") {
+  if (
+    packageName === "@form/vue" ||
+    packageName === "@form/element-plus" ||
+    packageName === "@form/arco-vue"
+  ) {
     return "vue";
   }
 
-  if (packageName === "@form/react" || packageName === "@form/mui") {
+  if (
+    packageName === "@form/react" ||
+    packageName === "@form/antd" ||
+    packageName === "@form/arco-react" ||
+    packageName === "@form/shadcn"
+  ) {
     return "react";
   }
 

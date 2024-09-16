@@ -4,11 +4,11 @@ import { describe, expect, test } from "vitest";
 import { REPO_ROOT } from "../lib/fs.js";
 
 describe("vue + element-plus architecture matrix", () => {
-  test("does not implement React, MUI, or a Universal Renderer", () => {
+  test("does not implement React, Ant Design, or a Universal Renderer", () => {
     const vue = fs.readFileSync(path.join(REPO_ROOT, "packages/vue/src/index.ts"), "utf8");
-    const elementPlus = fs.readFileSync(path.join(REPO_ROOT, "packages/element-plus/src/index.ts"), "utf8");
-    expect(vue).not.toMatch(/ReactUIAdapter|UniversalRenderer|@form\/react|@form\/mui/);
-    expect(elementPlus).not.toMatch(/@form\/react|@form\/mui|ReactUIAdapter/);
+    const elementPlus = fs.readFileSync(path.join(REPO_ROOT, "packages/adapter/element-plus/src/index.ts"), "utf8");
+    expect(vue).not.toMatch(/ReactUIAdapter|UniversalRenderer|@form\/react|@form\/antd/);
+    expect(elementPlus).not.toMatch(/@form\/react|@form\/antd|ReactUIAdapter/);
   });
 
   test("records Core owner ports as already published", () => {

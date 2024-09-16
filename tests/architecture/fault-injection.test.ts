@@ -51,7 +51,7 @@ describe("fault injection commands", () => {
 
   test("cross-framework dependency fails the boundary command", () => {
     const root = copyRepoPackages();
-    mutateManifest(root, "mui", (manifest) => {
+    mutateManifest(root, "adapter/antd", (manifest) => {
       manifest.dependencies = {
         ...manifest.dependencies,
         "@form/element-plus": "workspace:*",
@@ -60,7 +60,7 @@ describe("fault injection commands", () => {
 
     const result = runBoundaryCheck(root);
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("@form/mui");
+    expect(result.stderr).toContain("@form/antd");
     expect(result.stderr).toContain("@form/element-plus");
     expect(result.stderr).toContain(RULE.crossFrameworkDependency);
   });
@@ -83,7 +83,7 @@ describe("fault injection commands", () => {
 
   test("MUI X date pickers fail the boundary command", () => {
     const root = copyRepoPackages();
-    mutateManifest(root, "mui", (manifest) => {
+    mutateManifest(root, "adapter/antd", (manifest) => {
       manifest.dependencies = {
         ...manifest.dependencies,
         "@mui/x-date-pickers": "^8.0.0",
@@ -92,7 +92,7 @@ describe("fault injection commands", () => {
 
     const result = runBoundaryCheck(root);
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("@form/mui");
+    expect(result.stderr).toContain("@form/antd");
     expect(result.stderr).toContain("@mui/x-date-pickers");
     expect(result.stderr).toContain(RULE.forbiddenMuiXPackage);
   });
@@ -124,7 +124,7 @@ describe("fault injection commands", () => {
     expect(`${result.stdout}\n${result.stderr}`).toMatch(/Cannot find module|has no exported member|TS2307|TS2305/);
   });
 
-  test("Vue, React, Element Plus and MUI deep imports fail consumer typecheck", () => {
+  test("Vue, React, Element Plus and Ant Design deep imports fail consumer typecheck", () => {
     const vue = runTsc(path.join(REPO_ROOT, "tests/contracts/negative/vue-deep-import.tsconfig.json"));
     expect(vue.status).not.toBe(0);
     expect(`${vue.stdout}\n${vue.stderr}`).toMatch(/Cannot find module|TS2307/);
@@ -134,9 +134,12 @@ describe("fault injection commands", () => {
     const react = runTsc(path.join(REPO_ROOT, "tests/contracts/negative/react-deep-import.tsconfig.json"));
     expect(react.status).not.toBe(0);
     expect(`${react.stdout}\n${react.stderr}`).toMatch(/Cannot find module|TS2307/);
-    const mui = runTsc(path.join(REPO_ROOT, "tests/contracts/negative/mui-deep-import.tsconfig.json"));
-    expect(mui.status).not.toBe(0);
-    expect(`${mui.stdout}\n${mui.stderr}`).toMatch(/Cannot find module|TS2307/);
+    const antd = runTsc(path.join(REPO_ROOT, "tests/contracts/negative/antd-deep-import.tsconfig.json"));
+    expect(antd.status).not.toBe(0);
+    expect(`${antd.stdout}\n${antd.stderr}`).toMatch(/Cannot find module|TS2307/);
+    const shadcn = runTsc(path.join(REPO_ROOT, "tests/contracts/negative/shadcn-deep-import.tsconfig.json"));
+    expect(shadcn.status).not.toBe(0);
+    expect(`${shadcn.stdout}\n${shadcn.stderr}`).toMatch(/Cannot find module|TS2307/);
   });
 
   test("unexpected Core directory fails the boundary command", () => {

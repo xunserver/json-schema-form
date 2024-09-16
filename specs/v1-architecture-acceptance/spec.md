@@ -33,7 +33,7 @@ v1 门禁必须（MUST）在运行跨栈产品验收前检查版本化 prerequis
 - **THEN** 验收只从批准的 package exports 消费这些契约，且不访问 owning package 的内部模块
 
 ### Requirement: 同一 Definition 与业务 Plugin 在两条渲染链路复用
-跨 framework 验收必须（MUST）让同一份 `FormDefinition` 与同一组 framework-neutral 业务 Plugin 在 Vue/Element Plus 和 React/MUI 两条完整链路分别 compile、instantiate 和 render。两条链路必须（MUST）在等价的输入与公开语义操作后得到等价的 canonical values、`ArrayItemId` 身份关系、effective/presentable snapshots、validation 结果、serialization payload 与 submit 结果；允许 framework DOM 结构不同，但不得（MUST NOT）共享 Renderer 实现、创建 Universal Renderer 或把 framework component 放入 Core Plugin。
+跨 framework 验收必须（MUST）让同一份 `FormDefinition` 与同一组 framework-neutral 业务 Plugin 在 Vue/Element Plus 和 React/Ant Design 两条完整链路分别 compile、instantiate 和 render。两条链路必须（MUST）在等价的输入与公开语义操作后得到等价的 canonical values、`ArrayItemId` 身份关系、effective/presentable snapshots、validation 结果、serialization payload 与 submit 结果；允许 framework DOM 结构不同，但不得（MUST NOT）共享 Renderer 实现、创建 Universal Renderer 或把 framework component 放入 Core Plugin。
 
 #### Scenario: 两个 framework 产生等价业务结果
 - **GIVEN** 一个含 custom logical Widget、nested array、State/Computed Rule、Schema/async/server validation 与 conditional branch 的共享 Definition 和业务 Plugin
@@ -41,7 +41,7 @@ v1 门禁必须（MUST）在运行跨栈产品验收前检查版本化 prerequis
 - **THEN** 两边的 Core 可观察业务结果等价，且各自只使用自己的 RendererEnvironment 与 UI Adapter
 
 #### Scenario: 跨 framework 实现耦合被拒绝
-- **GIVEN** React/MUI 验收代码导入 Vue/Element Plus 协议，或任一 framework 包试图注册 Universal Renderer
+- **GIVEN** React 验收代码导入 Vue/Element Plus 协议，或任一 framework 包试图注册 Universal Renderer
 - **WHEN** 运行 import、declaration 与 matrix boundary 检查
 - **THEN** v1 gate 失败并定位违规依赖，不能以共享 UI 实现换取结果一致
 

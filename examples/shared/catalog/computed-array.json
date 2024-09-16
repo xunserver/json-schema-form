@@ -1,0 +1,106 @@
+{
+  "id": "computed-array",
+  "title": "计算字段与数组",
+  "description": "可编辑商品数组，并自动计算小计与合计",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "discount": { "type": "number" },
+      "subtotal": { "type": "number" },
+      "total": { "type": "number" },
+      "products": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "quantity": { "type": "number" },
+            "price": { "type": "number" },
+            "lineTotal": { "type": "number" }
+          },
+          "required": ["title"]
+        }
+      }
+    }
+  },
+  "uiSchema": {
+    "fields": {
+      "discount": { "widget": "number", "display": { "label": "折扣" } },
+      "subtotal": { "widget": "number", "display": { "label": "小计" } },
+      "total": { "widget": "number", "display": { "label": "合计" } },
+      "products": { "display": { "label": "商品" } },
+      "products[].title": { "widget": "text", "display": { "label": "名称" } },
+      "products[].quantity": { "widget": "number", "display": { "label": "数量" } },
+      "products[].price": { "widget": "number", "display": { "label": "单价" } },
+      "products[].lineTotal": { "widget": "number", "display": { "label": "行小计" } }
+    },
+    "layout": {
+      "type": "object",
+      "children": [
+        {
+          "type": "layout",
+          "columns": 3,
+          "children": [
+            { "type": "field", "path": "discount" },
+            { "type": "field", "path": "subtotal" },
+            { "type": "field", "path": "total" }
+          ]
+        },
+        {
+          "type": "array",
+          "path": "products",
+          "children": [
+            { "type": "field", "path": "products[].title" },
+            { "type": "field", "path": "products[].quantity" },
+            { "type": "field", "path": "products[].price" },
+            { "type": "field", "path": "products[].lineTotal" }
+          ]
+        }
+      ]
+    }
+  },
+  "rules": [
+    {
+      "kind": "computed",
+      "target": "products[].lineTotal",
+      "action": {
+        "value": {
+          "call": "playground.mul",
+          "args": [{ "field": "products[].quantity" }, { "field": "products[].price" }]
+        }
+      }
+    },
+    {
+      "kind": "computed",
+      "target": "subtotal",
+      "action": {
+        "value": {
+          "call": "playground.sumLines",
+          "args": [{ "field": "products" }]
+        }
+      }
+    },
+    {
+      "kind": "computed",
+      "target": "total",
+      "action": {
+        "value": {
+          "call": "playground.sub",
+          "args": [{ "field": "subtotal" }, { "field": "discount" }]
+        }
+      }
+    }
+  ],
+  "config": {
+    "schemaValidator": "ajv-2020"
+  },
+  "formData": {
+    "discount": 5,
+    "subtotal": 0,
+    "total": 0,
+    "products": [
+      { "title": "Widget", "quantity": 2, "price": 10, "lineTotal": 0 },
+      { "title": "Gadget", "quantity": 1, "price": 25, "lineTotal": 0 }
+    ]
+  }
+}

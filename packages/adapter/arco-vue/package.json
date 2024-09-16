@@ -1,0 +1,31 @@
+{
+  "name": "@form/arco-vue",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -b --pretty false",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "dependencies": {
+    "@form/core": "workspace:*",
+    "@form/vue": "workspace:*"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0",
+    "@arco-design/web-vue": "^2.0.0"
+  },
+  "devDependencies": {
+    "vue": "^3.5.0",
+    "@arco-design/web-vue": "^2.0.0"
+  }
+}

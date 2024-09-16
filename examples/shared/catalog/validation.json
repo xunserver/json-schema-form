@@ -1,0 +1,44 @@
+{
+  "id": "validation",
+  "title": "校验示例",
+  "description": "Schema 必填/最小长度，配合 change 校验与 touched-or-submitted 错误展示",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "email": { "type": "string", "minLength": 5 },
+      "password": { "type": "string", "minLength": 8 },
+      "confirm": { "type": "string" }
+    },
+    "required": ["email", "password", "confirm"]
+  },
+  "uiSchema": {
+    "fields": {
+      "email": { "widget": "text", "display": { "label": "邮箱", "help": "至少 5 个字符" } },
+      "password": { "widget": "text", "display": { "label": "密码" } },
+      "confirm": { "widget": "text", "display": { "label": "确认密码" } }
+    }
+  },
+  "rules": [
+    {
+      "kind": "validation",
+      "target": "confirm",
+      "action": {
+        "assertion": { "eq": [{ "field": "confirm" }, { "field": "password" }] },
+        "failure": {
+          "code": "password.mismatch",
+          "message": "两次密码必须一致"
+        }
+      }
+    }
+  ],
+  "config": {
+    "schemaValidator": "ajv-2020",
+    "validateOn": "change",
+    "errorPresentation": "touched-or-submitted"
+  },
+  "formData": {
+    "email": "a@",
+    "password": "short",
+    "confirm": "different"
+  }
+}

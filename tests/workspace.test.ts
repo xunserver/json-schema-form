@@ -10,7 +10,10 @@ const FIRST_PARTY_PACKAGES = [
   "@form/vue",
   "@form/react",
   "@form/element-plus",
-  "@form/mui",
+  "@form/antd",
+  "@form/arco-vue",
+  "@form/arco-react",
+  "@form/shadcn",
 ] as const;
 
 describe("workspace contract", () => {
@@ -42,12 +45,15 @@ describe("workspace contract", () => {
       "./packages/validator-ajv",
       "./packages/vue",
       "./packages/react",
-      "./packages/element-plus",
-      "./packages/mui",
+      "./packages/adapter/element-plus",
+      "./packages/adapter/antd",
+      "./packages/adapter/arco-vue",
+      "./packages/adapter/arco-react",
+      "./packages/adapter/shadcn",
     ]);
   });
 
-  test("pnpm enumerates exactly the six first-party packages", () => {
+  test("pnpm enumerates exactly the first-party packages", () => {
     const result = spawnSync("pnpm", ["recursive", "list", "--depth", "-1", "--json"], {
       cwd: REPO_ROOT,
       encoding: "utf8",

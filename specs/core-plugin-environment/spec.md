@@ -48,7 +48,7 @@ Core 必须（SHALL）从 `@form/core/extension` 暴露 `createFormEnvironment()
 #### Scenario: 默认 Widget 不绑定 UI library
 - **GIVEN** 调用者检查任一默认 Widget Definition
 - **WHEN** 遍历其公开 contract
-- **THEN** 其中不包含 Vue/React component、Element Plus/MUI props 或 DOM event handler
+- **THEN** 其中不包含 Vue/React component、Element Plus/Ant Design props 或 DOM event handler
 
 ### Requirement: Plugin 依赖按确定顺序解析
 Environment build 必须（SHALL）在注册 contribution 前解析 Plugin 依赖，使每个依赖先于依赖方安装；互不依赖的 Plugin 必须（MUST）保持调用者给定的相对顺序。缺失依赖或依赖环必须（MUST）阻止 Environment 成功构建并产生结构化 Plugin diagnostic。

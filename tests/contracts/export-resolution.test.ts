@@ -70,20 +70,29 @@ describe("runtime export resolution", () => {
     );
   });
 
-  test("resolves Vue, React, Element Plus and MUI root entries and rejects deep paths", () => {
+  test("resolves Vue, React, and UI adapter root entries and rejects deep paths", () => {
     expect(resolveWithNode("@form/vue").stdout.trim()).toMatch(/packages\/vue\/dist\/index\.js$/);
     expect(resolveWithNode("@form/element-plus").stdout.trim()).toMatch(
-      /packages\/element-plus\/dist\/index\.js$/,
+      /packages\/adapter\/element-plus\/dist\/index\.js$/,
     );
     expect(resolveWithNode("@form/react").stdout.trim()).toMatch(/packages\/react\/dist\/index\.js$/);
-    expect(resolveWithNode("@form/mui").stdout.trim()).toMatch(/packages\/mui\/dist\/index\.js$/);
+    expect(resolveWithNode("@form/antd").stdout.trim()).toMatch(/packages\/adapter\/antd\/dist\/index\.js$/);
+    expect(resolveWithNode("@form/arco-vue").stdout.trim()).toMatch(/packages\/adapter\/arco-vue\/dist\/index\.js$/);
+    expect(resolveWithNode("@form/arco-react").stdout.trim()).toMatch(/packages\/adapter\/arco-react\/dist\/index\.js$/);
+    expect(resolveWithNode("@form/shadcn").stdout.trim()).toMatch(/packages\/adapter\/shadcn\/dist\/index\.js$/);
     const vueDeep = resolveWithNode("@form/vue/src/renderer/FormRenderer.js");
     expect(vueDeep.status).not.toBe(0);
     const plusDeep = resolveWithNode("@form/element-plus/src/widgets/mapper.js");
     expect(plusDeep.status).not.toBe(0);
     const reactDeep = resolveWithNode("@form/react/src/renderer/FormRenderer.js");
     expect(reactDeep.status).not.toBe(0);
-    const muiDeep = resolveWithNode("@form/mui/src/widgets/mapper.js");
-    expect(muiDeep.status).not.toBe(0);
+    const antdDeep = resolveWithNode("@form/antd/src/widgets/mapper.js");
+    expect(antdDeep.status).not.toBe(0);
+    const arcoVueDeep = resolveWithNode("@form/arco-vue/src/widgets/mapper.js");
+    expect(arcoVueDeep.status).not.toBe(0);
+    const arcoReactDeep = resolveWithNode("@form/arco-react/src/widgets/mapper.js");
+    expect(arcoReactDeep.status).not.toBe(0);
+    const shadcnDeep = resolveWithNode("@form/shadcn/src/widgets/mapper.js");
+    expect(shadcnDeep.status).not.toBe(0);
   });
 });

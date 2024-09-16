@@ -1,28 +1,51 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
+import { createDemoForm } from "../../examples/shared/src/demo.ts";
 import { REPO_ROOT } from "../lib/fs.js";
 import { runNodeProcess } from "../lib/process.js";
 
 describe("v1 examples", () => {
-  test("V1-EXAMPLES builds and smokes both public example apps", () => {
-    const vueSrc = fs.readFileSync(path.join(REPO_ROOT, "examples/vue-element-plus/src/definition.ts"), "utf8");
-    const reactSrc = fs.readFileSync(path.join(REPO_ROOT, "examples/react-mui/src/definition.ts"), "utf8");
+  test("V1-EXAMPLES typechecks the public playground and shared catalog", async () => {
+    const playgroundPkg = fs.readFileSync(path.join(REPO_ROOT, "examples/playground/package.json"), "utf8");
+    const playgroundSrc = collectSource(path.join(REPO_ROOT, "examples/playground/src"));
     const sharedEnv = fs.readFileSync(path.join(REPO_ROOT, "examples/shared/src/environment.ts"), "utf8");
     const kitchenSink = fs.readFileSync(
       path.join(REPO_ROOT, "examples/shared/catalog/kitchen-sink.json"),
       "utf8",
     );
-    expect(vueSrc).not.toMatch(/@form\/vue\/src/);
-    expect(reactSrc).not.toMatch(/@form\/react\/src/);
-    expect(vueSrc).toContain("@form/example-shared");
-    expect(reactSrc).toContain("@form/example-shared");
+    expect(playgroundPkg).toContain("@form/example-shared");
+    expect(playgroundPkg).not.toContain("@mui/");
+    expect(playgroundSrc).toContain("@form/example-shared");
+    expect(playgroundSrc).not.toMatch(/@form\/vue\/src/);
+    expect(playgroundSrc).not.toMatch(/@form\/react\/src/);
     expect(sharedEnv).toContain("company.currency");
     expect(kitchenSink).toContain("company.currency");
-    expect(fs.readFileSync(path.join(REPO_ROOT, "examples/react-mui/package.json"), "utf8")).not.toContain("@mui/x-");
-    const vue = runNodeProcess("pnpm", ["example:vue"]);
-    expect(vue.status, vue.stderr).toBe(0);
-    const react = runNodeProcess("pnpm", ["example:react"]);
-    expect(react.status, react.stderr).toBe(0);
+
+    const shared = runNodeProcess("pnpm", ["--filter", "@form/example-shared", "typecheck"]);
+    expect(shared.status, shared.stderr).toBe(0);
+    const playground = runNodeProcess("pnpm", ["--filter", "@form/example-playground", "typecheck"]);
+    expect(playground.status, playground.stderr).toBe(0);
+
+    const form = createDemoForm();
+    expect(form.getValue("name")).toBe("Ada");
+    const submitted = await form.submit(async (payload) => payload);
+    expect(submitted.submitted).toBe(true);
+    expect(submitted.valid).toBe(true);
   });
 });
+
+function collectSource(root: string): string {
+  const parts: string[] = [];
+  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+    const full = path.join(root, entry.name);
+    if (entry.isDirectory()) {
+      parts.push(collectSource(full));
+      continue;
+    }
+    if (/\.(?:ts|tsx)$/.test(entry.name)) {
+      parts.push(fs.readFileSync(full, "utf8"));
+    }
+  }
+  return parts.join("\n");
+}

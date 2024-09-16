@@ -225,7 +225,7 @@
       },
       {
         "changeId": "add-react-mui-rendering",
-        "capability": "mui-ui-adapter",
+        "capability": "antd-ui-adapter",
         "requirement": "九类内置逻辑 Widget 均有 binding",
         "scenario": "默认 Widget 集合完整"
       }
@@ -240,8 +240,8 @@
       {
         "changeId": "add-react-mui-rendering",
         "capability": "package-architecture",
-        "requirement": "React 与 MUI 提供完整集成验收入口",
-        "scenario": "React+MUI 示例覆盖端到端行为"
+        "requirement": "React 与 UI adapter 提供完整集成验收入口",
+        "scenario": "React+Ant Design 示例覆盖端到端行为"
       }
     ],
     "SLICE-05": [

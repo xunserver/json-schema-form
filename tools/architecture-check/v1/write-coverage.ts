@@ -40,7 +40,6 @@ const COMMANDS: CommandRecord[] = [
   { id: "check:boundaries", kind: "root-script", name: "check:boundaries" },
   { id: "check:v1-matrix", kind: "root-script", name: "check:v1-matrix" },
   { id: "verify:v1", kind: "root-script", name: "verify:v1" },
-  { id: "example:vue", kind: "root-script", name: "example:vue" },
   { id: "test:v1:host", kind: "root-script", name: "test:v1:host" },
   { id: "test:v1:docs", kind: "root-script", name: "test:v1:docs" },
   { id: "matrix-validate", kind: "builtin", name: "matrix-validate" },
@@ -138,7 +137,6 @@ const packages = [
   "@form/vue",
   "@form/react",
   "@form/element-plus",
-  "@form/mui",
 ].map((name, index) =>
   e(`PKG-0${index + 1}`, 17, index + 1, name, "covered", [o("bootstrap-monorepo-and-contracts", "package-architecture", "首期工作区 package", "发现全部首期 package")], ["V1-WORKSPACE-LAYOUT"]),
 );
@@ -146,14 +144,15 @@ const packages = [
 const directories: CatalogEntry[] = [
   e("DIR-TESTS", 18, 1, "tests/", "covered", [o("bootstrap-monorepo-and-contracts", "package-architecture", "仓库验证包含边界检查", "验证未修改的合规工作区")], ["V1-WORKSPACE-LAYOUT"]),
   e("DIR-DOCS", 18, 2, "docs/", "covered", [o("bootstrap-monorepo-and-contracts", "package-architecture", "仓库验证包含边界检查", "验证未修改的合规工作区")], ["V1-DOCS-INDEX"]),
-  e("DIR-EX-VUE", 18, 3, "examples/vue-element-plus/", "covered", [o("add-vue-element-plus-rendering", "package-architecture", "Vue/Element Plus 依赖与集成验收可重复验证", "Element Plus example完成端到端交互")], ["V1-EXAMPLES"]),
-  e("DIR-EX-REACT", 18, 4, "examples/react-mui/", "covered", [o("add-react-mui-rendering", "package-architecture", "React 与 MUI 提供完整集成验收入口", "React+MUI 示例覆盖端到端行为")], ["V1-EXAMPLES"]),
+  e("DIR-EX-PLAYGROUND", 18, 3, "examples/playground/", "covered", [o("bootstrap-monorepo-and-contracts", "package-architecture", "仓库验证包含边界检查", "验证未修改的合规工作区")], ["V1-EXAMPLES"]),
+  e("DIR-EX-SHARED", 18, 4, "examples/shared/", "covered", [o("bootstrap-monorepo-and-contracts", "package-architecture", "仓库验证包含边界检查", "验证未修改的合规工作区")], ["V1-EXAMPLES"]),
   e("DIR-CORE-LAYOUT", 18, 5, "packages/core/src architecture domains", "covered", [o("align-core-contributions-and-layout", "package-architecture", "Core 内部目录按架构生命周期领域组织", "顶层目录与架构一致")], ["V1-PRE-CORE-LAYOUT"]),
   e("DIR-VALIDATOR", 18, 6, "packages/validator-ajv/src", "covered", [o("add-validation-pipeline", "package-architecture", "AJV具体依赖与实现只属于validator package", "validator-ajv合法依赖AJV与Core")], ["V1-WORKSPACE-LAYOUT"]),
   e("DIR-VUE", 18, 7, "packages/vue/src renderer/context/composables/adapter", "covered", [o("add-vue-element-plus-rendering", "package-architecture", "Vue 与 Element Plus 只暴露受支持 Renderer 入口", "应用从根入口组合 Renderer")], ["V1-WORKSPACE-LAYOUT"]),
-  e("DIR-REACT", 18, 8, "packages/react/src renderer/context/hooks/adapter", "covered", [o("add-react-mui-rendering", "package-architecture", "React 与 MUI 渲染包只公开受支持入口", "消费者只使用根入口")], ["V1-WORKSPACE-LAYOUT"]),
-  e("DIR-ELEMENT-PLUS", 18, 9, "packages/element-plus/src widgets/layouts/field-chrome/form", "covered", [o("add-vue-element-plus-rendering", "element-plus-ui-adapter", "Element Plus Adapter 完整提供四类角色", "Form wrapper 不接管 Core 状态")], ["V1-WORKSPACE-LAYOUT"]),
-  e("DIR-MUI", 18, 10, "packages/mui/src widgets/layouts/field-chrome/form", "covered", [o("add-react-mui-rendering", "mui-ui-adapter", "官方 MUI adapter 完整提供四类角色", "MUI Form 不运行第二套验证")], ["V1-WORKSPACE-LAYOUT"]),
+  e("DIR-REACT", 18, 8, "packages/react/src renderer/context/hooks/adapter", "covered", [o("add-react-mui-rendering", "package-architecture", "React 与 UI adapter 渲染包只公开受支持入口", "消费者只使用根入口")], ["V1-WORKSPACE-LAYOUT"]),
+  e("DIR-ELEMENT-PLUS", 18, 9, "packages/adapter/element-plus/src widgets/layouts/field-chrome/form", "covered", [o("add-vue-element-plus-rendering", "element-plus-ui-adapter", "Element Plus Adapter 完整提供四类角色", "Form wrapper 不接管 Core 状态")], ["V1-WORKSPACE-LAYOUT"]),
+  e("DIR-ANTD", 18, 10, "packages/adapter/antd/src widgets/layouts/field-chrome/form", "covered", [o("add-react-mui-rendering", "antd-ui-adapter", "官方 Ant Design adapter 完整提供四类角色", "Form wrapper 不接管 Core 状态")], ["V1-WORKSPACE-LAYOUT"]),
+  e("DIR-SHADCN", 18, 11, "packages/adapter/shadcn/src widgets/layouts/field-chrome/form", "covered", [o("add-react-shadcn-adapter", "shadcn-ui-adapter", "官方 shadcn adapter 通过注入组件提供四类角色", "Form wrapper 不接管 Core 状态")], ["V1-WORKSPACE-LAYOUT"]),
 ];
 
 const exportsCatalog: CatalogEntry[] = [
@@ -162,9 +161,10 @@ const exportsCatalog: CatalogEntry[] = [
   e("EXP-CORE-EXTENSION", 16, 3, "@form/core/extension", "covered", [o("compile-static-form-model", "core-public-contracts", "受支持的 export 隔离内部模块", "导入受支持的extension子路径")], ["V1-PRE-WIDGET-HELPER", "V1-EXPORT-SURFACE"]),
   e("EXP-VALIDATOR-AJV", 17, 4, "@form/validator-ajv", "covered", [o("add-validation-pipeline", "package-architecture", "AJV具体依赖与实现只属于validator package", "validator-ajv合法依赖AJV与Core")], ["V1-EXPORT-SURFACE"]),
   e("EXP-VUE", 17, 5, "@form/vue", "covered", [o("add-vue-element-plus-rendering", "package-architecture", "Vue 与 Element Plus 只暴露受支持 Renderer 入口", "应用从根入口组合 Renderer")], ["V1-EXPORT-SURFACE"]),
-  e("EXP-REACT", 17, 6, "@form/react", "covered", [o("add-react-mui-rendering", "package-architecture", "React 与 MUI 渲染包只公开受支持入口", "消费者只使用根入口")], ["V1-EXPORT-SURFACE"]),
+  e("EXP-REACT", 17, 6, "@form/react", "covered", [o("add-react-mui-rendering", "package-architecture", "React 与 UI adapter 渲染包只公开受支持入口", "消费者只使用根入口")], ["V1-EXPORT-SURFACE"]),
   e("EXP-ELEMENT-PLUS", 17, 7, "@form/element-plus", "covered", [o("add-vue-element-plus-rendering", "package-architecture", "Vue 与 Element Plus 只暴露受支持 Renderer 入口", "应用从根入口组合 Renderer")], ["V1-EXPORT-SURFACE"]),
-  e("EXP-MUI", 17, 8, "@form/mui", "covered", [o("add-react-mui-rendering", "package-architecture", "React 与 MUI 渲染包只公开受支持入口", "消费者只使用根入口")], ["V1-EXPORT-SURFACE"]),
+  e("EXP-ANTD", 17, 8, "@form/antd", "covered", [o("add-react-mui-rendering", "package-architecture", "React 与 UI adapter 渲染包只公开受支持入口", "消费者只使用根入口")], ["V1-EXPORT-SURFACE"]),
+  e("EXP-SHADCN", 17, 10, "@form/shadcn", "covered", [o("add-react-shadcn-adapter", "package-architecture", "React 与 UI adapter 渲染包只公开受支持入口", "消费者只使用根入口")], ["V1-EXPORT-SURFACE"]),
   e("EXP-DEEP-IMPORT-DENY", 16, 9, "undeclared deep import deny", "covered", [o("compile-static-form-model", "core-public-contracts", "受支持的 export 隔离内部模块", "拒绝内部 deep import")], ["V1-EXPORT-DEEP-DENY"]),
 ];
 

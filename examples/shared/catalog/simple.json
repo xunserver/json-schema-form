@@ -1,0 +1,30 @@
+{
+  "id": "simple",
+  "title": "简单示例",
+  "description": "最小 Schema，使用默认 ViewTree",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "email": { "type": "string" },
+      "age": { "type": "number" }
+    },
+    "required": ["name"]
+  },
+  "uiSchema": {
+    "fields": {
+      "name": { "display": { "label": "姓名" } },
+      "email": { "display": { "label": "邮箱" } },
+      "age": { "display": { "label": "年龄" } }
+    }
+  },
+  "rules": [],
+  "config": {
+    "schemaValidator": "ajv-2020"
+  },
+  "formData": {
+    "name": "Ada",
+    "email": "ada@example.com",
+    "age": 36
+  }
+}

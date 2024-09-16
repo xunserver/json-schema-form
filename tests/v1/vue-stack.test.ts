@@ -4,7 +4,7 @@ import { mount } from "@vue/test-utils";
 import { describe, expect, test } from "vitest";
 import { FormRenderer } from "@form/vue";
 import { applySemanticSteps, compileV1, observeForm } from "../fixtures/v1/index.js";
-import { createDemoRendererEnvironment } from "../../examples/vue-element-plus/src/renderer.ts";
+import { createDemoRendererEnvironment } from "../lib/demo-element-plus-environment.ts";
 
 if (typeof globalThis.ResizeObserver === "undefined") {
   globalThis.ResizeObserver = class {

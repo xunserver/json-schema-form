@@ -49,9 +49,9 @@ Element Plus mapper 必须（MUST）从逻辑 Widget props、Field/View descript
 - **THEN** 产生可定位 adapter diagnostic且恶意值/handler不生效，唯一写路径仍是 codec后的semantic command
 
 #### Scenario: adapter namespace 隔离
-- **GIVEN** 同一 Field含 `element-plus` 与 `mui` native options
+- **GIVEN** 同一 Field含 `element-plus` 与 `antd` native options
 - **WHEN** Element Plus mapper运行
-- **THEN** 只读取前者的非保留 options，不解释或转发 `mui` payload
+- **THEN** 只读取前者的非保留 options，不解释或转发 `antd` payload
 
 ### Requirement: FieldChrome 呈现语义与无障碍关系
 FieldChromeAdapter 必须（MUST）从 resolved Field/View metadata及Core effective/presentation snapshots呈现 label、help、required indicator、validating state与 presentable errors，并为 native control建立确定的 label/error/help ID、`aria-labelledby`/`aria-describedby`、`aria-invalid`、`aria-required` 及适用 disabled/readonly语义。它不得（MUST NOT）从 Schema、raw error source或 Element Plus rules自行重算 required、error eligibility或validity。

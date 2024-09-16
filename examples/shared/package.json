@@ -1,0 +1,28 @@
+{
+  "name": "@form/example-shared",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./preview.css": "./src/preview.css",
+    "./preview-runtime": {
+      "types": "./src/preview-runtime.ts",
+      "import": "./src/preview-runtime.ts"
+    },
+    "./protocol": {
+      "types": "./src/protocol.ts",
+      "import": "./src/protocol.ts"
+    },
+    "./catalog/*": "./catalog/*"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --pretty false --noEmit"
+  },
+  "dependencies": {
+    "@form/core": "workspace:*",
+    "@form/validator-ajv": "workspace:*"
+  }
+}

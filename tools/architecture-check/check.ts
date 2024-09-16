@@ -139,11 +139,25 @@ function discoverPackages(workspaceRoot: string): DiscoveredPackage[] {
     return [];
   }
 
-  return fs
-    .readdirSync(packagesRoot, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => {
-      const directory = path.join(packagesRoot, entry.name);
+  const directories: string[] = [];
+  for (const entry of fs.readdirSync(packagesRoot, { withFileTypes: true })) {
+    if (!entry.isDirectory()) {
+      continue;
+    }
+    const directory = path.join(packagesRoot, entry.name);
+    if (entry.name === "adapter") {
+      for (const nested of fs.readdirSync(directory, { withFileTypes: true })) {
+        if (nested.isDirectory()) {
+          directories.push(path.join(directory, nested.name));
+        }
+      }
+      continue;
+    }
+    directories.push(directory);
+  }
+
+  return directories
+    .map((directory) => {
       const manifestPath = path.join(directory, "package.json");
       if (!fs.existsSync(manifestPath)) {
         return undefined;
@@ -238,12 +252,19 @@ function checkManifestPolicy(pkg: DiscoveredPackage): ArchitectureDiagnostic[] {
       });
     }
 
-    if ((pkg.name === "@form/mui" || pkg.name === "@form/react") && isMuiForbiddenPackage(target)) {
+    if (
+      (pkg.name === "@form/react" ||
+        pkg.name === "@form/antd" ||
+        pkg.name === "@form/arco-react" ||
+        pkg.name === "@form/arco-vue" ||
+        pkg.name === "@form/shadcn") &&
+      isMuiForbiddenPackage(target)
+    ) {
       diagnostics.push({
         sourcePackage: pkg.name,
         targetPackage: target,
         rule: RULE.forbiddenMuiXPackage,
-        message: `React/MUI packages must not depend on "${target}".`,
+        message: `UI adapter packages must not depend on "${target}".`,
         file: path.join(pkg.directory, "package.json"),
       });
     }
@@ -328,12 +349,19 @@ function checkSourceImports(
         continue;
       }
 
-      if ((pkg.name === "@form/mui" || pkg.name === "@form/react") && isMuiForbiddenPackage(targetName)) {
+      if (
+        (pkg.name === "@form/react" ||
+          pkg.name === "@form/antd" ||
+          pkg.name === "@form/arco-react" ||
+          pkg.name === "@form/arco-vue" ||
+          pkg.name === "@form/shadcn") &&
+        isMuiForbiddenPackage(targetName)
+      ) {
         diagnostics.push({
           sourcePackage: pkg.name,
           targetPackage: targetName,
           rule: RULE.forbiddenMuiXPackage,
-          message: `React/MUI packages must not import "${targetName}".`,
+          message: `UI adapter packages must not import "${targetName}".`,
           file,
           specifier,
         });

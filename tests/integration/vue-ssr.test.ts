@@ -2,8 +2,8 @@ import { createSSRApp, h } from "vue";
 import { renderToString } from "vue/server-renderer";
 import { describe, expect, test } from "vitest";
 import { FormRenderer } from "@form/vue";
-import { createDemoForm } from "../../examples/vue-element-plus/src/definition.ts";
-import { createDemoRendererEnvironment } from "../../examples/vue-element-plus/src/renderer.ts";
+import { createDemoForm } from "../../examples/shared/src/demo.ts";
+import { createDemoRendererEnvironment } from "../lib/demo-element-plus-environment.ts";
 import { subscribeRuntime, valueSelector } from "@form/core/runtime";
 
 describe("vue + element-plus SSR", () => {
@@ -17,7 +17,7 @@ describe("vue + element-plus SSR", () => {
         },
       }),
     );
-    expect(html).toContain("Name");
+    expect(html).toContain("姓名");
     expect(html).toContain("aria-labelledby");
     expect(html).toContain('value="USD"');
     const leaked: unknown[] = [];

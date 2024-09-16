@@ -4,17 +4,17 @@ import { act, cleanup, render } from "@testing-library/react";
 import { afterEach } from "vitest";
 import { FormRenderer } from "@form/react";
 import { applySemanticSteps, compileV1, observeForm } from "../fixtures/v1/index.js";
-import { createDemoRendererEnvironment } from "../../examples/react-mui/src/renderer.tsx";
+import { createDemoRendererEnvironment } from "../lib/demo-antd-environment.tsx";
 
 afterEach(() => {
   cleanup();
 });
 
 describe("v1 react stack", () => {
-  test("V1-CROSS-STACK-REACT renders the shared fixture through MUI", async () => {
+  test("V1-CROSS-STACK-REACT renders the shared fixture through Ant Design", async () => {
     const { form } = compileV1("explicit");
     const view = render(
-      <FormRenderer form={form} environment={createDemoRendererEnvironment()} adapterId="mui" />,
+      <FormRenderer form={form} environment={createDemoRendererEnvironment()} adapterId="antd" />,
     );
     expect(view.container.textContent).toContain("Name");
     const previousIds = form.array("products").items().map((item) => item.id);

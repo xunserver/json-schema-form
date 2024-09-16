@@ -17,7 +17,7 @@ describe("v1 workspace layout and dependency graph", () => {
     const root = makeTempDir("v1-layout-");
     fs.mkdirSync(path.join(root, "packages"), { recursive: true });
     const issues = checkWorkspaceLayout(root);
-    expect(issues.some((issue) => issue.entryId === "DIR-EX-REACT" && issue.path?.includes("react-mui"))).toBe(true);
+    expect(issues.some((issue) => issue.entryId === "DIR-EX-PLAYGROUND" && issue.path?.includes("playground"))).toBe(true);
     expect(issues.some((issue) => issue.entryId === "DIR-TESTS")).toBe(true);
     fs.mkdirSync(path.join(root, "packages/vue/src/wrong"), { recursive: true });
     const misplaced = checkWorkspaceLayout(root);
@@ -35,7 +35,7 @@ describe("v1 workspace layout and dependency graph", () => {
     const root = makeTempDir("v1-dep-fault-");
     copyWorkspacePackages(root);
     writeText(path.join(root, "packages/core/src/leak.ts"), 'import "ajv";\nimport "@form/vue";\n');
-    writeText(path.join(root, "packages/mui/src/x.ts"), 'import "@mui/x-date-pickers";\nimport "@form/vue";\n');
+    writeText(path.join(root, "packages/adapter/antd/src/x.ts"), 'import "@mui/x-date-pickers";\nimport "@form/vue";\n');
     const diagnostics = checkArchitecture(root);
     expect(diagnostics.some((item) => item.rule === RULE.forbiddenCorePackage)).toBe(true);
     expect(diagnostics.some((item) => item.rule === RULE.crossFrameworkDependency || item.rule === RULE.reverseDependency)).toBe(

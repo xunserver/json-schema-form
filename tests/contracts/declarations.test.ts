@@ -158,13 +158,13 @@ describe("generated Vue and Element Plus public surface", () => {
     ]) {
       expect(declaration, `missing ${name}`).toContain(name);
     }
-    for (const name of ["ReactUIAdapter", "MuiAdapter", "TransactionManager", "RuntimeNodeId", "ValueStoreImpl"]) {
+    for (const name of ["ReactUIAdapter", "AntdAdapter", "TransactionManager", "RuntimeNodeId", "ValueStoreImpl"]) {
       expect(declaration, `leaked ${name}`).not.toContain(name);
     }
   });
 
   test("Element Plus root declarations expose the standard adapter without private mapper types", () => {
-    const declaration = fs.readFileSync(path.join(REPO_ROOT, "packages/element-plus/dist/index.d.ts"), "utf8");
+    const declaration = fs.readFileSync(path.join(REPO_ROOT, "packages/adapter/element-plus/dist/index.d.ts"), "utf8");
     expect(declaration).toContain("elementPlusAdapter");
     expect(declaration).toContain("createElementPlusAdapter");
     expect(declaration).toContain("extendElementPlusAdapter");

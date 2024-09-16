@@ -9,7 +9,7 @@ import { act } from "@testing-library/react";
 import { FormRenderer as VueFormRenderer } from "@form/vue";
 import { FormRenderer as ReactFormRenderer } from "@form/react";
 import { compileV1 } from "../fixtures/v1/index.js";
-import { createDemoRendererEnvironment as createVueEnv } from "../../examples/vue-element-plus/src/renderer.ts";
+import { createDemoRendererEnvironment as createVueEnv } from "../lib/demo-element-plus-environment.ts";
 import { createRecordingAdapter } from "../../packages/react/src/test-utils/fake-adapter.tsx";
 import { subscribeRuntime, valueSelector } from "@form/core/runtime";
 

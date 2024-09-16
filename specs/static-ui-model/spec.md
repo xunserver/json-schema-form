@@ -74,7 +74,7 @@ UIModel 必须（SHALL）按 `ModelPath` 提供独立于 DataNode 和 ViewNode �
 - **THEN** 产生带该 `ModelPath` 的阻断 Diagnostic，而不是创建脱离 Data Tree 的 Field
 
 #### Scenario: 按 Adapter ID 保留 native options
-- **GIVEN** 一个 Field 分别声明 `element-plus` 与 `mui` 的非保留 native options
+- **GIVEN** 一个 Field 分别声明 `element-plus` 与 `antd` 的非保留 native options
 - **WHEN** 编译 UIModel
 - **THEN** 两个 options namespace 独立且运行时不可修改，Core 不解释其 UI library 语义
 

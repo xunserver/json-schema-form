@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "architectureDigest": "ecff28cdd210e685935e4f0c29363ddfa26a70eb4d70c39859f70d6e74fa3e6e",
+  "architectureDigest": "1291e57d3e0432e59768c4c966bc523f9ee658dd67e436ce310cbc4142ece6c4",
   "catalogs": {
     "invariants": [
       {
@@ -393,7 +393,7 @@
           },
           {
             "changeId": "add-react-mui-rendering",
-            "capability": "mui-ui-adapter",
+            "capability": "antd-ui-adapter",
             "requirement": "九类内置逻辑 Widget 均有 binding",
             "scenario": "默认 Widget 集合完整"
           }
@@ -408,7 +408,7 @@
         "id": "SLICE-04",
         "section": 20,
         "ordinal": 4,
-        "normalizedText": "Vue + Element Plus 与 React + MUI 两条完整渲染链路。",
+        "normalizedText": "Vue + Element Plus 与 React + Ant Design 两条完整渲染链路。",
         "status": "covered",
         "owners": [
           {
@@ -420,8 +420,8 @@
           {
             "changeId": "add-react-mui-rendering",
             "capability": "package-architecture",
-            "requirement": "React 与 MUI 提供完整集成验收入口",
-            "scenario": "React+MUI 示例覆盖端到端行为"
+            "requirement": "React 与 UI adapter 提供完整集成验收入口",
+            "scenario": "React+Ant Design 示例覆盖端到端行为"
           }
         ],
         "evidenceIds": [
@@ -609,7 +609,7 @@
         "id": "AC-01",
         "section": 21,
         "ordinal": 1,
-        "normalizedText": "同一 FormDefinition 和业务 Plugin 可在 Vue/Element Plus 与 React/MUI 中复用。",
+        "normalizedText": "同一 FormDefinition 和业务 Plugin 可在 Vue/Element Plus 与 React/Ant Design 中复用。",
         "status": "covered",
         "owners": [
           {
@@ -915,24 +915,6 @@
         "evidenceIds": [
           "V1-WORKSPACE-LAYOUT"
         ]
-      },
-      {
-        "id": "PKG-06",
-        "section": 17,
-        "ordinal": 6,
-        "normalizedText": "@form/mui",
-        "status": "covered",
-        "owners": [
-          {
-            "changeId": "bootstrap-monorepo-and-contracts",
-            "capability": "package-architecture",
-            "requirement": "首期工作区 package",
-            "scenario": "发现全部首期 package"
-          }
-        ],
-        "evidenceIds": [
-          "V1-WORKSPACE-LAYOUT"
-        ]
       }
     ],
     "directories": [
@@ -973,17 +955,17 @@
         ]
       },
       {
-        "id": "DIR-EX-VUE",
+        "id": "DIR-EX-PLAYGROUND",
         "section": 18,
         "ordinal": 3,
-        "normalizedText": "examples/vue-element-plus/",
+        "normalizedText": "examples/playground/",
         "status": "covered",
         "owners": [
           {
-            "changeId": "add-vue-element-plus-rendering",
+            "changeId": "bootstrap-monorepo-and-contracts",
             "capability": "package-architecture",
-            "requirement": "Vue/Element Plus 依赖与集成验收可重复验证",
-            "scenario": "Element Plus example完成端到端交互"
+            "requirement": "仓库验证包含边界检查",
+            "scenario": "验证未修改的合规工作区"
           }
         ],
         "evidenceIds": [
@@ -991,17 +973,17 @@
         ]
       },
       {
-        "id": "DIR-EX-REACT",
+        "id": "DIR-EX-SHARED",
         "section": 18,
         "ordinal": 4,
-        "normalizedText": "examples/react-mui/",
+        "normalizedText": "examples/shared/",
         "status": "covered",
         "owners": [
           {
-            "changeId": "add-react-mui-rendering",
+            "changeId": "bootstrap-monorepo-and-contracts",
             "capability": "package-architecture",
-            "requirement": "React 与 MUI 提供完整集成验收入口",
-            "scenario": "React+MUI 示例覆盖端到端行为"
+            "requirement": "仓库验证包含边界检查",
+            "scenario": "验证未修改的合规工作区"
           }
         ],
         "evidenceIds": [
@@ -1072,7 +1054,7 @@
           {
             "changeId": "add-react-mui-rendering",
             "capability": "package-architecture",
-            "requirement": "React 与 MUI 渲染包只公开受支持入口",
+            "requirement": "React 与 UI adapter 渲染包只公开受支持入口",
             "scenario": "消费者只使用根入口"
           }
         ],
@@ -1084,7 +1066,7 @@
         "id": "DIR-ELEMENT-PLUS",
         "section": 18,
         "ordinal": 9,
-        "normalizedText": "packages/element-plus/src widgets/layouts/field-chrome/form",
+        "normalizedText": "packages/adapter/element-plus/src widgets/layouts/field-chrome/form",
         "status": "covered",
         "owners": [
           {
@@ -1099,17 +1081,35 @@
         ]
       },
       {
-        "id": "DIR-MUI",
+        "id": "DIR-ANTD",
         "section": 18,
         "ordinal": 10,
-        "normalizedText": "packages/mui/src widgets/layouts/field-chrome/form",
+        "normalizedText": "packages/adapter/antd/src widgets/layouts/field-chrome/form",
         "status": "covered",
         "owners": [
           {
             "changeId": "add-react-mui-rendering",
-            "capability": "mui-ui-adapter",
-            "requirement": "官方 MUI adapter 完整提供四类角色",
-            "scenario": "MUI Form 不运行第二套验证"
+            "capability": "antd-ui-adapter",
+            "requirement": "官方 Ant Design adapter 完整提供四类角色",
+            "scenario": "Form wrapper 不接管 Core 状态"
+          }
+        ],
+        "evidenceIds": [
+          "V1-WORKSPACE-LAYOUT"
+        ]
+      },
+      {
+        "id": "DIR-SHADCN",
+        "section": 18,
+        "ordinal": 11,
+        "normalizedText": "packages/adapter/shadcn/src widgets/layouts/field-chrome/form",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-react-shadcn-adapter",
+            "capability": "shadcn-ui-adapter",
+            "requirement": "官方 shadcn adapter 通过注入组件提供四类角色",
+            "scenario": "Form wrapper 不接管 Core 状态"
           }
         ],
         "evidenceIds": [
@@ -1221,7 +1221,7 @@
           {
             "changeId": "add-react-mui-rendering",
             "capability": "package-architecture",
-            "requirement": "React 与 MUI 渲染包只公开受支持入口",
+            "requirement": "React 与 UI adapter 渲染包只公开受支持入口",
             "scenario": "消费者只使用根入口"
           }
         ],
@@ -1248,16 +1248,34 @@
         ]
       },
       {
-        "id": "EXP-MUI",
+        "id": "EXP-ANTD",
         "section": 17,
         "ordinal": 8,
-        "normalizedText": "@form/mui",
+        "normalizedText": "@form/antd",
         "status": "covered",
         "owners": [
           {
             "changeId": "add-react-mui-rendering",
             "capability": "package-architecture",
-            "requirement": "React 与 MUI 渲染包只公开受支持入口",
+            "requirement": "React 与 UI adapter 渲染包只公开受支持入口",
+            "scenario": "消费者只使用根入口"
+          }
+        ],
+        "evidenceIds": [
+          "V1-EXPORT-SURFACE"
+        ]
+      },
+      {
+        "id": "EXP-SHADCN",
+        "section": 17,
+        "ordinal": 10,
+        "normalizedText": "@form/shadcn",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-react-shadcn-adapter",
+            "capability": "package-architecture",
+            "requirement": "React 与 UI adapter 渲染包只公开受支持入口",
             "scenario": "消费者只使用根入口"
           }
         ],
@@ -1994,7 +2012,7 @@
       "id": "V1-CROSS-STACK-REACT",
       "kind": "integration",
       "file": "tests/v1/react-stack.test.tsx",
-      "title": "V1-CROSS-STACK-REACT renders the shared fixture through MUI",
+      "title": "V1-CROSS-STACK-REACT renders the shared fixture through Ant Design",
       "commandId": "test"
     },
     {
@@ -2029,8 +2047,8 @@
       "id": "V1-EXAMPLES",
       "kind": "integration",
       "file": "tests/v1/examples.test.ts",
-      "title": "V1-EXAMPLES builds and smokes both public example apps",
-      "commandId": "example:vue"
+      "title": "V1-EXAMPLES typechecks the public playground and shared catalog",
+      "commandId": "test:v1:host"
     },
     {
       "id": "V1-PORTABILITY-DEPS",
@@ -2137,11 +2155,6 @@
       "id": "verify:v1",
       "kind": "root-script",
       "name": "verify:v1"
-    },
-    {
-      "id": "example:vue",
-      "kind": "root-script",
-      "name": "example:vue"
     },
     {
       "id": "test:v1:host",

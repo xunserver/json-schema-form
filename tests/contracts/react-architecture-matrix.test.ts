@@ -3,15 +3,18 @@ import path from "node:path";
 import { describe, expect, test } from "vitest";
 import { REPO_ROOT } from "../lib/fs.js";
 
-describe("react + mui architecture matrix", () => {
-  test("does not implement Vue protocols, Universal Renderer, or MUI X", () => {
+describe("react architecture matrix", () => {
+  test("does not implement Vue protocols, Universal Renderer, or date-picker libraries", () => {
     const react = fs.readFileSync(path.join(REPO_ROOT, "packages/react/src/index.ts"), "utf8");
-    const mui = fs.readFileSync(path.join(REPO_ROOT, "packages/mui/src/index.ts"), "utf8");
+    const antd = fs.readFileSync(path.join(REPO_ROOT, "packages/adapter/antd/src/index.ts"), "utf8");
     expect(react).toMatch(/FormRenderer/);
     expect(react).toMatch(/defineReactUIAdapter/);
     expect(react).not.toMatch(/VueUIAdapter|UniversalRenderer|@form\/vue|@form\/element-plus/);
-    expect(mui).toMatch(/muiAdapter/);
-    expect(mui).not.toMatch(/@form\/vue|@form\/element-plus|@mui\/x-date-pickers|UniversalRenderer/);
+    expect(antd).toMatch(/antdAdapter/);
+    expect(antd).not.toMatch(/@form\/vue|@form\/element-plus|@mui\/x-date-pickers|UniversalRenderer/);
+    const shadcn = fs.readFileSync(path.join(REPO_ROOT, "packages/adapter/shadcn/src/index.ts"), "utf8");
+    expect(shadcn).toMatch(/createShadcnAdapter/);
+    expect(shadcn).not.toMatch(/shadcnAdapter[^C]|@form\/vue|@base-ui\/react|UniversalRenderer/);
   });
 
   test("records Core owner ports as already published", () => {
@@ -34,7 +37,8 @@ describe("react + mui architecture matrix", () => {
   test("package sources do not import Vue or MUI X", () => {
     const files = collect(
       path.join(REPO_ROOT, "packages/react/src"),
-      path.join(REPO_ROOT, "packages/mui/src"),
+      path.join(REPO_ROOT, "packages/adapter/antd/src"),
+      path.join(REPO_ROOT, "packages/adapter/shadcn/src"),
     );
     for (const file of files) {
       const source = fs.readFileSync(file, "utf8");

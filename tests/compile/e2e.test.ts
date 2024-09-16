@@ -38,7 +38,7 @@ describe("compileForm end-to-end fixtures", () => {
     expect(JSON.stringify(layout.model.ui.viewTree)).not.toContain("remaining-fields");
 
     const withNative = compileForm(NATIVE);
-    expect(withNative.model.ui.fields.get("name")?.native?.mui).toEqual({ size: "small" });
+    expect(withNative.model.ui.fields.get("name")?.native?.antd).toEqual({ size: "small" });
 
     expect(() => compileForm(BAD_WIDGET)).toThrow(CompileError);
   });
@@ -156,7 +156,7 @@ const EXPLICIT_LAYOUT = {
 
 const NATIVE = {
   schema: { type: "object" as const, properties: { name: { type: "string" as const } } },
-  uiSchema: { fields: { name: { native: { mui: { size: "small" } } } } },
+  uiSchema: { fields: { name: { native: { antd: { size: "small" } } } } },
 };
 
 const BAD_WIDGET = {

@@ -1,0 +1,84 @@
+import type { Diagnostic } from "@form/core";
+import { RENDERER_DIAGNOSTIC_CODES, RendererAdapterError, type WidgetRenderInput } from "@form/react";
+
+export const SHADCN_NAMESPACE = "shadcn";
+
+export const PROTECTED_NATIVE_KEYS = Object.freeze(
+  new Set([
+    "value",
+    "defaultValue",
+    "checked",
+    "defaultChecked",
+    "disabled",
+    "readonly",
+    "readOnly",
+    "required",
+    "error",
+    "errors",
+    "id",
+    "htmlFor",
+    "name",
+    "onChange",
+    "onInput",
+    "onFocus",
+    "onBlur",
+    "onCheckedChange",
+    "onValueChange",
+    "onchange",
+    "oninput",
+    "onfocus",
+    "onblur",
+    "aria-labelledby",
+    "aria-describedby",
+    "aria-invalid",
+    "aria-required",
+    "aria-disabled",
+    "aria-readonly",
+  ]),
+);
+
+export function mapShadcnProps(input: WidgetRenderInput): Readonly<Record<string, unknown>> {
+  const merged: Record<string, unknown> = {};
+  collectLayer(merged, input.field.props, input, "props");
+  collectLayer(merged, input.field.native?.[SHADCN_NAMESPACE], input, "native");
+  return Object.freeze(merged);
+}
+
+function collectLayer(
+  target: Record<string, unknown>,
+  source: Readonly<Record<string, unknown>> | undefined,
+  input: WidgetRenderInput,
+  layer: string,
+): void {
+  if (source === undefined) {
+    return;
+  }
+  for (const key of Object.keys(source).sort()) {
+    if (key.startsWith("aria-") || PROTECTED_NATIVE_KEYS.has(key)) {
+      throw protectedKeyError(input, key, layer);
+    }
+    if (key === "onClick" || /^on[A-Z]/.test(key)) {
+      throw protectedKeyError(input, key, layer);
+    }
+    target[key] = source[key];
+  }
+}
+
+function protectedKeyError(input: WidgetRenderInput, key: string, layer: string): RendererAdapterError {
+  const diagnostic: Diagnostic = {
+    code: RENDERER_DIAGNOSTIC_CODES.MAPPER_PROTECTED_KEY,
+    severity: "error",
+    message: `Protected native key "${key}" cannot be set from ${layer}`,
+    source: "adapter",
+    pluginId: SHADCN_NAMESPACE,
+    modelPath: input.field.path,
+    metadata: {
+      adapterId: SHADCN_NAMESPACE,
+      key: input.field.widget,
+      protectedKey: key,
+      layer,
+      viewId: input.view.id,
+    },
+  };
+  return new RendererAdapterError(diagnostic);
+}

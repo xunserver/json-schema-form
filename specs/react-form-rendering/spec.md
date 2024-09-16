@@ -39,7 +39,7 @@ React Context 必须（MUST）只保存当前 `FormInstance`、所选冻结 adap
 Group/Layout binding 若呈现可折叠区域或 Tab，必须（MUST）以 Core `ViewSnapshot.collapsed`/`activeTab` 为唯一状态来源，并只通过 `setCollapsed(viewId, ...)`/`setActiveTab(viewId, ...)` 公开命令修改；不得（MUST NOT）以 React state 保存可与 Core 分叉的折叠/Tab 副本。Layout adapter 必须（MUST）在 preflight 时校验 tab key 属于其 layout 参数，非法 key 产生 adapter diagnostic 而不写入 Core。
 
 #### Scenario: 折叠状态经 Core 往返
-- **GIVEN** 一个 Group View 由 MUI Accordion 呈现且当前 `collapsed: false`
+- **GIVEN** 一个 Group View 由可折叠面板呈现且当前 `collapsed: false`
 - **WHEN** 用户点击折叠且随后 Core 通过 `reset()` 恢复默认值
 - **THEN** 点击只调用 `setCollapsed(viewId, true)`，Accordion 状态跟随 snapshot；`reset()` 后重新展开，组件内不存在残留本地折叠状态
 

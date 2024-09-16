@@ -198,14 +198,14 @@ describe("UIModel compiler", () => {
           name: {
             native: {
               "element-plus": { clearable: true },
-              mui: { size: "small" },
+              antd: { size: "small" },
             },
           },
         },
       },
     });
     expect(result.model.ui.fields.get("name")?.native?.["element-plus"]).toEqual({ clearable: true });
-    expect(result.model.ui.fields.get("name")?.native?.mui).toEqual({ size: "small" });
+    expect(result.model.ui.fields.get("name")?.native?.antd).toEqual({ size: "small" });
     expect(Object.isFrozen(result.model.ui.fields.get("name")?.native)).toBe(true);
 
     try {
@@ -213,7 +213,7 @@ describe("UIModel compiler", () => {
         schema: { type: "object", properties: { name: { type: "string" } } },
         uiSchema: {
           fields: {
-            name: { native: { mui: { value: "x" } } },
+            name: { native: { antd: { value: "x" } } },
           },
         },
       });
@@ -224,7 +224,7 @@ describe("UIModel compiler", () => {
         (item) => item.code === COMPILER_DIAGNOSTIC_CODES.NATIVE_RESERVED_KEY,
       );
       expect(diagnostic?.modelPath).toBe("name");
-      expect(diagnostic?.metadata).toMatchObject({ adapterId: "mui", key: "value" });
+      expect(diagnostic?.metadata).toMatchObject({ adapterId: "antd", key: "value" });
     }
 
     try {
@@ -487,7 +487,7 @@ describe("UIModel compiler", () => {
         schema: { type: "object", properties: { name: { type: "string" } } },
         uiSchema: {
           fields: {
-            name: { native: { mui: { required: true } } },
+            name: { native: { antd: { required: true } } },
           },
         },
       });
@@ -497,7 +497,7 @@ describe("UIModel compiler", () => {
       const diagnostic = (error as CompileError).diagnostics.find(
         (item) => item.code === COMPILER_DIAGNOSTIC_CODES.NATIVE_RESERVED_KEY,
       );
-      expect(diagnostic?.metadata).toMatchObject({ adapterId: "mui", key: "required" });
+      expect(diagnostic?.metadata).toMatchObject({ adapterId: "antd", key: "required" });
     }
   });
 });

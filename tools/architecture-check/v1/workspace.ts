@@ -5,8 +5,8 @@ import { FIRST_PARTY_PACKAGES, RULE } from "../policy.ts";
 import type { MatrixIssue } from "./types.ts";
 
 const EXAMPLE_DIRS = [
-  { id: "DIR-EX-VUE", dir: "examples/vue-element-plus" },
-  { id: "DIR-EX-REACT", dir: "examples/react-mui" },
+  { id: "DIR-EX-PLAYGROUND", dir: "examples/playground" },
+  { id: "DIR-EX-SHARED", dir: "examples/shared" },
 ] as const;
 
 const TOP_DIRS = [
@@ -35,10 +35,25 @@ const PACKAGE_LAYOUT: Readonly<Record<string, { id: string; dirs: readonly strin
     dirs: ["widgets", "layouts", "field-chrome", "form"],
     files: ["create-element-plus-adapter.ts", "index.ts"],
   },
-  "@form/mui": {
-    id: "DIR-MUI",
+  "@form/antd": {
+    id: "DIR-ANTD",
     dirs: ["widgets", "layouts", "field-chrome", "form"],
-    files: ["create-mui-adapter.ts", "index.ts"],
+    files: ["create-antd-adapter.ts", "index.ts"],
+  },
+  "@form/arco-vue": {
+    id: "DIR-ARCO-VUE",
+    dirs: ["widgets", "layouts", "field-chrome", "form"],
+    files: ["create-arco-vue-adapter.ts", "index.ts"],
+  },
+  "@form/arco-react": {
+    id: "DIR-ARCO-REACT",
+    dirs: ["widgets", "layouts", "field-chrome", "form"],
+    files: ["create-arco-react-adapter.ts", "index.ts"],
+  },
+  "@form/shadcn": {
+    id: "DIR-SHADCN",
+    dirs: ["widgets", "layouts", "field-chrome", "form"],
+    files: ["create-shadcn-adapter.ts", "index.ts"],
   },
 };
 
@@ -47,17 +62,23 @@ const PACKAGE_DIRS: Readonly<Record<string, string>> = {
   "@form/validator-ajv": "validator-ajv",
   "@form/vue": "vue",
   "@form/react": "react",
-  "@form/element-plus": "element-plus",
-  "@form/mui": "mui",
+  "@form/element-plus": "adapter/element-plus",
+  "@form/antd": "adapter/antd",
+  "@form/arco-vue": "adapter/arco-vue",
+  "@form/arco-react": "adapter/arco-react",
+  "@form/shadcn": "adapter/shadcn",
 };
+
+export { PACKAGE_DIRS as FIRST_PARTY_PACKAGE_DIRS };
 
 const FORBIDDEN_BUNDLE = [
   "vue",
   "react",
   "react-dom",
   "element-plus",
-  "@mui/material",
-  "@mui/x-date-pickers",
+  "antd",
+  "@arco-design/web-vue",
+  "@arco-design/web-react",
   "ajv",
 ] as const;
 

@@ -149,16 +149,25 @@ describe("consumer export isolation", () => {
     expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@form\/react\/src\/renderer\/FormRenderer\.js'/);
   });
 
-  test("rejects MUI internal deep imports", () => {
+  test("rejects Ant Design internal deep imports", () => {
     const diagnostics = typecheckFiles(
-      [path.join(REPO_ROOT, "tests/contracts/negative/mui-deep-import.ts")],
+      [path.join(REPO_ROOT, "tests/contracts/negative/antd-deep-import.ts")],
       consumerOptions,
     );
     expect(diagnostics.length).toBeGreaterThan(0);
-    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@form\/mui\/src\/widgets\/mapper\.js'/);
+    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@form\/antd\/src\/widgets\/mapper\.js'/);
   });
 
-  test("rejects React/MUI types from Vue packages", () => {
+  test("rejects shadcn internal deep imports", () => {
+    const diagnostics = typecheckFiles(
+      [path.join(REPO_ROOT, "tests/contracts/negative/shadcn-deep-import.ts")],
+      consumerOptions,
+    );
+    expect(diagnostics.length).toBeGreaterThan(0);
+    expect(formatDiagnostics(diagnostics)).toMatch(/Cannot find module '@form\/shadcn\/src\/widgets\/mapper\.js'/);
+  });
+
+  test("rejects React types from Vue packages", () => {
     const diagnostics = typecheckFiles(
       [path.join(REPO_ROOT, "tests/contracts/negative/vue-cross-framework.ts")],
       consumerOptions,

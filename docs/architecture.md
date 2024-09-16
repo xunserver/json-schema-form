@@ -26,7 +26,7 @@
 ### 2.2 非目标
 
 - Core 不直接渲染 Vue、React 或任何 DOM。
-- Core 不绑定 Element Plus、Ant Design、MUI 或其他 UI 库。
+- Core 不绑定 Element Plus、Ant Design 或其他 UI 库。
 - Core 不绑定 AJV；AJV 只是一个 Validator Adapter 实现。
 - 不承诺所有合法 JSON Schema 都能自动生成理想表单。
 - 不创建跨 Vue/React 的通用 Renderer 或自定义 VDOM。
@@ -90,7 +90,7 @@ FormInstance
    Vue UI Adapter           React UI Adapter
           |                       |
           v                       v
- Element Plus / ...          MUI / ...
+ Element Plus / ...          Ant Design / ...
 ```
 
 依赖只能沿上述方向流动。特别禁止 `model -> runtime`、`widget -> compiler`、`core -> framework` 和 `core -> concrete validator`。
@@ -521,7 +521,7 @@ WidgetDefinition 不包含 Vue/React component、native props/events、UI librar
 ```text
 Core logical protocol
   +-- @form/vue   -> VueUIAdapter   -> Element Plus / Ant Design Vue / ...
-  `-- @form/react -> ReactUIAdapter -> MUI / Ant Design React / Mantine / ...
+  `-- @form/react -> ReactUIAdapter -> Ant Design React / Arco Design React / shadcn / ...
 ```
 
 VueRenderer 和 ReactRenderer 独立实现树遍历、生命周期和订阅，但共享 ViewTree、Runtime、Snapshot 和行为规范。
@@ -611,7 +611,7 @@ Vue：
 React：
 
 ```tsx
-<FormRenderer form={form} adapter={muiAdapter} />
+<FormRenderer form={form} adapter={antdAdapter} />
 ```
 
 ### 16.2 Engine 路径
@@ -693,16 +693,18 @@ Public object 优先暴露 interface + factory，不暴露可直接 `new` 的内
 @form/vue
 @form/react
 @form/element-plus
-@form/mui
 ```
 
-验证架构后再增加：
+已扩展的 UI Adapter 包：
 
 ```text
-@form/ant-design-vue
-@form/antd-react
-其他 framework/UI adapters
+@form/antd
+@form/arco-vue
+@form/arco-react
+@form/shadcn
 ```
+
+后续可继续增加其他 framework/UI adapters。
 
 不拆分 `@form/compiler`、`@form/runtime`、`@form/schema`、`@form/rules`、`@form/validation`。它们是 Core 内部模块边界，不是独立使用或发布边界。AJV 独立成包，因为它是明确的第三方依赖和替换边界。
 
@@ -713,7 +715,10 @@ Public object 优先暴露 interface + factory，不暴露可直接 `new` 的内
 @form/vue ----------------> @form/core
 @form/react --------------> @form/core
 @form/element-plus -------> @form/vue + @form/core
-@form/mui ----------------> @form/react + @form/core
+@form/antd ---------------> @form/react + @form/core
+@form/arco-vue -----------> @form/vue + @form/core
+@form/arco-react ---------> @form/react + @form/core
+@form/shadcn -------------> @form/react + @form/core
 ```
 
 Vue/React 和 UI 库通过 peerDependencies 表达宿主依赖。
@@ -727,12 +732,15 @@ repo/
   |    |- validator-ajv/
   |    |- vue/
   |    |- react/
-  |    |- element-plus/
-  |    `- mui/
+  |    |- adapter/
+  |    |    |- element-plus/
+  |    |    |- antd/
+  |    |    |- arco-vue/
+  |    |    |- arco-react/
+  |    |    `- shadcn/
   |- examples/
-  |    |- shared/            # playground catalog 与框架无关编译管线（非 v1 必选验收目录）
-  |    |- vue-element-plus/  # smoke + 可浏览 Vite 工作台（Element Plus）
-  |    `- react-mui/         # smoke + 可浏览 Vite 工作台（MUI）
+  |    |- shared/            # playground catalog 与框架无关编译管线
+  |    `- playground/        # 单 Vite MPA：shadcn React + Monaco 编辑器 + 四 UI 预览 iframe
   |- tests/
   |- docs/
   |- package.json
@@ -808,7 +816,7 @@ packages/vue/src/
   |- test-utils/     # non-exported test helpers
   `- index.ts
 
-packages/element-plus/src/
+packages/adapter/element-plus/src/
   |- widgets/
   |- layouts/
   |- field-chrome/
@@ -816,12 +824,37 @@ packages/element-plus/src/
   |- create-element-plus-adapter.ts
   `- index.ts
 
-packages/mui/src/
+packages/adapter/antd/src/
   |- widgets/
   |- layouts/
   |- field-chrome/
   |- form/
-  |- create-mui-adapter.ts
+  |- create-antd-adapter.ts
+  `- index.ts
+
+packages/adapter/arco-vue/src/
+  |- widgets/
+  |- layouts/
+  |- field-chrome/
+  |- form/
+  |- create-arco-vue-adapter.ts
+  `- index.ts
+
+packages/adapter/arco-react/src/
+  |- widgets/
+  |- layouts/
+  |- field-chrome/
+  |- form/
+  |- create-arco-react-adapter.ts
+  `- index.ts
+
+packages/adapter/shadcn/src/
+  |- widgets/
+  |- layouts/
+  |- field-chrome/
+  |- form/
+  |- components.ts
+  |- create-shadcn-adapter.ts
   `- index.ts
 ```
 
@@ -863,7 +896,7 @@ Schema Frontend、Compiler、Plugin installation、Adapter capability 和 Runtim
 1. Draft 2020-12 常用 Object/Array/Scalar schema 编译。
 2. 默认 ViewTree 与显式 layout。
 3. text/number/select/boolean/date 等逻辑 Widget。
-4. Vue + Element Plus 与 React + MUI 两条完整渲染链路。
+4. Vue + Element Plus 与 React + Ant Design 两条完整渲染链路。
 5. transactional set/setValues 和 selector subscription。
 6. Array append/insert/remove/move 与稳定 ArrayItemId。
 7. State/Computed rules、dependency indexing 和 cycle diagnostics。
@@ -886,7 +919,7 @@ Schema Frontend、Compiler、Plugin installation、Adapter capability 和 Runtim
 
 实现达到以下条件时，说明分层成立：
 
-- 同一 FormDefinition 和业务 Plugin 可在 Vue/Element Plus 与 React/MUI 中复用。
+- 同一 FormDefinition 和业务 Plugin 可在 Vue/Element Plus 与 React/Ant Design 中复用。
 - `@form/core` 的依赖树中不存在 Vue、React、DOM UI library 和 AJV。
 - 编译结果可被检查和缓存，并且创建多个 FormInstance 时状态完全隔离。
 - 数组 move 后，业务 item 的 touched/error/view state 跟随 ArrayItemId，而不是旧 index。

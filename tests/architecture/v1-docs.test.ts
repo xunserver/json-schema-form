@@ -10,8 +10,8 @@ describe("v1 documentation", () => {
     const readme = fs.readFileSync(path.join(REPO_ROOT, "README.md"), "utf8");
     const workspace = fs.readFileSync(path.join(REPO_ROOT, "docs/workspace.md"), "utf8");
     expect(readme).toContain("pnpm verify:v1");
-    expect(readme).toContain("examples/vue-element-plus");
-    expect(readme).toContain("examples/react-mui");
+    expect(readme).toContain("examples/playground");
+    expect(readme).toContain("examples/shared");
     expect(workspace).toContain("verify:v1");
     expect(workspace).toContain("@form/core/runtime");
     expect(workspace).toContain("deferred");

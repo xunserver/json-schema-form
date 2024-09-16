@@ -1,0 +1,106 @@
+{
+  "id": "kitchen-sink",
+  "title": "全功能示例",
+  "description": "内置控件、布局、数组、可见性规则与自定义货币控件",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "bio": { "type": "string" },
+      "age": { "type": "number" },
+      "role": { "type": "string", "enum": ["admin", "user"] },
+      "tags": { "type": "array", "items": { "type": "string", "enum": ["a", "b"] } },
+      "active": { "type": "boolean" },
+      "alerts": { "type": "boolean" },
+      "joined": { "type": "string", "format": "date" },
+      "meeting": { "type": "string", "format": "date-time" },
+      "currency": { "type": "string" },
+      "kind": { "type": "string" },
+      "nickname": { "type": "string" },
+      "products": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" }
+          }
+        }
+      }
+    },
+    "required": ["name"]
+  },
+  "uiSchema": {
+    "fields": {
+      "name": { "widget": "text", "display": { "label": "姓名", "help": "全名" } },
+      "bio": { "widget": "textarea", "display": { "label": "简介" } },
+      "age": { "widget": "number", "display": { "label": "年龄" } },
+      "role": {
+        "widget": "select",
+        "display": { "label": "角色" },
+        "props": { "options": ["admin", "user"] }
+      },
+      "tags": {
+        "widget": "multi-select",
+        "display": { "label": "标签" },
+        "props": { "options": ["a", "b"] }
+      },
+      "tags[]": { "field": false },
+      "active": { "widget": "checkbox", "display": { "label": "启用" } },
+      "alerts": { "widget": "switch", "display": { "label": "提醒" } },
+      "joined": { "widget": "date", "display": { "label": "入职日期" } },
+      "meeting": { "widget": "datetime", "display": { "label": "会议时间" } },
+      "currency": { "widget": "company.currency", "display": { "label": "货币" } },
+      "kind": { "widget": "text", "display": { "label": "类型" } },
+      "nickname": { "widget": "text", "display": { "label": "昵称" } },
+      "products": { "display": { "label": "商品" } },
+      "products[].title": { "widget": "text", "display": { "label": "标题" } }
+    },
+    "layout": {
+      "type": "object",
+      "children": [
+        {
+          "type": "group",
+          "children": [
+            { "type": "field", "path": "name" },
+            { "type": "field", "path": "bio" }
+          ]
+        },
+        {
+          "type": "layout",
+          "columns": 2,
+          "children": [
+            { "type": "field", "path": "age" },
+            { "type": "field", "path": "role" }
+          ]
+        },
+        { "type": "array", "path": "products", "children": [{ "type": "remaining-fields" }] },
+        { "type": "remaining-fields" }
+      ]
+    }
+  },
+  "rules": [
+    {
+      "kind": "state",
+      "target": "nickname",
+      "action": { "visible": { "eq": [{ "field": "kind" }, "show"] } }
+    }
+  ],
+  "config": {
+    "schemaValidator": "ajv-2020"
+  },
+  "formData": {
+    "name": "Ada",
+    "bio": "Pioneer",
+    "age": 36,
+    "role": "admin",
+    "tags": ["a"],
+    "active": true,
+    "alerts": false,
+    "joined": "2026-09-15",
+    "meeting": "2026-09-15T12:00:00+00:00",
+    "currency": "USD",
+    "kind": "show",
+    "nickname": "A",
+    "products": [{ "title": "First" }, { "title": "Second" }]
+  }
+}

@@ -37,9 +37,10 @@ describe("architecture checker", () => {
       "validator-ajv": 'import type { FormDefinition } from "@form/core";\nexport type Probe = FormDefinition;\n',
       vue: 'import type { FormDefinition } from "@form/core";\nexport type Probe = FormDefinition;\n',
       react: 'import type { FormDefinition } from "@form/core";\nexport type Probe = FormDefinition;\n',
-      "element-plus":
+      "adapter/element-plus":
         'import type { FormDefinition } from "@form/core";\nimport "@form/vue";\nexport type Probe = FormDefinition;\n',
-      mui: 'import type { FormDefinition } from "@form/core";\nimport "@form/react";\nexport type Probe = FormDefinition;\n',
+      "adapter/antd":
+        'import type { FormDefinition } from "@form/core";\nimport "@form/react";\nexport type Probe = FormDefinition;\n',
     };
 
     for (const [directory, source] of Object.entries(importFiles)) {
@@ -51,7 +52,10 @@ describe("architecture checker", () => {
     expect(ALLOWED_EDGES["@form/vue"]).toEqual(["@form/core"]);
     expect(ALLOWED_EDGES["@form/react"]).toEqual(["@form/core"]);
     expect(ALLOWED_EDGES["@form/element-plus"]).toEqual(["@form/core", "@form/vue"]);
-    expect(ALLOWED_EDGES["@form/mui"]).toEqual(["@form/core", "@form/react"]);
+    expect(ALLOWED_EDGES["@form/antd"]).toEqual(["@form/core", "@form/react"]);
+    expect(ALLOWED_EDGES["@form/arco-vue"]).toEqual(["@form/core", "@form/vue"]);
+    expect(ALLOWED_EDGES["@form/arco-react"]).toEqual(["@form/core", "@form/react"]);
+    expect(ALLOWED_EDGES["@form/shadcn"]).toEqual(["@form/core", "@form/react"]);
   });
 
   test("rejects a reverse Core -> Vue dependency", () => {
@@ -72,7 +76,7 @@ describe("architecture checker", () => {
 
   test("rejects a cross-framework Adapter dependency", () => {
     const root = copyRepoPackages();
-    mutateManifest(root, "mui", (manifest) => {
+    mutateManifest(root, "adapter/antd", (manifest) => {
       manifest.dependencies = {
         ...manifest.dependencies,
         "@form/vue": "workspace:*",
@@ -83,18 +87,18 @@ describe("architecture checker", () => {
     expect(diagnostics.some((diagnostic) => diagnostic.rule === RULE.crossFrameworkDependency)).toBe(true);
     expect(
       diagnostics.some(
-        (diagnostic) => diagnostic.sourcePackage === "@form/mui" && diagnostic.targetPackage === "@form/vue",
+        (diagnostic) => diagnostic.sourcePackage === "@form/antd" && diagnostic.targetPackage === "@form/vue",
       ),
     ).toBe(true);
   });
 
   test("rejects an undeclared but otherwise legal import", () => {
     const root = copyRepoPackages();
-    mutateManifest(root, "element-plus", (manifest) => {
+    mutateManifest(root, "adapter/element-plus", (manifest) => {
       delete manifest.dependencies?.["@form/core"];
     });
     writeText(
-      path.join(root, "packages", "element-plus", "src", "index.ts"),
+      path.join(root, "packages", "adapter", "element-plus", "src", "index.ts"),
       'import type { FormDefinition } from "@form/core";\nexport type Probe = FormDefinition;\n',
     );
 

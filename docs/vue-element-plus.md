@@ -67,7 +67,7 @@ Custom Widget 只能拿到 readonly descriptor、snapshots、scope view 与 `set
 - `onUpdate:modelValue` 以及 change / focus / blur handlers
 - `rules` / `validate` / `resetFields` / `model`
 
-其他 adapter namespace（例如 `mui`）会被忽略。
+其他 adapter namespace（例如 `antd`）会被忽略。
 
 ## 与 Core 的边界
 
@@ -79,7 +79,7 @@ Custom Widget 只能拿到 readonly descriptor、snapshots、scope view 与 `set
 ## Playground
 
 ```bash
-pnpm playground:vue
+pnpm playground
 ```
 
-打开 http://127.0.0.1:5174/ 。左侧五个 JSON 编辑器对应 `FormDefinition` 的 `schema` / `uiSchema` / `rules` / `config` 以及 `createForm` 的 `initialValues`（formData）。右侧是 Element Plus `FormRenderer` 预览与 Inspector（诊断、live values、`serialize()`、submit payload）。顶栏 Example 切换共享 catalog；「MUI」链接跳到 React playground（默认 http://127.0.0.1:5173/?example=...），不会在同一页面挂载 React。
+打开 http://127.0.0.1:5173/ 。左侧五个 JSON 编辑器对应 `FormDefinition` 的 `schema` / `uiSchema` / `rules` / `config` 以及 `createForm` 的 `initialValues`（formData）。右侧用 Adapter Tab 对照 Element Plus / Ant Design / Arco Vue / Arco React（四个 iframe 同时挂载并持续渲染）；切换 Tab 只改变可见帧，并把 Inspector 焦点设到当前帧。

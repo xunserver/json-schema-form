@@ -3,7 +3,7 @@ import { BUILTIN_WIDGET_KEYS } from "./widget.js";
 import { CORE_PLUGIN_ID } from "./built-in.js";
 import { createFormEnvironment } from "../extension/create-form-environment.js";
 
-const FRAMEWORK_PATTERN = /vue|react|element-plus|@mui|document|onclick|addeventlistener|ajv/i;
+const FRAMEWORK_PATTERN = /vue|react|element-plus|antd|document|onclick|addeventlistener|ajv/i;
 
 describe("core built-in plugin", () => {
   const environment = createFormEnvironment();

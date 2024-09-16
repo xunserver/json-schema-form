@@ -28,11 +28,11 @@ describe("defineReactUIAdapter", () => {
 
 describe("createReactRendererEnvironment", () => {
   test("validates protocol, id, four roles and freezes the published environment", () => {
-    const adapter = createRecordingAdapter("mui");
+    const adapter = createRecordingAdapter("headless");
     const environment = createReactRendererEnvironment({ adapters: [adapter] });
     expect(environment.protocol).toEqual({ major: 1, minor: 0 });
-    expect(environment.adapterIds).toEqual(["mui"]);
-    const resolved = environment.getAdapter("mui");
+    expect(environment.adapterIds).toEqual(["headless"]);
+    const resolved = environment.getAdapter("headless");
     expect(resolved?.widgets.get("text")).toBeDefined();
     expect(resolved?.layouts.get("object")).toBeDefined();
     expect(Object.isFrozen(environment)).toBe(true);
@@ -40,11 +40,11 @@ describe("createReactRendererEnvironment", () => {
     expect(() => {
       (environment as { adapterIds: string[] }).adapterIds = ["x"];
     }).toThrow();
-    expect(resolved?.widgets.inspect("text")?.owner).toBe("mui");
+    expect(resolved?.widgets.inspect("text")?.owner).toBe("headless");
   });
 
   test("rejects duplicate widget keys without last-write-wins", () => {
-    const base = createRecordingAdapter("mui");
+    const base = createRecordingAdapter("headless");
     const replacement: WidgetBinding = {
       ...base.widgets.text!,
       custom: true,
@@ -55,7 +55,7 @@ describe("createReactRendererEnvironment", () => {
         contributions: [
           {
             owner: "app",
-            adapterId: "mui",
+            adapterId: "headless",
             widgets: { text: replacement },
           },
         ],
@@ -64,43 +64,43 @@ describe("createReactRendererEnvironment", () => {
     expect(error.diagnostics.map((item) => item.code)).toEqual([RENDERER_DIAGNOSTIC_CODES.REGISTRY_CONFLICT]);
     expect(error.diagnostics[0]?.source).toBe("adapter");
     expect(error.diagnostics[0]?.metadata).toMatchObject({
-      adapterId: "mui",
+      adapterId: "headless",
       registry: "widgets",
       key: "text",
-      existingOwner: "mui",
+      existingOwner: "headless",
       incomingOwner: "app",
     });
   });
 
   test("applies an exact owner override and fails wildcard, mismatch, and unused overrides", () => {
-    const base = createRecordingAdapter("mui");
+    const base = createRecordingAdapter("headless");
     const replacement: WidgetBinding = { ...base.widgets.text!, custom: true };
     const environment = createReactRendererEnvironment({
       adapters: [base],
-      contributions: [{ owner: "app", adapterId: "mui", widgets: { text: replacement } }],
+      contributions: [{ owner: "app", adapterId: "headless", widgets: { text: replacement } }],
       overrides: [
         {
-          adapterId: "mui",
+          adapterId: "headless",
           registry: "widgets",
           key: "text",
-          expectedOwner: "mui",
+          expectedOwner: "headless",
           replacementOwner: "app",
         },
       ],
     });
-    expect(environment.inspect("mui", "widgets", "text")?.owner).toBe("app");
-    expect(environment.getAdapter("mui")?.widgets.get("text")?.custom).toBe(true);
+    expect(environment.inspect("headless", "widgets", "text")?.owner).toBe("app");
+    expect(environment.getAdapter("headless")?.widgets.get("text")?.custom).toBe(true);
 
     const wildcard = expectBuildError(() =>
       createReactRendererEnvironment({
-        adapters: [createRecordingAdapter("mui")],
-        contributions: [{ owner: "app", adapterId: "mui", widgets: { text: replacement } }],
+        adapters: [createRecordingAdapter("headless")],
+        contributions: [{ owner: "app", adapterId: "headless", widgets: { text: replacement } }],
         overrides: [
           {
             adapterId: "*",
             registry: "widgets",
             key: "text",
-            expectedOwner: "mui",
+            expectedOwner: "headless",
             replacementOwner: "app",
           },
         ],
@@ -110,11 +110,11 @@ describe("createReactRendererEnvironment", () => {
 
     const mismatch = expectBuildError(() =>
       createReactRendererEnvironment({
-        adapters: [createRecordingAdapter("mui")],
-        contributions: [{ owner: "app", adapterId: "mui", widgets: { text: replacement } }],
+        adapters: [createRecordingAdapter("headless")],
+        contributions: [{ owner: "app", adapterId: "headless", widgets: { text: replacement } }],
         overrides: [
           {
-            adapterId: "mui",
+            adapterId: "headless",
             registry: "widgets",
             key: "text",
             expectedOwner: "other",
@@ -129,13 +129,13 @@ describe("createReactRendererEnvironment", () => {
 
     const unused = expectBuildError(() =>
       createReactRendererEnvironment({
-        adapters: [createRecordingAdapter("mui")],
+        adapters: [createRecordingAdapter("headless")],
         overrides: [
           {
-            adapterId: "mui",
+            adapterId: "headless",
             registry: "widgets",
             key: "text",
-            expectedOwner: "mui",
+            expectedOwner: "headless",
             replacementOwner: "app",
           },
         ],

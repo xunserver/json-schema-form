@@ -3,7 +3,15 @@ import path from "node:path";
 import { describe, expect, test } from "vitest";
 import { REPO_ROOT } from "../lib/fs.js";
 
-const RENDERER_PACKAGES = ["vue", "react", "element-plus", "mui"] as const;
+const RENDERER_PACKAGES = [
+  "vue",
+  "react",
+  "adapter/element-plus",
+  "adapter/antd",
+  "adapter/arco-vue",
+  "adapter/arco-react",
+  "adapter/shadcn",
+] as const;
 const FORBIDDEN = [
   "applyErrors",
   "ValidationEngine",
@@ -29,7 +37,7 @@ function collect(root: string): string[] {
 }
 
 describe("renderer packages do not own validation writes", () => {
-  test("Vue React Element Plus and MUI sources do not import AJV or error writers", () => {
+  test("renderer package sources do not import AJV or error writers", () => {
     for (const directory of RENDERER_PACKAGES) {
       const files = collect(path.join(REPO_ROOT, "packages", directory, "src"));
       for (const file of files) {

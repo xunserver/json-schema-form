@@ -5,8 +5,8 @@ import { describe, expect, test } from "vitest";
 import { FormRenderer } from "@form/vue";
 import { elementPlusAdapter } from "@form/element-plus";
 import { compileForm, createForm, defineForm } from "@form/core";
-import { createDemoForm } from "../../examples/vue-element-plus/src/definition.ts";
-import { createDemoRendererEnvironment } from "../../examples/vue-element-plus/src/renderer.ts";
+import { createDemoForm } from "../../examples/shared/src/demo.ts";
+import { createDemoRendererEnvironment } from "../lib/demo-element-plus-environment.ts";
 import { createRecordingAdapter } from "../../packages/vue/src/test-utils/fake-adapter.ts";
 import { createArrayForm } from "../../packages/vue/src/test-utils/forms.ts";
 
@@ -25,16 +25,16 @@ describe("vue + element-plus integration", () => {
       props: { form, environment: createDemoRendererEnvironment(), adapterId: "element-plus" },
     });
     await nextTick();
-    expect(wrapper.html()).toContain("Name");
-    expect(wrapper.html()).toContain("Bio");
-    expect(wrapper.html()).toContain("Age");
-    expect(wrapper.html()).toContain("Role");
-    expect(wrapper.html()).toContain("Tags");
-    expect(wrapper.html()).toContain("Active");
-    expect(wrapper.html()).toContain("Alerts");
-    expect(wrapper.html()).toContain("Joined");
-    expect(wrapper.html()).toContain("Meeting");
-    expect(wrapper.html()).toContain("Currency");
+    expect(wrapper.html()).toContain("姓名");
+    expect(wrapper.html()).toContain("简介");
+    expect(wrapper.html()).toContain("年龄");
+    expect(wrapper.html()).toContain("角色");
+    expect(wrapper.html()).toContain("标签");
+    expect(wrapper.html()).toContain("启用");
+    expect(wrapper.html()).toContain("提醒");
+    expect(wrapper.html()).toContain("入职日期");
+    expect(wrapper.html()).toContain("会议时间");
+    expect(wrapper.html()).toContain("货币");
     const labeled = wrapper.find("[aria-labelledby]");
     expect(labeled.exists()).toBe(true);
     wrapper.unmount();

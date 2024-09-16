@@ -1,6 +1,6 @@
 # JSON Schema Form
 
-以 JSON Schema 为数据契约的表单引擎。当前仓库完成的是 pnpm/TypeScript 工作区、六个首期 package 边界，以及 `@form/core` 的框架无关公共契约：无副作用的 `defineForm()`、可诊断的冻结 `FormEnvironment`、把 Draft 2020-12 Schema / UI Schema / Rule AST / Schema Dynamics 编译为不可变静态模型的 `compileForm()`，事务化的 `createForm()` / `createFormEngine()` Runtime（含 Rule 求值、activation、effective state 与 `serialize()`），以及 Core 拥有的 Validation pipeline（`validate()` / `applyErrors()` / `submit()`，AJV 只存在于 `@form/validator-ajv`）。Vue/Element Plus 与 React/MUI 两条渲染链路已交付，分别见 `examples/vue-element-plus` 与 `examples/react-mui`。
+以 JSON Schema 为数据契约的表单引擎。当前仓库完成的是 pnpm/TypeScript 工作区、首期 package 边界与扩展 UI Adapter，以及 `@form/core` 的框架无关公共契约：无副作用的 `defineForm()`、可诊断的冻结 `FormEnvironment`、把 Draft 2020-12 Schema / UI Schema / Rule AST / Schema Dynamics 编译为不可变静态模型的 `compileForm()`，事务化的 `createForm()` / `createFormEngine()` Runtime（含 Rule 求值、activation、effective state 与 `serialize()`），以及 Core 拥有的 Validation pipeline（`validate()` / `applyErrors()` / `submit()`，AJV 只存在于 `@form/validator-ajv`）。Vue/Element Plus、React/Ant Design、Arco Vue、Arco React、shadcn 渲染链路已交付；可浏览对照台见 `examples/playground`，共享 catalog 见 `examples/shared`。
 
 架构基线见 [`docs/architecture.md`](docs/architecture.md)。工作区命令、package 职责、公共 export 规则以及 `packages/core/src` 的领域目录见 [`docs/workspace.md`](docs/workspace.md)。
 
@@ -13,7 +13,10 @@
 | `@form/vue` | Vue Renderer 边界，只依赖 Core 与 Vue peer |
 | `@form/react` | React Renderer 边界，只依赖 Core 与 React peer |
 | `@form/element-plus` | Element Plus UI Adapter 边界，位于 Vue Renderer 之上 |
-| `@form/mui` | MUI UI Adapter 边界，位于 React Renderer 之上 |
+| `@form/antd` | Ant Design UI Adapter 边界，位于 React Renderer 之上 |
+| `@form/arco-vue` | Arco Design Vue UI Adapter 边界，位于 Vue Renderer 之上 |
+| `@form/arco-react` | Arco Design React UI Adapter 边界，位于 React Renderer 之上 |
+| `@form/shadcn` | shadcn UI Adapter 边界（消费方注入组件），位于 React Renderer 之上 |
 
 ## 允许的依赖方向
 
@@ -22,7 +25,10 @@
 @form/vue ----------------> @form/core
 @form/react --------------> @form/core
 @form/element-plus -------> @form/vue + @form/core
-@form/mui ----------------> @form/react + @form/core
+@form/antd ---------------> @form/react + @form/core
+@form/arco-vue -----------> @form/vue + @form/core
+@form/arco-react ---------> @form/react + @form/core
+@form/shadcn -------------> @form/react + @form/core
 ```
 
 `@form/core` 不得依赖 Vue、React、DOM UI library 或 AJV。Vue/React 与 UI library 只作为对应集成 package 的 peer dependency。
@@ -38,24 +44,21 @@ pnpm check:boundaries
 pnpm check:v1-matrix
 pnpm verify
 pnpm verify:v1
-pnpm playground:react
-pnpm playground:vue
+pnpm playground
 ```
 
-`pnpm verify` 按依赖顺序构建六个 package，并执行类型检查、契约测试、跨 package 边界检查与两个 example smoke。`pnpm verify:v1` 是架构第 3/16–21 节的发布门禁：先核对 coverage matrix 与 prerequisite，再跑边界、build/typecheck/unit、跨栈集成、SSR/browser/examples 与文档证据。本地 `verify:v1` **不会**删除或重装开发者 workspace；干净 checkout 由 CI 执行 `pnpm install --frozen-lockfile` 后再跑同一门禁。覆盖索引见 [`docs/generated/v1-coverage.md`](docs/generated/v1-coverage.md)。
+`pnpm verify` 按依赖顺序构建全部 package，并执行类型检查、契约测试与跨 package 边界检查。`pnpm verify:v1` 是架构第 3/16–21 节的发布门禁：先核对 coverage matrix 与 prerequisite，再跑边界、build/typecheck/unit、跨栈集成、SSR/browser/playground 与文档证据。本地 `verify:v1` **不会**删除或重装开发者 workspace；干净 checkout 由 CI 执行 `pnpm install --frozen-lockfile` 后再跑同一门禁。覆盖索引见 [`docs/generated/v1-coverage.md`](docs/generated/v1-coverage.md)。
 
 ### Playground 工作台
 
-两个 example 各自提供可浏览的 Vite 工作台（互不混跑，避免 React/MUI 与 Vue/Element Plus 同页冲突）：
+`pnpm playground` 启动单个 Vite 多页面工作台（http://127.0.0.1:5173/）：
 
-| 命令 | 地址 | 栈 |
-|---|---|---|
-| `pnpm playground:react` | http://127.0.0.1:5173/ | React + MUI |
-| `pnpm playground:vue` | http://127.0.0.1:5174/ | Vue + Element Plus |
+- `index.html`：左侧 Monaco JSON 编辑器与 Inspector（React + shadcn 工作台 chrome）
+- `element-plus.html` / `antd.html` / `arco-vue.html` / `arco-react.html` / `shadcn.html`：右侧 Adapter Tab 预览（各 iframe 同时挂载并持续渲染，Tab 只切换可见帧与 Inspector 焦点）
 
-左侧可编辑 `schema` / `uiSchema` / `rules` / `config` / `formData`（JSON 文本）；右侧实时预览本栈 `FormRenderer`，并展示编译诊断、Runtime 诊断、live values、`serialize()` 与最近一次 submit payload。顶栏可切换 catalog 例子；框架按钮是跨端口链接（带 `?example=`），需要两个 playground 都在跑才能跳转。共享例子与编译管线在 `examples/shared`。
+左侧可编辑 `schema` / `uiSchema` / `rules` / `config` / `formData`；四个预览页各自独立 `createForm`。切换右侧 Adapter Tab 设焦点后，Inspector 显示该帧的 live values / `serialize()` / submit；已打开过的预览帧保持挂载。共享例子与编译管线在 `examples/shared`。playground 的 shadcn 组件仅用于工作台 chrome，不是表单 Widget 源，也不构成 `@form/shadcn` adapter。
 
-公开入口：`@form/core`、`@form/core/runtime`、`@form/core/extension`，以及五个叶子 package 的根入口。未声明 deep import 会被拒绝。浏览器/Worker 宿主测试依赖根目录 dev-only `playwright`，不会进入六个发布 package。架构第 20 节列出的八项能力（完整 JSON Schema 自动 UI、运行时改 Model、async rule / 内置远程 DataSource、万能 hooks、独立 nested store、DevTools mutable graph、compiler/runtime 拆包、一次性全 UI Adapter）保持 deferred / optional-unsupported，不作为 v1 产品 API。
+公开入口：`@form/core`、`@form/core/runtime`、`@form/core/extension`，以及各 Renderer/Adapter package 的根入口。未声明 deep import 会被拒绝。浏览器/Worker 宿主测试依赖根目录 dev-only `playwright`，不会进入发布 package。架构第 20 节列出的八项能力（完整 JSON Schema 自动 UI、运行时改 Model、async rule / 内置远程 DataSource、万能 hooks、独立 nested store、DevTools mutable graph、compiler/runtime 拆包、一次性全 UI Adapter）保持 deferred / optional-unsupported，不作为 v1 产品 API。
 
 ## Definition 与编译
 

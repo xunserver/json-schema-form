@@ -4,13 +4,32 @@ import { describe, expect, test } from "vitest";
 import { compileForm, createForm, defineForm } from "@form/core";
 import { REPO_ROOT, readJson } from "../lib/fs.js";
 
-const FORBIDDEN = ["vue", "react", "react-dom", "element-plus", "@mui/material", "ajv"];
+const FORBIDDEN = [
+  "vue",
+  "react",
+  "react-dom",
+  "element-plus",
+  "antd",
+  "@arco-design/web-vue",
+  "@arco-design/web-react",
+  "ajv",
+];
 
 describe("v1 core portability", () => {
   test("V1-PORTABILITY-DEPS keeps browser runners out of product packages", () => {
     const root = readJson<{ devDependencies?: Record<string, string> }>(path.join(REPO_ROOT, "package.json"));
     expect(root.devDependencies?.playwright ?? root.devDependencies?.["@vitest/browser"]).toBeDefined();
-    for (const directory of ["core", "validator-ajv", "vue", "react", "element-plus", "mui"]) {
+    for (const directory of [
+      "core",
+      "validator-ajv",
+      "vue",
+      "react",
+      "adapter/element-plus",
+      "adapter/antd",
+      "adapter/arco-vue",
+      "adapter/arco-react",
+      "adapter/shadcn",
+    ]) {
       const manifest = readJson<{
         dependencies?: Record<string, string>;
         peerDependencies?: Record<string, string>;

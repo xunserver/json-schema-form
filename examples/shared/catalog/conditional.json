@@ -1,0 +1,63 @@
+{
+  "id": "conditional",
+  "title": "条件显示",
+  "description": "Schema if/then 激活，配合可见性状态规则",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "kind": { "type": "string", "enum": ["person", "company", "show"] },
+      "fullName": { "type": "string" },
+      "companyName": { "type": "string" },
+      "nickname": { "type": "string" }
+    },
+    "required": ["kind"],
+    "if": {
+      "properties": { "kind": { "const": "show" } },
+      "required": ["kind"]
+    },
+    "then": {
+      "properties": { "nickname": { "type": "string" } },
+      "required": ["nickname"]
+    }
+  },
+  "uiSchema": {
+    "fields": {
+      "kind": {
+        "widget": "select",
+        "display": { "label": "类型" },
+        "props": { "options": ["person", "company", "show"] }
+      },
+      "fullName": { "widget": "text", "display": { "label": "姓名" } },
+      "companyName": { "widget": "text", "display": { "label": "公司名称" } },
+      "nickname": { "widget": "text", "display": { "label": "昵称（kind 为 show 时必填）" } }
+    }
+  },
+  "rules": [
+    {
+      "kind": "state",
+      "target": "nickname",
+      "action": { "visible": { "eq": [{ "field": "kind" }, "show"] } }
+    },
+    {
+      "kind": "state",
+      "target": "fullName",
+      "action": { "visible": { "eq": [{ "field": "kind" }, "person"] } }
+    },
+    {
+      "kind": "state",
+      "target": "companyName",
+      "action": { "visible": { "eq": [{ "field": "kind" }, "company"] } }
+    }
+  ],
+  "config": {
+    "schemaValidator": "ajv-2020",
+    "validateOn": "blur",
+    "errorPresentation": "touched-or-submitted"
+  },
+  "formData": {
+    "kind": "person",
+    "fullName": "Ada Lovelace",
+    "companyName": "",
+    "nickname": ""
+  }
+}

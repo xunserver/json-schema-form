@@ -3,7 +3,7 @@
 本文件由 `tests/architecture/v1-coverage.json` 生成，仅作索引，不改写 `docs/architecture.md` 规范正文。
 
 - schemaVersion: 1
-- architectureDigest: `ecff28cdd210e685935e4f0c29363ddfa26a70eb4d70c39859f70d6e74fa3e6e`
+- architectureDigest: `1291e57d3e0432e59768c4c966bc523f9ee658dd67e436ce310cbc4142ece6c4`
 
 ## Invariants
 
@@ -59,17 +59,17 @@
 | PKG-03 | covered | bootstrap-monorepo-and-contracts / 发现全部首期 package | V1-WORKSPACE-LAYOUT |
 | PKG-04 | covered | bootstrap-monorepo-and-contracts / 发现全部首期 package | V1-WORKSPACE-LAYOUT |
 | PKG-05 | covered | bootstrap-monorepo-and-contracts / 发现全部首期 package | V1-WORKSPACE-LAYOUT |
-| PKG-06 | covered | bootstrap-monorepo-and-contracts / 发现全部首期 package | V1-WORKSPACE-LAYOUT |
 | DIR-TESTS | covered | bootstrap-monorepo-and-contracts / 验证未修改的合规工作区 | V1-WORKSPACE-LAYOUT |
 | DIR-DOCS | covered | bootstrap-monorepo-and-contracts / 验证未修改的合规工作区 | V1-DOCS-INDEX |
-| DIR-EX-VUE | covered | add-vue-element-plus-rendering / Element Plus example完成端到端交互 | V1-EXAMPLES |
-| DIR-EX-REACT | covered | add-react-mui-rendering / React+MUI 示例覆盖端到端行为 | V1-EXAMPLES |
+| DIR-EX-PLAYGROUND | covered | bootstrap-monorepo-and-contracts / 验证未修改的合规工作区 | V1-EXAMPLES |
+| DIR-EX-SHARED | covered | bootstrap-monorepo-and-contracts / 验证未修改的合规工作区 | V1-EXAMPLES |
 | DIR-CORE-LAYOUT | covered | align-core-contributions-and-layout / 顶层目录与架构一致 | V1-PRE-CORE-LAYOUT |
 | DIR-VALIDATOR | covered | add-validation-pipeline / validator-ajv合法依赖AJV与Core | V1-WORKSPACE-LAYOUT |
 | DIR-VUE | covered | add-vue-element-plus-rendering / 应用从根入口组合 Renderer | V1-WORKSPACE-LAYOUT |
 | DIR-REACT | covered | add-react-mui-rendering / 消费者只使用根入口 | V1-WORKSPACE-LAYOUT |
 | DIR-ELEMENT-PLUS | covered | add-vue-element-plus-rendering / Form wrapper 不接管 Core 状态 | V1-WORKSPACE-LAYOUT |
-| DIR-MUI | covered | add-react-mui-rendering / MUI Form 不运行第二套验证 | V1-WORKSPACE-LAYOUT |
+| DIR-ANTD | covered | add-react-mui-rendering / Form wrapper 不接管 Core 状态 | V1-WORKSPACE-LAYOUT |
+| DIR-SHADCN | covered | add-react-shadcn-adapter / Form wrapper 不接管 Core 状态 | V1-WORKSPACE-LAYOUT |
 | EXP-CORE-ROOT | covered | compile-static-form-model / 导入根入口公共契约 | V1-EXPORT-SURFACE, V1-PUBLIC-API-DEFAULT |
 | EXP-CORE-RUNTIME | covered | add-renderer-interaction-and-binding-ports / 导入受支持的子路径 | V1-PRE-RENDER-BINDING, V1-EXPORT-SURFACE |
 | EXP-CORE-EXTENSION | covered | compile-static-form-model / 导入受支持的extension子路径 | V1-PRE-WIDGET-HELPER, V1-EXPORT-SURFACE |
@@ -77,7 +77,8 @@
 | EXP-VUE | covered | add-vue-element-plus-rendering / 应用从根入口组合 Renderer | V1-EXPORT-SURFACE |
 | EXP-REACT | covered | add-react-mui-rendering / 消费者只使用根入口 | V1-EXPORT-SURFACE |
 | EXP-ELEMENT-PLUS | covered | add-vue-element-plus-rendering / 应用从根入口组合 Renderer | V1-EXPORT-SURFACE |
-| EXP-MUI | covered | add-react-mui-rendering / 消费者只使用根入口 | V1-EXPORT-SURFACE |
+| EXP-ANTD | covered | add-react-mui-rendering / 消费者只使用根入口 | V1-EXPORT-SURFACE |
+| EXP-SHADCN | covered | add-react-shadcn-adapter / 消费者只使用根入口 | V1-EXPORT-SURFACE |
 | EXP-DEEP-IMPORT-DENY | covered | compile-static-form-model / 拒绝内部 deep import | V1-EXPORT-DEEP-DENY |
 
 ## Diagnostic sources

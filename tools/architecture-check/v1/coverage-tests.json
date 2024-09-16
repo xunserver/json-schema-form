@@ -332,7 +332,7 @@
     "id": "V1-CROSS-STACK-REACT",
     "kind": "integration",
     "file": "tests/v1/react-stack.test.tsx",
-    "title": "V1-CROSS-STACK-REACT renders the shared fixture through MUI",
+    "title": "V1-CROSS-STACK-REACT renders the shared fixture through Ant Design",
     "commandId": "test"
   },
   {
@@ -367,8 +367,8 @@
     "id": "V1-EXAMPLES",
     "kind": "integration",
     "file": "tests/v1/examples.test.ts",
-    "title": "V1-EXAMPLES builds and smokes both public example apps",
-    "commandId": "example:vue"
+    "title": "V1-EXAMPLES typechecks the public playground and shared catalog",
+    "commandId": "test:v1:host"
   },
   {
     "id": "V1-PORTABILITY-DEPS",
