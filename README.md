@@ -1,6 +1,6 @@
 # JSON Schema Form
 
-以 JSON Schema 为数据契约的表单引擎。当前仓库完成的是 pnpm/TypeScript 工作区、六个首期 package 边界，以及 `@form/core` 的框架无关公共契约：无副作用的 `defineForm()`、可诊断的冻结 `FormEnvironment`、把 Draft 2020-12 Schema / UI Schema / Rule AST / Schema Dynamics 编译为不可变静态模型的 `compileForm()`，事务化的 `createForm()` / `createFormEngine()` Runtime（含 Rule 求值、activation、effective state 与 `serialize()`），以及 Core 拥有的 Validation pipeline（`validate()` / `applyErrors()` / `submit()`，AJV 只存在于 `@form/validator-ajv`）。Renderer 仍由后续垂直切片交付。
+以 JSON Schema 为数据契约的表单引擎。当前仓库完成的是 pnpm/TypeScript 工作区、六个首期 package 边界，以及 `@form/core` 的框架无关公共契约：无副作用的 `defineForm()`、可诊断的冻结 `FormEnvironment`、把 Draft 2020-12 Schema / UI Schema / Rule AST / Schema Dynamics 编译为不可变静态模型的 `compileForm()`，事务化的 `createForm()` / `createFormEngine()` Runtime（含 Rule 求值、activation、effective state 与 `serialize()`），以及 Core 拥有的 Validation pipeline（`validate()` / `applyErrors()` / `submit()`，AJV 只存在于 `@form/validator-ajv`）。Vue/Element Plus 与 React/MUI 两条渲染链路已交付，分别见 `examples/vue-element-plus` 与 `examples/react-mui`。
 
 架构基线见 [`docs/architecture.md`](docs/architecture.md)。工作区命令、package 职责、公共 export 规则以及 `packages/core/src` 的领域目录见 [`docs/workspace.md`](docs/workspace.md)。
 
@@ -35,10 +35,14 @@ pnpm build
 pnpm typecheck
 pnpm test
 pnpm check:boundaries
+pnpm check:v1-matrix
 pnpm verify
+pnpm verify:v1
 ```
 
-`pnpm verify` 按依赖顺序构建六个 package，并执行类型检查、契约测试与跨 package 边界检查。
+`pnpm verify` 按依赖顺序构建六个 package，并执行类型检查、契约测试、跨 package 边界检查与两个 example smoke。`pnpm verify:v1` 是架构第 3/16–21 节的发布门禁：先核对 coverage matrix 与 prerequisite，再跑边界、build/typecheck/unit、跨栈集成、SSR/browser/examples 与文档证据。本地 `verify:v1` **不会**删除或重装开发者 workspace；干净 checkout 由 CI 执行 `pnpm install --frozen-lockfile` 后再跑同一门禁。覆盖索引见 [`docs/generated/v1-coverage.md`](docs/generated/v1-coverage.md)。
+
+公开入口：`@form/core`、`@form/core/runtime`、`@form/core/extension`，以及五个叶子 package 的根入口。未声明 deep import 会被拒绝。浏览器/Worker 宿主测试依赖根目录 dev-only `playwright`，不会进入六个发布 package。架构第 20 节列出的八项能力（完整 JSON Schema 自动 UI、运行时改 Model、内置远程 DataSource、万能 hooks、独立 nested store、DevTools mutable graph、compiler/runtime 拆包、一次性全 UI Adapter）保持 deferred / optional-unsupported，不作为 v1 产品 API。
 
 ## Definition 与编译
 
@@ -140,7 +144,7 @@ try {
 
 `FormInstance.array(path)` 与 `scope(path)` 返回共享同一 Runtime 的轻量 facade。数组 index 只是当前地址，`ArrayItemId` 才是 item 身份：`move` 后 Field/View source state 跟随 ID，`remove`/`replaceItem`/`reset` 以及默认 whole-array `setValue` 会作废旧 ID 与 scope。`setItemValue` 保留根 item ID；未配置 Identity Resolver 时，有效的整个数组替换会重建全部 item ID，而不会按 index 或业务字段猜测复用。可在 `createForm` 选项中按数组 `ModelPath` 提供纯同步 `ArrayIdentityResolver`（从 `@form/core/runtime` 导入类型）做 key reconcile；重复 key 或抛错会使 transaction 回滚。固定 tuple 现存 slot 可 `setItemValue`/`replaceItem`，但不支持 append/insert/remove/move/clear。
 
-`createForm()` 在返回实例前会无 publish 地稳定 Computed/Effect/activation，`version` 仍为 0，稳定后的 values 作为 dirty baseline。`FormInstance.serialize(options?)` 读取已提交 snapshot；默认 active-only。Validation 由 `validate()` / `applyErrors()` / `submit()` 交付；Core 仍不提供 async Rule，也不渲染 UI。
+`createForm()` 在返回实例前会无 publish 地稳定 Computed/Effect/activation，`version` 仍为 0，稳定后的 values 作为 dirty baseline。`FormInstance.serialize(options?)` 读取已提交 snapshot；默认 active-only。Validation 由 `validate()` / `applyErrors()` / `submit()` 交付；Core 不提供异步规则执行器，也不渲染 UI。
 
 只读 selector / subscription / Runtime diagnostic observer 以及 array order/item/binding selector 从 `@form/core/runtime` 导入，不从根入口重导出。`currentBindingSelector` 发布完整 `InstanceBinding`（静态 `DataNodeId`/`ModelPath`、当前 `InstancePath`、`ArrayItemId` chain 与 `stale`）。`getRenderScope(form | scoped)` 返回只读 `RenderScope`：可把相对或绝对模板 `ModelPath`（如 `products[].name`）解析为当前 `InstancePath`，并按 item/scope 派生；它没有 writer。move 后同一 scope 的 chain 不变而 path 更新；remove/replace/clear/reset 后永久 stale。不要把 `RenderScope` 当作 `FormInstance` 传给 Renderer 去绕过 command。
 

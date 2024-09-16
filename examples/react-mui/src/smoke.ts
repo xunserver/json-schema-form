@@ -8,7 +8,8 @@ if (form.getValue("name") !== "Ada") {
 if (environment.getAdapter("mui")?.widgets.has("company.currency") !== true) {
   throw new Error("custom currency widget is missing");
 }
-if (environment.getAdapter("mui")?.widgets.has("text") !== true) {
-  throw new Error("default text widget is missing");
+const submitted = await form.submit(async (payload) => payload);
+if (submitted.submitted === true && submitted.valid === false) {
+  throw new Error("unexpected invalid submitted payload");
 }
 console.log("react-mui smoke ok");

@@ -95,6 +95,9 @@ export const demoDefinition = defineForm({
       action: { visible: { eq: [{ field: "kind" }, "show"] } },
     },
   ],
+  config: {
+    schemaValidator: "ajv-2020",
+  },
 });
 
 export function createDemoForm() {

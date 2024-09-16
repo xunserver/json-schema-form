@@ -1,0 +1,524 @@
+{
+  "invariants": {
+    "INV-01": [
+      {
+        "changeId": "add-definition-and-environment",
+        "capability": "form-definition-authoring",
+        "requirement": "Form Definition 组合四类 authoring 输入",
+        "scenario": "声明完整 Definition"
+      },
+      {
+        "changeId": "add-definition-and-environment",
+        "capability": "form-definition-authoring",
+        "requirement": "Definition 与编译和运行阶段保持分离",
+        "scenario": "拒绝 Renderer 与 Validator 实现成员"
+      }
+    ],
+    "INV-02": [
+      {
+        "changeId": "compile-static-form-model",
+        "capability": "core-public-contracts",
+        "requirement": "compileForm 提供纯编译 Application API",
+        "scenario": "使用默认 Environment 编译"
+      },
+      {
+        "changeId": "add-transactional-form-runtime",
+        "capability": "transactional-form-runtime",
+        "requirement": "Compiled Model 通过一致 Environment 实例化",
+        "scenario": "使用默认 Environment 创建表单"
+      }
+    ],
+    "INV-03": [
+      {
+        "changeId": "compile-static-form-model",
+        "capability": "core-public-contracts",
+        "requirement": "编译产物在运行时保持不可变和阶段隔离",
+        "scenario": "拒绝修改已编译 Model"
+      },
+      {
+        "changeId": "add-transactional-form-runtime",
+        "capability": "transactional-form-runtime",
+        "requirement": "多个 FormInstance 的 Runtime state 完全隔离",
+        "scenario": "同一 Model 创建两个隔离实例"
+      }
+    ],
+    "INV-04": [
+      {
+        "changeId": "compile-static-form-model",
+        "capability": "static-ui-model",
+        "requirement": "DataNode、FieldDescriptor 与 ViewNode 不合并",
+        "scenario": "区分数据 container 与展示 group"
+      }
+    ],
+    "INV-05": [
+      {
+        "changeId": "bootstrap-monorepo-and-contracts",
+        "capability": "core-public-contracts",
+        "requirement": "公共实体 ID 在类型上彼此独立",
+        "scenario": "区分数组身份与数组地址"
+      },
+      {
+        "changeId": "add-array-identity-and-scopes",
+        "capability": "array-identity-and-scopes",
+        "requirement": "数组 item 身份独立于 values 与当前位置",
+        "scenario": "move 改变地址但不改变身份"
+      }
+    ],
+    "INV-06": [
+      {
+        "changeId": "add-transactional-form-runtime",
+        "capability": "transactional-form-runtime",
+        "requirement": "嵌套 values 是唯一 value source",
+        "scenario": "Field 与 Form 读取同一嵌套值"
+      },
+      {
+        "changeId": "add-transactional-form-runtime",
+        "capability": "transactional-form-runtime",
+        "requirement": "嵌套 values 是唯一 value source",
+        "scenario": "公开 snapshot 不可用于绕过命令"
+      }
+    ],
+    "INV-07": [
+      {
+        "changeId": "add-transactional-form-runtime",
+        "capability": "transactional-form-runtime",
+        "requirement": "每个 public mutation 都原子提交",
+        "scenario": "setValues 不发布中间字段组合"
+      },
+      {
+        "changeId": "add-vue-element-plus-rendering",
+        "capability": "vue-form-rendering",
+        "requirement": "Widget 受控值与交互只经过语义命令",
+        "scenario": "native change 转为一次 setValue"
+      },
+      {
+        "changeId": "add-react-mui-rendering",
+        "capability": "react-form-rendering",
+        "requirement": "Widget 受 Core 控制并只发出语义交互",
+        "scenario": "用户编辑通过事务回显"
+      }
+    ],
+    "INV-08": [
+      {
+        "changeId": "compile-static-form-model",
+        "capability": "static-ui-model",
+        "requirement": "DataNode、FieldDescriptor 与 ViewNode 不合并",
+        "scenario": "ViewTree 不泄漏 Render-time state"
+      },
+      {
+        "changeId": "add-vue-element-plus-rendering",
+        "capability": "vue-form-rendering",
+        "requirement": "Vue Renderer 只遍历最终 resolved ViewTree",
+        "scenario": "默认与显式 layout 使用同一遍历入口"
+      },
+      {
+        "changeId": "add-react-mui-rendering",
+        "capability": "react-form-rendering",
+        "requirement": "Renderer 只遍历 resolved ViewTree",
+        "scenario": "编译结果决定呈现顺序"
+      }
+    ],
+    "INV-09": [
+      {
+        "changeId": "bootstrap-monorepo-and-contracts",
+        "capability": "package-architecture",
+        "requirement": "Core 独立于框架、DOM、UI library 和 AJV",
+        "scenario": "在非 DOM 环境验证 Core"
+      },
+      {
+        "changeId": "add-validation-pipeline",
+        "capability": "package-architecture",
+        "requirement": "AJV具体依赖与实现只属于validator package",
+        "scenario": "拒绝Core或Renderer导入AJV"
+      }
+    ],
+    "INV-10": [
+      {
+        "changeId": "add-definition-and-environment",
+        "capability": "core-plugin-environment",
+        "requirement": "Plugin authoring 描述框架无关的逻辑贡献",
+        "scenario": "拒绝 framework binding"
+      },
+      {
+        "changeId": "add-vue-element-plus-rendering",
+        "capability": "vue-renderer-environment",
+        "requirement": "RendererEnvironment 与 FormEnvironment 严格分离",
+        "scenario": "拒绝把 Vue component 注册进 Core"
+      },
+      {
+        "changeId": "add-react-mui-rendering",
+        "capability": "react-renderer-environment",
+        "requirement": "RendererEnvironment 与 FormEnvironment 严格分离",
+        "scenario": "Renderer adapter 不能注册 Core plugin"
+      }
+    ],
+    "INV-11": [
+      {
+        "changeId": "add-definition-and-environment",
+        "capability": "core-plugin-environment",
+        "requirement": "成功构建的 Environment 与 Registry view 保持冻结",
+        "scenario": "拒绝构建后的 Registry mutation"
+      },
+      {
+        "changeId": "add-transactional-form-runtime",
+        "capability": "transactional-form-runtime",
+        "requirement": "基础 Runtime 不抢占后续公共能力所有权",
+        "scenario": "Extension 不可绕过 transaction"
+      }
+    ],
+    "INV-12": [
+      {
+        "changeId": "add-rules-and-schema-dynamics",
+        "capability": "rules-and-schema-dynamics",
+        "requirement": "effective状态具有固定组合优先级且active不等于visible",
+        "scenario": "hidden保持active"
+      },
+      {
+        "changeId": "compile-static-form-model",
+        "capability": "static-ui-model",
+        "requirement": "Field Registry 是 Data Tree 的独立交互投影",
+        "scenario": "field false 与 visible false 不等价"
+      }
+    ]
+  },
+  "slices": {
+    "SLICE-01": [
+      {
+        "changeId": "compile-static-form-model",
+        "capability": "schema-frontend-and-shape-analysis",
+        "requirement": "Schema Frontend 识别并 meta-validate Draft 2020-12",
+        "scenario": "编译未声明 dialect 的常用 Schema"
+      },
+      {
+        "changeId": "compile-static-form-model",
+        "capability": "static-data-model",
+        "requirement": "Array 节点区分 list template 与 tuple slot",
+        "scenario": "编译 list item template"
+      }
+    ],
+    "SLICE-02": [
+      {
+        "changeId": "compile-static-form-model",
+        "capability": "static-ui-model",
+        "requirement": "缺省 layout 生成保留数据结构的 ViewTree",
+        "scenario": "生成嵌套默认 ViewTree"
+      },
+      {
+        "changeId": "compile-static-form-model",
+        "capability": "static-ui-model",
+        "requirement": "显式 layout authoritative 且在编译期完全解析",
+        "scenario": "未引用字段默认不渲染"
+      }
+    ],
+    "SLICE-03": [
+      {
+        "changeId": "add-definition-and-environment",
+        "capability": "core-plugin-environment",
+        "requirement": "默认 Environment 提供首期逻辑 Widget Definition",
+        "scenario": "解析默认 text Widget"
+      },
+      {
+        "changeId": "add-vue-element-plus-rendering",
+        "capability": "element-plus-ui-adapter",
+        "requirement": "九类内置逻辑 Widget 均有 binding",
+        "scenario": "内置 Widget capability 完整"
+      },
+      {
+        "changeId": "add-react-mui-rendering",
+        "capability": "mui-ui-adapter",
+        "requirement": "九类内置逻辑 Widget 均有 binding",
+        "scenario": "默认 Widget 集合完整"
+      }
+    ],
+    "SLICE-04": [
+      {
+        "changeId": "add-vue-element-plus-rendering",
+        "capability": "package-architecture",
+        "requirement": "Vue/Element Plus 依赖与集成验收可重复验证",
+        "scenario": "Element Plus example完成端到端交互"
+      },
+      {
+        "changeId": "add-react-mui-rendering",
+        "capability": "package-architecture",
+        "requirement": "React 与 MUI 提供完整集成验收入口",
+        "scenario": "React+MUI 示例覆盖端到端行为"
+      }
+    ],
+    "SLICE-05": [
+      {
+        "changeId": "add-transactional-form-runtime",
+        "capability": "transactional-form-runtime",
+        "requirement": "每个 public mutation 都原子提交",
+        "scenario": "setValues 不发布中间字段组合"
+      },
+      {
+        "changeId": "add-transactional-form-runtime",
+        "capability": "transactional-form-runtime",
+        "requirement": "Selector subscription 只发布受影响的稳定 snapshot",
+        "scenario": "单字段更新只通知相关 selector"
+      }
+    ],
+    "SLICE-06": [
+      {
+        "changeId": "add-array-identity-and-scopes",
+        "capability": "array-identity-and-scopes",
+        "requirement": "ArrayInstance 提供完整且原子的 list 命令",
+        "scenario": "append 与 insert 原子建立身份"
+      },
+      {
+        "changeId": "add-array-identity-and-scopes",
+        "capability": "array-identity-and-scopes",
+        "requirement": "数组 item 身份独立于 values 与当前位置",
+        "scenario": "move 改变地址但不改变身份"
+      }
+    ],
+    "SLICE-07": [
+      {
+        "changeId": "add-rules-and-schema-dynamics",
+        "capability": "rules-and-schema-dynamics",
+        "requirement": "State Rule 只产生独立的rule-owned状态结果",
+        "scenario": "State Rule更新effective selector"
+      },
+      {
+        "changeId": "add-rules-and-schema-dynamics",
+        "capability": "rules-and-schema-dynamics",
+        "requirement": "Computed Rule 形成单writer DAG并在transaction内拓扑求值",
+        "scenario": "cycle与多writer阻断编译"
+      }
+    ],
+    "SLICE-08": [
+      {
+        "changeId": "add-validation-pipeline",
+        "capability": "validation-pipeline",
+        "requirement": "validator-ajv实现Draft 2020-12并规范化AJV errors",
+        "scenario": "规范化required target"
+      },
+      {
+        "changeId": "add-validation-pipeline",
+        "capability": "validation-pipeline",
+        "requirement": "同步validation观察Rule稳定后的同一transaction draft",
+        "scenario": "Computed完成后再同步校验"
+      },
+      {
+        "changeId": "add-validation-pipeline",
+        "capability": "validation-pipeline",
+        "requirement": "Async validation非阻塞且latest-wins",
+        "scenario": "迟到旧结果被丢弃"
+      },
+      {
+        "changeId": "add-validation-pipeline",
+        "capability": "validation-pipeline",
+        "requirement": "Server errors通过applyErrors独立注入与清除",
+        "scenario": "原子注入并聚合Server errors"
+      }
+    ],
+    "SLICE-09": [
+      {
+        "changeId": "compile-static-form-model",
+        "capability": "static-data-model",
+        "requirement": "Conditional 结构编译为静态并集",
+        "scenario": "条件分支引入不同字段"
+      },
+      {
+        "changeId": "add-rules-and-schema-dynamics",
+        "capability": "rules-and-schema-dynamics",
+        "requirement": "Runtime activation 只切换实例状态并保留inactive内容",
+        "scenario": "branch切换保留draft state"
+      },
+      {
+        "changeId": "add-rules-and-schema-dynamics",
+        "capability": "rules-and-schema-dynamics",
+        "requirement": "serialize 基于committed active binding生成readonly输出",
+        "scenario": "默认active-only而getValues保留全部"
+      }
+    ],
+    "SLICE-10": [
+      {
+        "changeId": "add-definition-and-environment",
+        "capability": "core-plugin-environment",
+        "requirement": "成功构建的 Environment 与 Registry view 保持冻结",
+        "scenario": "拒绝构建后的 Registry mutation"
+      },
+      {
+        "changeId": "add-definition-and-environment",
+        "capability": "core-plugin-environment",
+        "requirement": "Registry 冲突不得静默覆盖",
+        "scenario": "拒绝重复 Plugin ID"
+      },
+      {
+        "changeId": "add-definition-and-environment",
+        "capability": "core-plugin-environment",
+        "requirement": "Environment 校验 Plugin protocol compatibility",
+        "scenario": "拒绝不兼容 Plugin"
+      }
+    ]
+  },
+  "acceptance": {
+    "AC-01": [
+      {
+        "changeId": "add-vue-element-plus-rendering",
+        "capability": "vue-form-rendering",
+        "requirement": "Vue Renderer 只遍历最终 resolved ViewTree",
+        "scenario": "默认与显式 layout 使用同一遍历入口"
+      },
+      {
+        "changeId": "add-react-mui-rendering",
+        "capability": "react-form-rendering",
+        "requirement": "Renderer 只遍历 resolved ViewTree",
+        "scenario": "编译结果决定呈现顺序"
+      }
+    ],
+    "AC-02": [
+      {
+        "changeId": "bootstrap-monorepo-and-contracts",
+        "capability": "package-architecture",
+        "requirement": "Core 独立于框架、DOM、UI library 和 AJV",
+        "scenario": "在非 DOM 环境验证 Core"
+      },
+      {
+        "changeId": "add-validation-pipeline",
+        "capability": "package-architecture",
+        "requirement": "AJV具体依赖与实现只属于validator package",
+        "scenario": "拒绝Core或Renderer导入AJV"
+      }
+    ],
+    "AC-03": [
+      {
+        "changeId": "compile-static-form-model",
+        "capability": "core-public-contracts",
+        "requirement": "compileForm 提供纯编译 Application API",
+        "scenario": "重复编译具有纯函数语义"
+      },
+      {
+        "changeId": "add-transactional-form-runtime",
+        "capability": "transactional-form-runtime",
+        "requirement": "多个 FormInstance 的 Runtime state 完全隔离",
+        "scenario": "同一 Model 创建两个隔离实例"
+      }
+    ],
+    "AC-04": [
+      {
+        "changeId": "add-array-identity-and-scopes",
+        "capability": "array-identity-and-scopes",
+        "requirement": "move 保留状态而删除清理整个 Runtime subtree",
+        "scenario": "touched 和 focused 随 ID move"
+      },
+      {
+        "changeId": "add-validation-pipeline",
+        "capability": "validation-pipeline",
+        "requirement": "array identity与subtree lifecycle决定validation所有权",
+        "scenario": "error与validating随item move"
+      }
+    ],
+    "AC-05": [
+      {
+        "changeId": "add-transactional-form-runtime",
+        "capability": "transactional-form-runtime",
+        "requirement": "Selector subscription 只发布受影响的稳定 snapshot",
+        "scenario": "单字段更新只通知相关 selector"
+      },
+      {
+        "changeId": "add-vue-element-plus-rendering",
+        "capability": "vue-form-rendering",
+        "requirement": "Vue composables 精确桥接 Core external store",
+        "scenario": "无关 Field commit 不重渲染"
+      },
+      {
+        "changeId": "add-react-mui-rendering",
+        "capability": "react-form-rendering",
+        "requirement": "React hooks 精准桥接 Core external store",
+        "scenario": "无关更新不重渲染叶节点"
+      }
+    ],
+    "AC-06": [
+      {
+        "changeId": "add-rules-and-schema-dynamics",
+        "capability": "rules-and-schema-dynamics",
+        "requirement": "Computed Rule 形成单writer DAG并在transaction内拓扑求值",
+        "scenario": "链式computed按拓扑顺序稳定"
+      },
+      {
+        "changeId": "add-validation-pipeline",
+        "capability": "validation-pipeline",
+        "requirement": "同步validation观察Rule稳定后的同一transaction draft",
+        "scenario": "Computed完成后再同步校验"
+      }
+    ],
+    "AC-07": [
+      {
+        "changeId": "add-vue-element-plus-rendering",
+        "capability": "vue-form-rendering",
+        "requirement": "Widget 受控值与交互只经过语义命令",
+        "scenario": "native change 转为一次 setValue"
+      },
+      {
+        "changeId": "add-react-mui-rendering",
+        "capability": "react-form-rendering",
+        "requirement": "Widget 受 Core 控制并只发出语义交互",
+        "scenario": "用户编辑通过事务回显"
+      },
+      {
+        "changeId": "add-vue-element-plus-rendering",
+        "capability": "vue-renderer-environment",
+        "requirement": "VueUIAdapter 明确组合四类职责",
+        "scenario": "custom render 不暴露直接写入口"
+      }
+    ],
+    "AC-08": [
+      {
+        "changeId": "bootstrap-monorepo-and-contracts",
+        "capability": "core-public-contracts",
+        "requirement": "Diagnostic 使用共享结构化契约",
+        "scenario": "消费最小 Diagnostic"
+      },
+      {
+        "changeId": "compile-static-form-model",
+        "capability": "schema-frontend-and-shape-analysis",
+        "requirement": "Schema Frontend 识别并 meta-validate Draft 2020-12",
+        "scenario": "拒绝未支持 dialect"
+      },
+      {
+        "changeId": "add-definition-and-environment",
+        "capability": "core-plugin-environment",
+        "requirement": "Environment build failure 暴露统一 Diagnostic",
+        "scenario": "消费结构化构建失败"
+      }
+    ]
+  },
+  "evidence": {
+    "INV-01": ["V1-FIXTURE-PUBLIC-ONLY", "V1-PUBLIC-API-DEFAULT"],
+    "INV-02": ["V1-PUBLIC-API-DEFAULT", "V1-PUBLIC-API-EXPLICIT", "V1-PUBLIC-API-ENGINE"],
+    "INV-03": ["V1-MODEL-REUSE-ISOLATION", "V1-PUBLIC-API-DEFAULT"],
+    "INV-04": ["V1-FIXTURE-PUBLIC-ONLY", "V1-PUBLIC-API-DEFAULT"],
+    "INV-05": ["V1-ARRAY-MOVE-STATE"],
+    "INV-06": ["V1-ADAPTER-PORT", "V1-PUBLIC-API-DEFAULT"],
+    "INV-07": ["V1-ADAPTER-PORT", "V1-STABLE-TX", "V1-CROSS-STACK-VUE", "V1-CROSS-STACK-REACT"],
+    "INV-08": ["V1-CROSS-STACK-VUE", "V1-CROSS-STACK-REACT", "V1-ADAPTER-CHROME"],
+    "INV-09": ["V1-PORTABILITY-DEPS", "V1-PORTABILITY-NODE", "V1-WORKSPACE-LAYOUT"],
+    "INV-10": ["V1-CROSS-STACK-VUE", "V1-CROSS-STACK-REACT", "V1-FIXTURE-PUBLIC-ONLY"],
+    "INV-11": ["V1-ADAPTER-PORT", "V1-PUBLIC-API-EXPLICIT"],
+    "INV-12": ["V1-PRE-REQUIRED-PRESENTATION", "V1-CROSS-STACK-VUE"]
+  },
+  "sliceEvidence": {
+    "SLICE-01": ["V1-PUBLIC-API-DEFAULT", "V1-FIXTURE-PUBLIC-ONLY"],
+    "SLICE-02": ["V1-PUBLIC-API-DEFAULT", "V1-EXAMPLES"],
+    "SLICE-03": ["V1-PRE-WIDGET-INTERACTION", "V1-CROSS-STACK-VUE", "V1-CROSS-STACK-REACT"],
+    "SLICE-04": ["V1-CROSS-STACK-VUE", "V1-CROSS-STACK-REACT", "V1-EXAMPLES"],
+    "SLICE-05": ["V1-STABLE-TX", "V1-PRECISION-FIELD"],
+    "SLICE-06": ["V1-ARRAY-MOVE-STATE"],
+    "SLICE-07": ["V1-STABLE-TX", "V1-DIAGNOSTIC-SOURCES"],
+    "SLICE-08": ["V1-STABLE-TX", "V1-DIAGNOSTIC-SOURCES"],
+    "SLICE-09": ["V1-PUBLIC-API-DEFAULT", "V1-STABLE-TX"],
+    "SLICE-10": ["V1-PUBLIC-API-EXPLICIT", "V1-DIAGNOSTIC-SOURCES"]
+  },
+  "acEvidence": {
+    "AC-01": ["V1-CROSS-STACK-VUE", "V1-CROSS-STACK-REACT", "V1-CROSS-STACK-COMPARE"],
+    "AC-02": ["V1-PORTABILITY-DEPS", "V1-PORTABILITY-NODE", "V1-DEP-ALLOWLIST"],
+    "AC-03": ["V1-MODEL-REUSE-FINGERPRINT", "V1-MODEL-REUSE-ISOLATION"],
+    "AC-04": ["V1-ARRAY-MOVE-STATE"],
+    "AC-05": ["V1-PRECISION-FIELD", "V1-PRECISION-ARRAY", "V1-RENDER-PRECISION"],
+    "AC-06": ["V1-STABLE-TX"],
+    "AC-07": ["V1-ADAPTER-PORT", "V1-ADAPTER-CHROME"],
+    "AC-08": ["V1-DIAGNOSTIC-SOURCES", "V1-DIAGNOSTIC-STABLE"]
+  }
+}

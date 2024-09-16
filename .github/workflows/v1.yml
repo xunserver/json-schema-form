@@ -1,0 +1,25 @@
+name: v1
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  v1:
+    name: clean-checkout verify:v1
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Install locked workspace
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium for host tests
+        run: pnpm exec playwright install chromium --with-deps
+      - name: Run v1 architecture gate
+        run: pnpm verify:v1

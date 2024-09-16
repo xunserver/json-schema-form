@@ -1,0 +1,457 @@
+[
+  {
+    "id": "V1-PRE-WIDGET-HELPER",
+    "kind": "contract",
+    "file": "tests/architecture/v1-preflight.test.ts",
+    "title": "V1-PRE-WIDGET-HELPER defineWidget is an identity helper on the extension entry",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-PRE-RENDER-BINDING",
+    "kind": "contract",
+    "file": "tests/architecture/v1-preflight.test.ts",
+    "title": "V1-PRE-RENDER-BINDING exposes readonly RenderScope from the runtime entry",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-PRE-BLUR-PORT",
+    "kind": "contract",
+    "file": "tests/architecture/v1-preflight.test.ts",
+    "title": "V1-PRE-BLUR-PORT blur is a no-op that does not touch Field state",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-PRE-WIDGET-INTERACTION",
+    "kind": "contract",
+    "file": "tests/architecture/v1-preflight.test.ts",
+    "title": "V1-PRE-WIDGET-INTERACTION default widgets declare the four semantic actions",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-PRE-REQUIRED-PRESENTATION",
+    "kind": "contract",
+    "file": "tests/architecture/v1-preflight.test.ts",
+    "title": "V1-PRE-REQUIRED-PRESENTATION effective required follows static and inactive fields",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-PRE-VIEW-STATE",
+    "kind": "contract",
+    "file": "tests/architecture/v1-preflight.test.ts",
+    "title": "V1-PRE-VIEW-STATE collapsed and activeTab are View source state",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-PRE-CORE-LAYOUT",
+    "kind": "contract",
+    "file": "tests/architecture/v1-preflight.test.ts",
+    "title": "V1-PRE-CORE-LAYOUT reuses the core-layout boundary rule",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-PRE-CONTRIBUTION-PORTS",
+    "kind": "contract",
+    "file": "tests/architecture/v1-preflight.test.ts",
+    "title": "V1-PRE-CONTRIBUTION-PORTS dialect and initializer contracts are extension-owned",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-OWNER-AUDIT",
+    "kind": "contract",
+    "file": "tests/architecture/v1-preflight.test.ts",
+    "title": "V1-OWNER-AUDIT public FormInstance surface is not owned by acceptance",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-MATRIX-PARSE-OK",
+    "kind": "unit",
+    "file": "tests/architecture/v1-parser.test.ts",
+    "title": "V1-MATRIX-PARSE-OK loads a well-formed coverage object",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-MATRIX-UNKNOWN-FIELD",
+    "kind": "unit",
+    "file": "tests/architecture/v1-parser.test.ts",
+    "title": "V1-MATRIX-UNKNOWN-FIELD rejects unknown fields",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-MATRIX-DUPLICATE-ID",
+    "kind": "unit",
+    "file": "tests/architecture/v1-parser.test.ts",
+    "title": "V1-MATRIX-DUPLICATE-ID rejects duplicate catalog ids",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-MATRIX-INVALID-STATUS",
+    "kind": "unit",
+    "file": "tests/architecture/v1-parser.test.ts",
+    "title": "V1-MATRIX-INVALID-STATUS rejects an unknown catalog status",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-EXTRACTOR-EXACT-SET",
+    "kind": "unit",
+    "file": "tests/architecture/v1-extractor.test.ts",
+    "title": "V1-EXTRACTOR-EXACT-SET extracts the 12/10/8 architecture sets",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-EXTRACTOR-DRIFT",
+    "kind": "unit",
+    "file": "tests/architecture/v1-extractor.test.ts",
+    "title": "V1-EXTRACTOR-DRIFT reports entry id and section when architecture text changes",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-OWNER-ACTIVE-ARCHIVE-DURABLE",
+    "kind": "unit",
+    "file": "tests/architecture/v1-owner-resolver.test.ts",
+    "title": "V1-OWNER-ACTIVE-ARCHIVE-DURABLE resolves active, archive, and durable specs",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-OWNER-AMBIGUOUS-SCENARIO",
+    "kind": "unit",
+    "file": "tests/architecture/v1-owner-resolver.test.ts",
+    "title": "V1-OWNER-AMBIGUOUS-SCENARIO requires a requirement qualifier for duplicate titles",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-OWNER-DANGLING",
+    "kind": "unit",
+    "file": "tests/architecture/v1-owner-resolver.test.ts",
+    "title": "V1-OWNER-DANGLING reports a missing owner reference",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-TEST-RESOLVER-UNIQUE",
+    "kind": "unit",
+    "file": "tests/architecture/v1-test-resolver.test.ts",
+    "title": "V1-TEST-RESOLVER-UNIQUE accepts a unique V1 id in the registered file",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-TEST-RESOLVER-MISSING-FILE",
+    "kind": "unit",
+    "file": "tests/architecture/v1-test-resolver.test.ts",
+    "title": "V1-TEST-RESOLVER-MISSING-FILE rejects a missing file or title",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-TEST-RESOLVER-DUPLICATE",
+    "kind": "unit",
+    "file": "tests/architecture/v1-test-resolver.test.ts",
+    "title": "V1-TEST-RESOLVER-DUPLICATE rejects a repeated test id literal",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-COMMAND-ARBITRARY-SHELL",
+    "kind": "unit",
+    "file": "tests/architecture/v1-test-resolver.test.ts",
+    "title": "V1-COMMAND-ARBITRARY-SHELL rejects commands that are not root scripts or builtins",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-MATRIX-PRODUCT-OWNER",
+    "kind": "unit",
+    "file": "tests/architecture/v1-matrix.test.ts",
+    "title": "V1-MATRIX-PRODUCT-OWNER rejects acceptance as a product owner",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-MATRIX-POSITIVE-NOT-DEFERRED",
+    "kind": "unit",
+    "file": "tests/architecture/v1-matrix.test.ts",
+    "title": "V1-MATRIX-POSITIVE-NOT-DEFERRED keeps delivered contracts out of deferred",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-MATRIX-PREFLIGHT",
+    "kind": "unit",
+    "file": "tests/architecture/v1-matrix.test.ts",
+    "title": "V1-MATRIX-PREFLIGHT fails unresolved prerequisites before cross-stack work",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-MATRIX-UNRESOLVED-PRE",
+    "kind": "unit",
+    "file": "tests/architecture/v1-matrix.test.ts",
+    "title": "V1-MATRIX-UNRESOLVED-PRE does not load shims or deep imports",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-WORKSPACE-LAYOUT",
+    "kind": "contract",
+    "file": "tests/architecture/v1-workspace.test.ts",
+    "title": "V1-WORKSPACE-LAYOUT accepts the current six packages and examples",
+    "commandId": "check:boundaries"
+  },
+  {
+    "id": "V1-WORKSPACE-MISSING",
+    "kind": "contract",
+    "file": "tests/architecture/v1-workspace.test.ts",
+    "title": "V1-WORKSPACE-MISSING reports catalog id and path for a deleted example",
+    "commandId": "check:boundaries"
+  },
+  {
+    "id": "V1-DEP-ALLOWLIST",
+    "kind": "contract",
+    "file": "tests/architecture/v1-workspace.test.ts",
+    "title": "V1-DEP-ALLOWLIST keeps the five product edges and host peers",
+    "commandId": "check:boundaries"
+  },
+  {
+    "id": "V1-DEP-FAULT",
+    "kind": "contract",
+    "file": "tests/architecture/v1-workspace.test.ts",
+    "title": "V1-DEP-FAULT fails reverse, cross-framework, AJV, and MUI X violations",
+    "commandId": "check:boundaries"
+  },
+  {
+    "id": "V1-EXPORT-SURFACE",
+    "kind": "contract",
+    "file": "tests/architecture/v1-workspace.test.ts",
+    "title": "V1-EXPORT-SURFACE compares package exports, runtime keys, and declarations",
+    "commandId": "check:boundaries"
+  },
+  {
+    "id": "V1-PUBLIC-API-DEFAULT",
+    "kind": "contract",
+    "file": "tests/architecture/v1-public-api.test.ts",
+    "title": "V1-PUBLIC-API-DEFAULT composes the default Environment path",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-PUBLIC-API-EXPLICIT",
+    "kind": "contract",
+    "file": "tests/architecture/v1-public-api.test.ts",
+    "title": "V1-PUBLIC-API-EXPLICIT composes an explicit Environment",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-PUBLIC-API-ENGINE",
+    "kind": "contract",
+    "file": "tests/architecture/v1-public-api.test.ts",
+    "title": "V1-PUBLIC-API-ENGINE composes FormEngine compile and create",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-DEFERRED-ABSENCE",
+    "kind": "absence",
+    "file": "tests/architecture/v1-deferred.test.ts",
+    "title": "V1-DEFERRED-ABSENCE keeps deferred capabilities out of exports and docs",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-EXPORT-DEEP-DENY",
+    "kind": "absence",
+    "file": "tests/architecture/v1-deferred.test.ts",
+    "title": "V1-EXPORT-DEEP-DENY rejects undeclared deep imports",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-DIAGNOSTIC-SOURCES",
+    "kind": "contract",
+    "file": "tests/architecture/v1-diagnostics.test.ts",
+    "title": "V1-DIAGNOSTIC-SOURCES covers schema compiler plugin adapter and runtime",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-DIAGNOSTIC-STABLE",
+    "kind": "contract",
+    "file": "tests/architecture/v1-diagnostics.test.ts",
+    "title": "V1-DIAGNOSTIC-STABLE repeats redacted metadata and source order",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-FIXTURE-PUBLIC-ONLY",
+    "kind": "type",
+    "file": "tests/v1/fixture.test.ts",
+    "title": "V1-FIXTURE-PUBLIC-ONLY stays framework-neutral",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-MODEL-REUSE-FINGERPRINT",
+    "kind": "integration",
+    "file": "tests/v1/lifecycle.test.ts",
+    "title": "V1-MODEL-REUSE-FINGERPRINT keeps compile inspection deterministic",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-MODEL-REUSE-ISOLATION",
+    "kind": "integration",
+    "file": "tests/v1/lifecycle.test.ts",
+    "title": "V1-MODEL-REUSE-ISOLATION keeps FormInstance state independent",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-ARRAY-MOVE-STATE",
+    "kind": "integration",
+    "file": "tests/v1/array-move.test.ts",
+    "title": "V1-ARRAY-MOVE-STATE follows ArrayItemId through move remove replace and reset",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-STABLE-TX",
+    "kind": "integration",
+    "file": "tests/v1/stable-tx.test.ts",
+    "title": "V1-STABLE-TX publishes one commit after computed and sync validation",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-PRECISION-FIELD",
+    "kind": "integration",
+    "file": "tests/v1/precision.test.ts",
+    "title": "V1-PRECISION-FIELD does not recompute an unrelated field selector",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-PRECISION-ARRAY",
+    "kind": "integration",
+    "file": "tests/v1/precision.test.ts",
+    "title": "V1-PRECISION-ARRAY does not notify a sibling item selector",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-ADAPTER-PORT",
+    "kind": "integration",
+    "file": "tests/v1/adapter-port.test.ts",
+    "title": "V1-ADAPTER-PORT records only approved commands",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-CROSS-STACK-VUE",
+    "kind": "integration",
+    "file": "tests/v1/vue-stack.test.ts",
+    "title": "V1-CROSS-STACK-VUE renders the shared fixture through Element Plus",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-CROSS-STACK-REACT",
+    "kind": "integration",
+    "file": "tests/v1/react-stack.test.tsx",
+    "title": "V1-CROSS-STACK-REACT renders the shared fixture through MUI",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-CROSS-STACK-COMPARE",
+    "kind": "integration",
+    "file": "tests/v1/cross-stack.test.ts",
+    "title": "V1-CROSS-STACK-COMPARE equates Core observations without opaque ids",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-CROSS-STACK-DIFF",
+    "kind": "integration",
+    "file": "tests/v1/cross-stack.test.ts",
+    "title": "V1-CROSS-STACK-DIFF locates a business difference",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-ADAPTER-CHROME",
+    "kind": "integration",
+    "file": "tests/v1/chrome.test.tsx",
+    "title": "V1-ADAPTER-CHROME keeps native widgets from writing Core truth",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-RENDER-PRECISION",
+    "kind": "integration",
+    "file": "tests/v1/render-precision.test.tsx",
+    "title": "V1-RENDER-PRECISION does not rerender an unrelated leaf",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-EXAMPLES",
+    "kind": "integration",
+    "file": "tests/v1/examples.test.ts",
+    "title": "V1-EXAMPLES builds and smokes both public example apps",
+    "commandId": "example:vue"
+  },
+  {
+    "id": "V1-PORTABILITY-DEPS",
+    "kind": "contract",
+    "file": "tests/v1/portability.test.ts",
+    "title": "V1-PORTABILITY-DEPS keeps browser runners out of product packages",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-PORTABILITY-NODE",
+    "kind": "contract",
+    "file": "tests/v1/portability.test.ts",
+    "title": "V1-PORTABILITY-NODE loads built Core exports without host libraries",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-PORTABILITY-BROWSER",
+    "kind": "integration",
+    "file": "tests/v1/host/browser.test.ts",
+    "title": "V1-PORTABILITY-BROWSER loads public Core ESM in Chromium",
+    "commandId": "test:v1:host"
+  },
+  {
+    "id": "V1-PORTABILITY-WORKER",
+    "kind": "integration",
+    "file": "tests/v1/host/browser.test.ts",
+    "title": "V1-PORTABILITY-WORKER runs Core inside a module Worker",
+    "commandId": "test:v1:host"
+  },
+  {
+    "id": "V1-SSR-VUE",
+    "kind": "integration",
+    "file": "tests/v1/ssr.test.tsx",
+    "title": "V1-SSR-VUE server-renders a readonly snapshot",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-SSR-REACT",
+    "kind": "integration",
+    "file": "tests/v1/ssr.test.tsx",
+    "title": "V1-SSR-REACT hydrates and stays precise after StrictMode",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-GATE-COMMAND-CATALOG",
+    "kind": "unit",
+    "file": "tests/architecture/v1-gate.test.ts",
+    "title": "V1-GATE-COMMAND-CATALOG uses only root scripts and builtins",
+    "commandId": "check:v1-matrix"
+  },
+  {
+    "id": "V1-EVIDENCE-ATOMIC",
+    "kind": "unit",
+    "file": "tests/architecture/v1-gate.test.ts",
+    "title": "V1-EVIDENCE-ATOMIC publishes evidence only after success",
+    "commandId": "verify:v1"
+  },
+  {
+    "id": "V1-EVIDENCE-FAILURE",
+    "kind": "unit",
+    "file": "tests/architecture/v1-gate.test.ts",
+    "title": "V1-EVIDENCE-FAILURE removes the pass marker and keeps a failure summary",
+    "commandId": "verify:v1"
+  },
+  {
+    "id": "V1-CI-FROZEN-LOCKFILE",
+    "kind": "docs",
+    "file": "tests/architecture/v1-gate.test.ts",
+    "title": "V1-CI-FROZEN-LOCKFILE keeps the local gate from reinstalling the workspace",
+    "commandId": "test"
+  },
+  {
+    "id": "V1-DOCS-INDEX",
+    "kind": "docs",
+    "file": "tests/architecture/v1-docs.test.ts",
+    "title": "V1-DOCS-INDEX documents public paths, examples, gate, and deferred items",
+    "commandId": "test:v1:docs"
+  },
+  {
+    "id": "V1-SCENARIO-MAP",
+    "kind": "docs",
+    "file": "tests/architecture/v1-scenario-map.test.ts",
+    "title": "V1-SCENARIO-MAP maps each acceptance scenario to a V1 test",
+    "commandId": "test:v1:docs"
+  }
+]

@@ -1,0 +1,2162 @@
+{
+  "schemaVersion": 1,
+  "architectureDigest": "ecff28cdd210e685935e4f0c29363ddfa26a70eb4d70c39859f70d6e74fa3e6e",
+  "catalogs": {
+    "invariants": [
+      {
+        "id": "INV-01",
+        "section": 3,
+        "ordinal": 1,
+        "normalizedText": "`JSON Schema = Data Contract`，`UI Schema = Presentation Contract`，`FormConfig = Form-level Runtime Configuration`。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-definition-and-environment",
+            "capability": "form-definition-authoring",
+            "requirement": "Form Definition 组合四类 authoring 输入",
+            "scenario": "声明完整 Definition"
+          },
+          {
+            "changeId": "add-definition-and-environment",
+            "capability": "form-definition-authoring",
+            "requirement": "Definition 与编译和运行阶段保持分离",
+            "scenario": "拒绝 Renderer 与 Validator 实现成员"
+          }
+        ],
+        "evidenceIds": [
+          "V1-FIXTURE-PUBLIC-ONLY",
+          "V1-PUBLIC-API-DEFAULT"
+        ]
+      },
+      {
+        "id": "INV-02",
+        "section": 3,
+        "ordinal": 2,
+        "normalizedText": "生命周期固定为 `Definition -> compile -> Compiled Model -> instantiate -> Runtime`。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "core-public-contracts",
+            "requirement": "compileForm 提供纯编译 Application API",
+            "scenario": "使用默认 Environment 编译"
+          },
+          {
+            "changeId": "add-transactional-form-runtime",
+            "capability": "transactional-form-runtime",
+            "requirement": "Compiled Model 通过一致 Environment 实例化",
+            "scenario": "使用默认 Environment 创建表单"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PUBLIC-API-DEFAULT",
+          "V1-PUBLIC-API-EXPLICIT",
+          "V1-PUBLIC-API-ENGINE"
+        ]
+      },
+      {
+        "id": "INV-03",
+        "section": 3,
+        "ordinal": 3,
+        "normalizedText": "`CompiledFormModel` 是不可变模板；所有实例状态只存在于 `FormInstance`。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "core-public-contracts",
+            "requirement": "编译产物在运行时保持不可变和阶段隔离",
+            "scenario": "拒绝修改已编译 Model"
+          },
+          {
+            "changeId": "add-transactional-form-runtime",
+            "capability": "transactional-form-runtime",
+            "requirement": "多个 FormInstance 的 Runtime state 完全隔离",
+            "scenario": "同一 Model 创建两个隔离实例"
+          }
+        ],
+        "evidenceIds": [
+          "V1-MODEL-REUSE-ISOLATION",
+          "V1-PUBLIC-API-DEFAULT"
+        ]
+      },
+      {
+        "id": "INV-04",
+        "section": 3,
+        "ordinal": 4,
+        "normalizedText": "`Data Tree`、`Field Registry`、`View Tree` 不合并成万能 FormNode Tree。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "static-ui-model",
+            "requirement": "DataNode、FieldDescriptor 与 ViewNode 不合并",
+            "scenario": "区分数据 container 与展示 group"
+          }
+        ],
+        "evidenceIds": [
+          "V1-FIXTURE-PUBLIC-ONLY",
+          "V1-PUBLIC-API-DEFAULT"
+        ]
+      },
+      {
+        "id": "INV-05",
+        "section": 3,
+        "ordinal": 5,
+        "normalizedText": "Path 表示“在哪里”，ID 表示“是谁”；数组 index 永远不是身份。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "core-public-contracts",
+            "requirement": "公共实体 ID 在类型上彼此独立",
+            "scenario": "区分数组身份与数组地址"
+          },
+          {
+            "changeId": "add-array-identity-and-scopes",
+            "capability": "array-identity-and-scopes",
+            "requirement": "数组 item 身份独立于 values 与当前位置",
+            "scenario": "move 改变地址但不改变身份"
+          }
+        ],
+        "evidenceIds": [
+          "V1-ARRAY-MOVE-STATE"
+        ]
+      },
+      {
+        "id": "INV-06",
+        "section": 3,
+        "ordinal": 6,
+        "normalizedText": "嵌套业务对象是 Values 的唯一数据源；Field State 不复制 value。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-transactional-form-runtime",
+            "capability": "transactional-form-runtime",
+            "requirement": "嵌套 values 是唯一 value source",
+            "scenario": "Field 与 Form 读取同一嵌套值"
+          },
+          {
+            "changeId": "add-transactional-form-runtime",
+            "capability": "transactional-form-runtime",
+            "requirement": "嵌套 values 是唯一 value source",
+            "scenario": "公开 snapshot 不可用于绕过命令"
+          }
+        ],
+        "evidenceIds": [
+          "V1-ADAPTER-PORT",
+          "V1-PUBLIC-API-DEFAULT"
+        ]
+      },
+      {
+        "id": "INV-07",
+        "section": 3,
+        "ordinal": 7,
+        "normalizedText": "所有 mutation 必须经过 Runtime Command/Transaction，不能直接修改公开 values。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-transactional-form-runtime",
+            "capability": "transactional-form-runtime",
+            "requirement": "每个 public mutation 都原子提交",
+            "scenario": "setValues 不发布中间字段组合"
+          },
+          {
+            "changeId": "add-vue-element-plus-rendering",
+            "capability": "vue-form-rendering",
+            "requirement": "Widget 受控值与交互只经过语义命令",
+            "scenario": "native change 转为一次 setValue"
+          },
+          {
+            "changeId": "add-react-mui-rendering",
+            "capability": "react-form-rendering",
+            "requirement": "Widget 受 Core 控制并只发出语义交互",
+            "scenario": "用户编辑通过事务回显"
+          }
+        ],
+        "evidenceIds": [
+          "V1-ADAPTER-PORT",
+          "V1-STABLE-TX",
+          "V1-CROSS-STACK-VUE",
+          "V1-CROSS-STACK-REACT"
+        ]
+      },
+      {
+        "id": "INV-08",
+        "section": 3,
+        "ordinal": 8,
+        "normalizedText": "Renderer 只消费已解析的 ViewTree 和 Effective Snapshot，不解释 Schema、Rule 或 Validation 来源。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "static-ui-model",
+            "requirement": "DataNode、FieldDescriptor 与 ViewNode 不合并",
+            "scenario": "ViewTree 不泄漏 Render-time state"
+          },
+          {
+            "changeId": "add-vue-element-plus-rendering",
+            "capability": "vue-form-rendering",
+            "requirement": "Vue Renderer 只遍历最终 resolved ViewTree",
+            "scenario": "默认与显式 layout 使用同一遍历入口"
+          },
+          {
+            "changeId": "add-react-mui-rendering",
+            "capability": "react-form-rendering",
+            "requirement": "Renderer 只遍历 resolved ViewTree",
+            "scenario": "编译结果决定呈现顺序"
+          }
+        ],
+        "evidenceIds": [
+          "V1-CROSS-STACK-VUE",
+          "V1-CROSS-STACK-REACT",
+          "V1-ADAPTER-CHROME"
+        ]
+      },
+      {
+        "id": "INV-09",
+        "section": 3,
+        "ordinal": 9,
+        "normalizedText": "Core 对 Vue、React、DOM、UI 库和 AJV 保持零依赖。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "package-architecture",
+            "requirement": "Core 独立于框架、DOM、UI library 和 AJV",
+            "scenario": "在非 DOM 环境验证 Core"
+          },
+          {
+            "changeId": "add-validation-pipeline",
+            "capability": "package-architecture",
+            "requirement": "AJV具体依赖与实现只属于validator package",
+            "scenario": "拒绝Core或Renderer导入AJV"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PORTABILITY-DEPS",
+          "V1-PORTABILITY-NODE",
+          "V1-WORKSPACE-LAYOUT"
+        ]
+      },
+      {
+        "id": "INV-10",
+        "section": 3,
+        "ordinal": 10,
+        "normalizedText": "Core Plugin 必须框架无关；UI Adapter 属于 Render-time Extension。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-definition-and-environment",
+            "capability": "core-plugin-environment",
+            "requirement": "Plugin authoring 描述框架无关的逻辑贡献",
+            "scenario": "拒绝 framework binding"
+          },
+          {
+            "changeId": "add-vue-element-plus-rendering",
+            "capability": "vue-renderer-environment",
+            "requirement": "RendererEnvironment 与 FormEnvironment 严格分离",
+            "scenario": "拒绝把 Vue component 注册进 Core"
+          },
+          {
+            "changeId": "add-react-mui-rendering",
+            "capability": "react-renderer-environment",
+            "requirement": "RendererEnvironment 与 FormEnvironment 严格分离",
+            "scenario": "Renderer adapter 不能注册 Core plugin"
+          }
+        ],
+        "evidenceIds": [
+          "V1-CROSS-STACK-VUE",
+          "V1-CROSS-STACK-REACT",
+          "V1-FIXTURE-PUBLIC-ONLY"
+        ]
+      },
+      {
+        "id": "INV-11",
+        "section": 3,
+        "ordinal": 11,
+        "normalizedText": "Extension 通过注册能力实现；不得绕过 TransactionManager 或修改 Compiled Model。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-definition-and-environment",
+            "capability": "core-plugin-environment",
+            "requirement": "成功构建的 Environment 与 Registry view 保持冻结",
+            "scenario": "拒绝构建后的 Registry mutation"
+          },
+          {
+            "changeId": "add-transactional-form-runtime",
+            "capability": "transactional-form-runtime",
+            "requirement": "基础 Runtime 不抢占后续公共能力所有权",
+            "scenario": "Extension 不可绕过 transaction"
+          }
+        ],
+        "evidenceIds": [
+          "V1-ADAPTER-PORT",
+          "V1-PUBLIC-API-EXPLICIT"
+        ]
+      },
+      {
+        "id": "INV-12",
+        "section": 3,
+        "ordinal": 12,
+        "normalizedText": "Schema 的 `active` 与 UI 的 `visible` 是不同语义。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-rules-and-schema-dynamics",
+            "capability": "rules-and-schema-dynamics",
+            "requirement": "effective状态具有固定组合优先级且active不等于visible",
+            "scenario": "hidden保持active"
+          },
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "static-ui-model",
+            "requirement": "Field Registry 是 Data Tree 的独立交互投影",
+            "scenario": "field false 与 visible false 不等价"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PRE-REQUIRED-PRESENTATION",
+          "V1-CROSS-STACK-VUE"
+        ]
+      }
+    ],
+    "slices": [
+      {
+        "id": "SLICE-01",
+        "section": 20,
+        "ordinal": 1,
+        "normalizedText": "Draft 2020-12 常用 Object/Array/Scalar schema 编译。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "schema-frontend-and-shape-analysis",
+            "requirement": "Schema Frontend 识别并 meta-validate Draft 2020-12",
+            "scenario": "编译未声明 dialect 的常用 Schema"
+          },
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "static-data-model",
+            "requirement": "Array 节点区分 list template 与 tuple slot",
+            "scenario": "编译 list item template"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PUBLIC-API-DEFAULT",
+          "V1-FIXTURE-PUBLIC-ONLY"
+        ]
+      },
+      {
+        "id": "SLICE-02",
+        "section": 20,
+        "ordinal": 2,
+        "normalizedText": "默认 ViewTree 与显式 layout。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "static-ui-model",
+            "requirement": "缺省 layout 生成保留数据结构的 ViewTree",
+            "scenario": "生成嵌套默认 ViewTree"
+          },
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "static-ui-model",
+            "requirement": "显式 layout authoritative 且在编译期完全解析",
+            "scenario": "未引用字段默认不渲染"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PUBLIC-API-DEFAULT",
+          "V1-EXAMPLES"
+        ]
+      },
+      {
+        "id": "SLICE-03",
+        "section": 20,
+        "ordinal": 3,
+        "normalizedText": "text/number/select/boolean/date 等逻辑 Widget。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-definition-and-environment",
+            "capability": "core-plugin-environment",
+            "requirement": "默认 Environment 提供首期逻辑 Widget Definition",
+            "scenario": "解析默认 text Widget"
+          },
+          {
+            "changeId": "add-vue-element-plus-rendering",
+            "capability": "element-plus-ui-adapter",
+            "requirement": "九类内置逻辑 Widget 均有 binding",
+            "scenario": "内置 Widget capability 完整"
+          },
+          {
+            "changeId": "add-react-mui-rendering",
+            "capability": "mui-ui-adapter",
+            "requirement": "九类内置逻辑 Widget 均有 binding",
+            "scenario": "默认 Widget 集合完整"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PRE-WIDGET-INTERACTION",
+          "V1-CROSS-STACK-VUE",
+          "V1-CROSS-STACK-REACT"
+        ]
+      },
+      {
+        "id": "SLICE-04",
+        "section": 20,
+        "ordinal": 4,
+        "normalizedText": "Vue + Element Plus 与 React + MUI 两条完整渲染链路。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-vue-element-plus-rendering",
+            "capability": "package-architecture",
+            "requirement": "Vue/Element Plus 依赖与集成验收可重复验证",
+            "scenario": "Element Plus example完成端到端交互"
+          },
+          {
+            "changeId": "add-react-mui-rendering",
+            "capability": "package-architecture",
+            "requirement": "React 与 MUI 提供完整集成验收入口",
+            "scenario": "React+MUI 示例覆盖端到端行为"
+          }
+        ],
+        "evidenceIds": [
+          "V1-CROSS-STACK-VUE",
+          "V1-CROSS-STACK-REACT",
+          "V1-EXAMPLES"
+        ]
+      },
+      {
+        "id": "SLICE-05",
+        "section": 20,
+        "ordinal": 5,
+        "normalizedText": "transactional set/setValues 和 selector subscription。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-transactional-form-runtime",
+            "capability": "transactional-form-runtime",
+            "requirement": "每个 public mutation 都原子提交",
+            "scenario": "setValues 不发布中间字段组合"
+          },
+          {
+            "changeId": "add-transactional-form-runtime",
+            "capability": "transactional-form-runtime",
+            "requirement": "Selector subscription 只发布受影响的稳定 snapshot",
+            "scenario": "单字段更新只通知相关 selector"
+          }
+        ],
+        "evidenceIds": [
+          "V1-STABLE-TX",
+          "V1-PRECISION-FIELD"
+        ]
+      },
+      {
+        "id": "SLICE-06",
+        "section": 20,
+        "ordinal": 6,
+        "normalizedText": "Array append/insert/remove/move 与稳定 ArrayItemId。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-array-identity-and-scopes",
+            "capability": "array-identity-and-scopes",
+            "requirement": "ArrayInstance 提供完整且原子的 list 命令",
+            "scenario": "append 与 insert 原子建立身份"
+          },
+          {
+            "changeId": "add-array-identity-and-scopes",
+            "capability": "array-identity-and-scopes",
+            "requirement": "数组 item 身份独立于 values 与当前位置",
+            "scenario": "move 改变地址但不改变身份"
+          }
+        ],
+        "evidenceIds": [
+          "V1-ARRAY-MOVE-STATE"
+        ]
+      },
+      {
+        "id": "SLICE-07",
+        "section": 20,
+        "ordinal": 7,
+        "normalizedText": "State/Computed rules、dependency indexing 和 cycle diagnostics。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-rules-and-schema-dynamics",
+            "capability": "rules-and-schema-dynamics",
+            "requirement": "State Rule 只产生独立的rule-owned状态结果",
+            "scenario": "State Rule更新effective selector"
+          },
+          {
+            "changeId": "add-rules-and-schema-dynamics",
+            "capability": "rules-and-schema-dynamics",
+            "requirement": "Computed Rule 形成单writer DAG并在transaction内拓扑求值",
+            "scenario": "cycle与多writer阻断编译"
+          }
+        ],
+        "evidenceIds": [
+          "V1-STABLE-TX",
+          "V1-DIAGNOSTIC-SOURCES"
+        ]
+      },
+      {
+        "id": "SLICE-08",
+        "section": 20,
+        "ordinal": 8,
+        "normalizedText": "AJV schema validation、同步 custom validation、async latest-wins、server errors。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-validation-pipeline",
+            "capability": "validation-pipeline",
+            "requirement": "validator-ajv实现Draft 2020-12并规范化AJV errors",
+            "scenario": "规范化required target"
+          },
+          {
+            "changeId": "add-validation-pipeline",
+            "capability": "validation-pipeline",
+            "requirement": "同步validation观察Rule稳定后的同一transaction draft",
+            "scenario": "Computed完成后再同步校验"
+          },
+          {
+            "changeId": "add-validation-pipeline",
+            "capability": "validation-pipeline",
+            "requirement": "Async validation非阻塞且latest-wins",
+            "scenario": "迟到旧结果被丢弃"
+          },
+          {
+            "changeId": "add-validation-pipeline",
+            "capability": "validation-pipeline",
+            "requirement": "Server errors通过applyErrors独立注入与清除",
+            "scenario": "原子注入并聚合Server errors"
+          }
+        ],
+        "evidenceIds": [
+          "V1-STABLE-TX",
+          "V1-DIAGNOSTIC-SOURCES"
+        ]
+      },
+      {
+        "id": "SLICE-09",
+        "section": 20,
+        "ordinal": 9,
+        "normalizedText": "conditional static superset、active semantics 和 active-only serialization。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "static-data-model",
+            "requirement": "Conditional 结构编译为静态并集",
+            "scenario": "条件分支引入不同字段"
+          },
+          {
+            "changeId": "add-rules-and-schema-dynamics",
+            "capability": "rules-and-schema-dynamics",
+            "requirement": "Runtime activation 只切换实例状态并保留inactive内容",
+            "scenario": "branch切换保留draft state"
+          },
+          {
+            "changeId": "add-rules-and-schema-dynamics",
+            "capability": "rules-and-schema-dynamics",
+            "requirement": "serialize 基于committed active binding生成readonly输出",
+            "scenario": "默认active-only而getValues保留全部"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PUBLIC-API-DEFAULT",
+          "V1-STABLE-TX"
+        ]
+      },
+      {
+        "id": "SLICE-10",
+        "section": 20,
+        "ordinal": 10,
+        "normalizedText": "Plugin/Environment registry freeze 和冲突 diagnostics。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-definition-and-environment",
+            "capability": "core-plugin-environment",
+            "requirement": "成功构建的 Environment 与 Registry view 保持冻结",
+            "scenario": "拒绝构建后的 Registry mutation"
+          },
+          {
+            "changeId": "add-definition-and-environment",
+            "capability": "core-plugin-environment",
+            "requirement": "Registry 冲突不得静默覆盖",
+            "scenario": "拒绝重复 Plugin ID"
+          },
+          {
+            "changeId": "add-definition-and-environment",
+            "capability": "core-plugin-environment",
+            "requirement": "Environment 校验 Plugin protocol compatibility",
+            "scenario": "拒绝不兼容 Plugin"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PUBLIC-API-EXPLICIT",
+          "V1-DIAGNOSTIC-SOURCES"
+        ]
+      }
+    ],
+    "acceptanceCriteria": [
+      {
+        "id": "AC-01",
+        "section": 21,
+        "ordinal": 1,
+        "normalizedText": "同一 FormDefinition 和业务 Plugin 可在 Vue/Element Plus 与 React/MUI 中复用。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-vue-element-plus-rendering",
+            "capability": "vue-form-rendering",
+            "requirement": "Vue Renderer 只遍历最终 resolved ViewTree",
+            "scenario": "默认与显式 layout 使用同一遍历入口"
+          },
+          {
+            "changeId": "add-react-mui-rendering",
+            "capability": "react-form-rendering",
+            "requirement": "Renderer 只遍历 resolved ViewTree",
+            "scenario": "编译结果决定呈现顺序"
+          }
+        ],
+        "evidenceIds": [
+          "V1-CROSS-STACK-VUE",
+          "V1-CROSS-STACK-REACT",
+          "V1-CROSS-STACK-COMPARE"
+        ]
+      },
+      {
+        "id": "AC-02",
+        "section": 21,
+        "ordinal": 2,
+        "normalizedText": "`@form/core` 的依赖树中不存在 Vue、React、DOM UI library 和 AJV。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "package-architecture",
+            "requirement": "Core 独立于框架、DOM、UI library 和 AJV",
+            "scenario": "在非 DOM 环境验证 Core"
+          },
+          {
+            "changeId": "add-validation-pipeline",
+            "capability": "package-architecture",
+            "requirement": "AJV具体依赖与实现只属于validator package",
+            "scenario": "拒绝Core或Renderer导入AJV"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PORTABILITY-DEPS",
+          "V1-PORTABILITY-NODE",
+          "V1-DEP-ALLOWLIST"
+        ]
+      },
+      {
+        "id": "AC-03",
+        "section": 21,
+        "ordinal": 3,
+        "normalizedText": "编译结果可被检查和缓存，并且创建多个 FormInstance 时状态完全隔离。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "core-public-contracts",
+            "requirement": "compileForm 提供纯编译 Application API",
+            "scenario": "重复编译具有纯函数语义"
+          },
+          {
+            "changeId": "add-transactional-form-runtime",
+            "capability": "transactional-form-runtime",
+            "requirement": "多个 FormInstance 的 Runtime state 完全隔离",
+            "scenario": "同一 Model 创建两个隔离实例"
+          }
+        ],
+        "evidenceIds": [
+          "V1-MODEL-REUSE-FINGERPRINT",
+          "V1-MODEL-REUSE-ISOLATION"
+        ]
+      },
+      {
+        "id": "AC-04",
+        "section": 21,
+        "ordinal": 4,
+        "normalizedText": "数组 move 后，业务 item 的 touched/error/view state 跟随 ArrayItemId，而不是旧 index。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-array-identity-and-scopes",
+            "capability": "array-identity-and-scopes",
+            "requirement": "move 保留状态而删除清理整个 Runtime subtree",
+            "scenario": "touched 和 focused 随 ID move"
+          },
+          {
+            "changeId": "add-validation-pipeline",
+            "capability": "validation-pipeline",
+            "requirement": "array identity与subtree lifecycle决定validation所有权",
+            "scenario": "error与validating随item move"
+          }
+        ],
+        "evidenceIds": [
+          "V1-ARRAY-MOVE-STATE"
+        ]
+      },
+      {
+        "id": "AC-05",
+        "section": 21,
+        "ordinal": 5,
+        "normalizedText": "单字段更新只通知受影响 selector，不触发整表订阅者树重算/重渲染。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-transactional-form-runtime",
+            "capability": "transactional-form-runtime",
+            "requirement": "Selector subscription 只发布受影响的稳定 snapshot",
+            "scenario": "单字段更新只通知相关 selector"
+          },
+          {
+            "changeId": "add-vue-element-plus-rendering",
+            "capability": "vue-form-rendering",
+            "requirement": "Vue composables 精确桥接 Core external store",
+            "scenario": "无关 Field commit 不重渲染"
+          },
+          {
+            "changeId": "add-react-mui-rendering",
+            "capability": "react-form-rendering",
+            "requirement": "React hooks 精准桥接 Core external store",
+            "scenario": "无关更新不重渲染叶节点"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PRECISION-FIELD",
+          "V1-PRECISION-ARRAY",
+          "V1-RENDER-PRECISION"
+        ]
+      },
+      {
+        "id": "AC-06",
+        "section": 21,
+        "ordinal": 6,
+        "normalizedText": "Rule/Validation 看到 transaction 的稳定数据，外部订阅者看不到中间态。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-rules-and-schema-dynamics",
+            "capability": "rules-and-schema-dynamics",
+            "requirement": "Computed Rule 形成单writer DAG并在transaction内拓扑求值",
+            "scenario": "链式computed按拓扑顺序稳定"
+          },
+          {
+            "changeId": "add-validation-pipeline",
+            "capability": "validation-pipeline",
+            "requirement": "同步validation观察Rule稳定后的同一transaction draft",
+            "scenario": "Computed完成后再同步校验"
+          }
+        ],
+        "evidenceIds": [
+          "V1-STABLE-TX"
+        ]
+      },
+      {
+        "id": "AC-07",
+        "section": 21,
+        "ordinal": 7,
+        "normalizedText": "UI Adapter 无法绕过 Runtime Command 修改 values。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-vue-element-plus-rendering",
+            "capability": "vue-form-rendering",
+            "requirement": "Widget 受控值与交互只经过语义命令",
+            "scenario": "native change 转为一次 setValue"
+          },
+          {
+            "changeId": "add-react-mui-rendering",
+            "capability": "react-form-rendering",
+            "requirement": "Widget 受 Core 控制并只发出语义交互",
+            "scenario": "用户编辑通过事务回显"
+          },
+          {
+            "changeId": "add-vue-element-plus-rendering",
+            "capability": "vue-renderer-environment",
+            "requirement": "VueUIAdapter 明确组合四类职责",
+            "scenario": "custom render 不暴露直接写入口"
+          }
+        ],
+        "evidenceIds": [
+          "V1-ADAPTER-PORT",
+          "V1-ADAPTER-CHROME"
+        ]
+      },
+      {
+        "id": "AC-08",
+        "section": 21,
+        "ordinal": 8,
+        "normalizedText": "unsupported schema/widget/adapter/plugin 情况均有结构化 diagnostic，不依赖静默 fallback。",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "core-public-contracts",
+            "requirement": "Diagnostic 使用共享结构化契约",
+            "scenario": "消费最小 Diagnostic"
+          },
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "schema-frontend-and-shape-analysis",
+            "requirement": "Schema Frontend 识别并 meta-validate Draft 2020-12",
+            "scenario": "拒绝未支持 dialect"
+          },
+          {
+            "changeId": "add-definition-and-environment",
+            "capability": "core-plugin-environment",
+            "requirement": "Environment build failure 暴露统一 Diagnostic",
+            "scenario": "消费结构化构建失败"
+          }
+        ],
+        "evidenceIds": [
+          "V1-DIAGNOSTIC-SOURCES",
+          "V1-DIAGNOSTIC-STABLE"
+        ]
+      }
+    ],
+    "packages": [
+      {
+        "id": "PKG-01",
+        "section": 17,
+        "ordinal": 1,
+        "normalizedText": "@form/core",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "package-architecture",
+            "requirement": "首期工作区 package",
+            "scenario": "发现全部首期 package"
+          }
+        ],
+        "evidenceIds": [
+          "V1-WORKSPACE-LAYOUT"
+        ]
+      },
+      {
+        "id": "PKG-02",
+        "section": 17,
+        "ordinal": 2,
+        "normalizedText": "@form/validator-ajv",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "package-architecture",
+            "requirement": "首期工作区 package",
+            "scenario": "发现全部首期 package"
+          }
+        ],
+        "evidenceIds": [
+          "V1-WORKSPACE-LAYOUT"
+        ]
+      },
+      {
+        "id": "PKG-03",
+        "section": 17,
+        "ordinal": 3,
+        "normalizedText": "@form/vue",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "package-architecture",
+            "requirement": "首期工作区 package",
+            "scenario": "发现全部首期 package"
+          }
+        ],
+        "evidenceIds": [
+          "V1-WORKSPACE-LAYOUT"
+        ]
+      },
+      {
+        "id": "PKG-04",
+        "section": 17,
+        "ordinal": 4,
+        "normalizedText": "@form/react",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "package-architecture",
+            "requirement": "首期工作区 package",
+            "scenario": "发现全部首期 package"
+          }
+        ],
+        "evidenceIds": [
+          "V1-WORKSPACE-LAYOUT"
+        ]
+      },
+      {
+        "id": "PKG-05",
+        "section": 17,
+        "ordinal": 5,
+        "normalizedText": "@form/element-plus",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "package-architecture",
+            "requirement": "首期工作区 package",
+            "scenario": "发现全部首期 package"
+          }
+        ],
+        "evidenceIds": [
+          "V1-WORKSPACE-LAYOUT"
+        ]
+      },
+      {
+        "id": "PKG-06",
+        "section": 17,
+        "ordinal": 6,
+        "normalizedText": "@form/mui",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "package-architecture",
+            "requirement": "首期工作区 package",
+            "scenario": "发现全部首期 package"
+          }
+        ],
+        "evidenceIds": [
+          "V1-WORKSPACE-LAYOUT"
+        ]
+      }
+    ],
+    "directories": [
+      {
+        "id": "DIR-TESTS",
+        "section": 18,
+        "ordinal": 1,
+        "normalizedText": "tests/",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "package-architecture",
+            "requirement": "仓库验证包含边界检查",
+            "scenario": "验证未修改的合规工作区"
+          }
+        ],
+        "evidenceIds": [
+          "V1-WORKSPACE-LAYOUT"
+        ]
+      },
+      {
+        "id": "DIR-DOCS",
+        "section": 18,
+        "ordinal": 2,
+        "normalizedText": "docs/",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "package-architecture",
+            "requirement": "仓库验证包含边界检查",
+            "scenario": "验证未修改的合规工作区"
+          }
+        ],
+        "evidenceIds": [
+          "V1-DOCS-INDEX"
+        ]
+      },
+      {
+        "id": "DIR-EX-VUE",
+        "section": 18,
+        "ordinal": 3,
+        "normalizedText": "examples/vue-element-plus/",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-vue-element-plus-rendering",
+            "capability": "package-architecture",
+            "requirement": "Vue/Element Plus 依赖与集成验收可重复验证",
+            "scenario": "Element Plus example完成端到端交互"
+          }
+        ],
+        "evidenceIds": [
+          "V1-EXAMPLES"
+        ]
+      },
+      {
+        "id": "DIR-EX-REACT",
+        "section": 18,
+        "ordinal": 4,
+        "normalizedText": "examples/react-mui/",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-react-mui-rendering",
+            "capability": "package-architecture",
+            "requirement": "React 与 MUI 提供完整集成验收入口",
+            "scenario": "React+MUI 示例覆盖端到端行为"
+          }
+        ],
+        "evidenceIds": [
+          "V1-EXAMPLES"
+        ]
+      },
+      {
+        "id": "DIR-CORE-LAYOUT",
+        "section": 18,
+        "ordinal": 5,
+        "normalizedText": "packages/core/src architecture domains",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "align-core-contributions-and-layout",
+            "capability": "package-architecture",
+            "requirement": "Core 内部目录按架构生命周期领域组织",
+            "scenario": "顶层目录与架构一致"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PRE-CORE-LAYOUT"
+        ]
+      },
+      {
+        "id": "DIR-VALIDATOR",
+        "section": 18,
+        "ordinal": 6,
+        "normalizedText": "packages/validator-ajv/src",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-validation-pipeline",
+            "capability": "package-architecture",
+            "requirement": "AJV具体依赖与实现只属于validator package",
+            "scenario": "validator-ajv合法依赖AJV与Core"
+          }
+        ],
+        "evidenceIds": [
+          "V1-WORKSPACE-LAYOUT"
+        ]
+      },
+      {
+        "id": "DIR-VUE",
+        "section": 18,
+        "ordinal": 7,
+        "normalizedText": "packages/vue/src renderer/context/composables/adapter",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-vue-element-plus-rendering",
+            "capability": "package-architecture",
+            "requirement": "Vue 与 Element Plus 只暴露受支持 Renderer 入口",
+            "scenario": "应用从根入口组合 Renderer"
+          }
+        ],
+        "evidenceIds": [
+          "V1-WORKSPACE-LAYOUT"
+        ]
+      },
+      {
+        "id": "DIR-REACT",
+        "section": 18,
+        "ordinal": 8,
+        "normalizedText": "packages/react/src renderer/context/hooks/adapter",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-react-mui-rendering",
+            "capability": "package-architecture",
+            "requirement": "React 与 MUI 渲染包只公开受支持入口",
+            "scenario": "消费者只使用根入口"
+          }
+        ],
+        "evidenceIds": [
+          "V1-WORKSPACE-LAYOUT"
+        ]
+      },
+      {
+        "id": "DIR-ELEMENT-PLUS",
+        "section": 18,
+        "ordinal": 9,
+        "normalizedText": "packages/element-plus/src widgets/layouts/field-chrome/form",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-vue-element-plus-rendering",
+            "capability": "element-plus-ui-adapter",
+            "requirement": "Element Plus Adapter 完整提供四类角色",
+            "scenario": "Form wrapper 不接管 Core 状态"
+          }
+        ],
+        "evidenceIds": [
+          "V1-WORKSPACE-LAYOUT"
+        ]
+      },
+      {
+        "id": "DIR-MUI",
+        "section": 18,
+        "ordinal": 10,
+        "normalizedText": "packages/mui/src widgets/layouts/field-chrome/form",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-react-mui-rendering",
+            "capability": "mui-ui-adapter",
+            "requirement": "官方 MUI adapter 完整提供四类角色",
+            "scenario": "MUI Form 不运行第二套验证"
+          }
+        ],
+        "evidenceIds": [
+          "V1-WORKSPACE-LAYOUT"
+        ]
+      }
+    ],
+    "exports": [
+      {
+        "id": "EXP-CORE-ROOT",
+        "section": 16,
+        "ordinal": 1,
+        "normalizedText": "@form/core",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "core-public-contracts",
+            "requirement": "受支持的 export 隔离内部模块",
+            "scenario": "导入根入口公共契约"
+          }
+        ],
+        "evidenceIds": [
+          "V1-EXPORT-SURFACE",
+          "V1-PUBLIC-API-DEFAULT"
+        ]
+      },
+      {
+        "id": "EXP-CORE-RUNTIME",
+        "section": 16,
+        "ordinal": 2,
+        "normalizedText": "@form/core/runtime",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-renderer-interaction-and-binding-ports",
+            "capability": "core-public-contracts",
+            "requirement": "受支持的 export 隔离内部模块",
+            "scenario": "导入受支持的子路径"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PRE-RENDER-BINDING",
+          "V1-EXPORT-SURFACE"
+        ]
+      },
+      {
+        "id": "EXP-CORE-EXTENSION",
+        "section": 16,
+        "ordinal": 3,
+        "normalizedText": "@form/core/extension",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "core-public-contracts",
+            "requirement": "受支持的 export 隔离内部模块",
+            "scenario": "导入受支持的extension子路径"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PRE-WIDGET-HELPER",
+          "V1-EXPORT-SURFACE"
+        ]
+      },
+      {
+        "id": "EXP-VALIDATOR-AJV",
+        "section": 17,
+        "ordinal": 4,
+        "normalizedText": "@form/validator-ajv",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-validation-pipeline",
+            "capability": "package-architecture",
+            "requirement": "AJV具体依赖与实现只属于validator package",
+            "scenario": "validator-ajv合法依赖AJV与Core"
+          }
+        ],
+        "evidenceIds": [
+          "V1-EXPORT-SURFACE"
+        ]
+      },
+      {
+        "id": "EXP-VUE",
+        "section": 17,
+        "ordinal": 5,
+        "normalizedText": "@form/vue",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-vue-element-plus-rendering",
+            "capability": "package-architecture",
+            "requirement": "Vue 与 Element Plus 只暴露受支持 Renderer 入口",
+            "scenario": "应用从根入口组合 Renderer"
+          }
+        ],
+        "evidenceIds": [
+          "V1-EXPORT-SURFACE"
+        ]
+      },
+      {
+        "id": "EXP-REACT",
+        "section": 17,
+        "ordinal": 6,
+        "normalizedText": "@form/react",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-react-mui-rendering",
+            "capability": "package-architecture",
+            "requirement": "React 与 MUI 渲染包只公开受支持入口",
+            "scenario": "消费者只使用根入口"
+          }
+        ],
+        "evidenceIds": [
+          "V1-EXPORT-SURFACE"
+        ]
+      },
+      {
+        "id": "EXP-ELEMENT-PLUS",
+        "section": 17,
+        "ordinal": 7,
+        "normalizedText": "@form/element-plus",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-vue-element-plus-rendering",
+            "capability": "package-architecture",
+            "requirement": "Vue 与 Element Plus 只暴露受支持 Renderer 入口",
+            "scenario": "应用从根入口组合 Renderer"
+          }
+        ],
+        "evidenceIds": [
+          "V1-EXPORT-SURFACE"
+        ]
+      },
+      {
+        "id": "EXP-MUI",
+        "section": 17,
+        "ordinal": 8,
+        "normalizedText": "@form/mui",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-react-mui-rendering",
+            "capability": "package-architecture",
+            "requirement": "React 与 MUI 渲染包只公开受支持入口",
+            "scenario": "消费者只使用根入口"
+          }
+        ],
+        "evidenceIds": [
+          "V1-EXPORT-SURFACE"
+        ]
+      },
+      {
+        "id": "EXP-DEEP-IMPORT-DENY",
+        "section": 16,
+        "ordinal": 9,
+        "normalizedText": "undeclared deep import deny",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "compile-static-form-model",
+            "capability": "core-public-contracts",
+            "requirement": "受支持的 export 隔离内部模块",
+            "scenario": "拒绝内部 deep import"
+          }
+        ],
+        "evidenceIds": [
+          "V1-EXPORT-DEEP-DENY"
+        ]
+      }
+    ],
+    "diagnosticSources": [
+      {
+        "id": "DIAG-01",
+        "section": 19,
+        "ordinal": 1,
+        "normalizedText": "schema",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "core-public-contracts",
+            "requirement": "Diagnostic 使用共享结构化契约",
+            "scenario": "消费最小 Diagnostic"
+          }
+        ],
+        "evidenceIds": [
+          "V1-DIAGNOSTIC-SOURCES",
+          "V1-DIAGNOSTIC-STABLE"
+        ]
+      },
+      {
+        "id": "DIAG-02",
+        "section": 19,
+        "ordinal": 2,
+        "normalizedText": "compiler",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "core-public-contracts",
+            "requirement": "Diagnostic 使用共享结构化契约",
+            "scenario": "消费最小 Diagnostic"
+          }
+        ],
+        "evidenceIds": [
+          "V1-DIAGNOSTIC-SOURCES",
+          "V1-DIAGNOSTIC-STABLE"
+        ]
+      },
+      {
+        "id": "DIAG-03",
+        "section": 19,
+        "ordinal": 3,
+        "normalizedText": "plugin",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "core-public-contracts",
+            "requirement": "Diagnostic 使用共享结构化契约",
+            "scenario": "消费最小 Diagnostic"
+          }
+        ],
+        "evidenceIds": [
+          "V1-DIAGNOSTIC-SOURCES",
+          "V1-DIAGNOSTIC-STABLE"
+        ]
+      },
+      {
+        "id": "DIAG-04",
+        "section": 19,
+        "ordinal": 4,
+        "normalizedText": "adapter",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "core-public-contracts",
+            "requirement": "Diagnostic 使用共享结构化契约",
+            "scenario": "消费最小 Diagnostic"
+          }
+        ],
+        "evidenceIds": [
+          "V1-DIAGNOSTIC-SOURCES",
+          "V1-DIAGNOSTIC-STABLE"
+        ]
+      },
+      {
+        "id": "DIAG-05",
+        "section": 19,
+        "ordinal": 5,
+        "normalizedText": "runtime",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "bootstrap-monorepo-and-contracts",
+            "capability": "core-public-contracts",
+            "requirement": "Diagnostic 使用共享结构化契约",
+            "scenario": "消费最小 Diagnostic"
+          }
+        ],
+        "evidenceIds": [
+          "V1-DIAGNOSTIC-SOURCES",
+          "V1-DIAGNOSTIC-STABLE"
+        ]
+      }
+    ],
+    "deferred": [
+      {
+        "id": "DEF-01",
+        "section": 20,
+        "ordinal": 1,
+        "normalizedText": "完整覆盖所有 JSON Schema 关键字的自动 UI 生成；",
+        "status": "deferred",
+        "owners": [],
+        "evidenceIds": [
+          "V1-DEFERRED-ABSENCE"
+        ]
+      },
+      {
+        "id": "DEF-02",
+        "section": 20,
+        "ordinal": 2,
+        "normalizedText": "任意动态修改 Compiled Model；",
+        "status": "deferred",
+        "owners": [],
+        "evidenceIds": [
+          "V1-DEFERRED-ABSENCE"
+        ]
+      },
+      {
+        "id": "DEF-03",
+        "section": 20,
+        "ordinal": 3,
+        "normalizedText": "async rule / 内置远程 DataSource；",
+        "status": "deferred",
+        "owners": [],
+        "evidenceIds": [
+          "V1-DEFERRED-ABSENCE"
+        ]
+      },
+      {
+        "id": "DEF-04",
+        "section": 20,
+        "ordinal": 4,
+        "normalizedText": "万能生命周期 hooks；",
+        "status": "deferred",
+        "owners": [],
+        "evidenceIds": [
+          "V1-DEFERRED-ABSENCE"
+        ]
+      },
+      {
+        "id": "DEF-05",
+        "section": 20,
+        "ordinal": 5,
+        "normalizedText": "独立 nested runtime store；",
+        "status": "deferred",
+        "owners": [],
+        "evidenceIds": [
+          "V1-DEFERRED-ABSENCE"
+        ]
+      },
+      {
+        "id": "DEF-06",
+        "section": 20,
+        "ordinal": 6,
+        "normalizedText": "DevTools 对内部 mutable graph 的直接访问；",
+        "status": "deferred",
+        "owners": [],
+        "evidenceIds": [
+          "V1-DEFERRED-ABSENCE"
+        ]
+      },
+      {
+        "id": "DEF-07",
+        "section": 20,
+        "ordinal": 7,
+        "normalizedText": "编译器/运行时拆成独立 npm 包；",
+        "status": "deferred",
+        "owners": [],
+        "evidenceIds": [
+          "V1-DEFERRED-ABSENCE"
+        ]
+      },
+      {
+        "id": "DEF-08",
+        "section": 20,
+        "ordinal": 8,
+        "normalizedText": "为所有 UI 库一次性提供 Adapter。",
+        "status": "deferred",
+        "owners": [],
+        "evidenceIds": [
+          "V1-DEFERRED-ABSENCE"
+        ]
+      }
+    ],
+    "positiveContracts": [
+      {
+        "id": "POS-VIEW-COLLAPSED-ACTIVETAB",
+        "section": 8,
+        "ordinal": 1,
+        "normalizedText": "collapsed/activeTab View source state",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "add-renderer-interaction-and-binding-ports",
+            "capability": "transactional-form-runtime",
+            "requirement": "基础 value 与交互命令具有明确语义",
+            "scenario": "collapsed 与 activeTab 属于具体 View"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PRE-VIEW-STATE"
+        ]
+      },
+      {
+        "id": "POS-VALUE-INITIALIZER",
+        "section": 15,
+        "ordinal": 2,
+        "normalizedText": "valueInitializers",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "align-core-contributions-and-layout",
+            "capability": "transactional-form-runtime",
+            "requirement": "named Value Initializer 在实例化前产出 Runtime-owned initial values",
+            "scenario": "默认 initializer 填充初始值"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PRE-CONTRIBUTION-PORTS"
+        ]
+      },
+      {
+        "id": "POS-DIALECT-ADAPTER",
+        "section": 7,
+        "ordinal": 3,
+        "normalizedText": "SchemaDialectAdapter",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "align-core-contributions-and-layout",
+            "capability": "schema-frontend-and-shape-analysis",
+            "requirement": "非 canonical dialect 通过冻结 Registry 的 Dialect Adapter 转换",
+            "scenario": "通过 adapter 编译 draft-07 Schema"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PRE-CONTRIBUTION-PORTS"
+        ]
+      },
+      {
+        "id": "POS-X-KEYWORD-SPLIT",
+        "section": 7,
+        "ordinal": 4,
+        "normalizedText": "declared x-* split",
+        "status": "covered",
+        "owners": [
+          {
+            "changeId": "align-core-contributions-and-layout",
+            "capability": "schema-frontend-and-shape-analysis",
+            "requirement": "已声明的 x-* keyword 在编译前拆分为标准输入",
+            "scenario": "x-ui 拆分为 FieldUI"
+          }
+        ],
+        "evidenceIds": [
+          "V1-PRE-CONTRIBUTION-PORTS"
+        ]
+      }
+    ]
+  },
+  "prerequisites": [
+    {
+      "id": "PRE-WIDGET-HELPER",
+      "status": "resolved",
+      "owner": {
+        "changeId": "compile-static-form-model",
+        "capability": "core-plugin-environment",
+        "requirement": "defineWidget 是无副作用的 Widget authoring helper",
+        "scenario": "保留自定义 Widget identity 与 literal"
+      },
+      "publicEntry": "@form/core/extension",
+      "evidenceIds": [
+        "V1-PRE-WIDGET-HELPER"
+      ]
+    },
+    {
+      "id": "PRE-RENDER-BINDING",
+      "status": "resolved",
+      "owner": {
+        "changeId": "add-renderer-interaction-and-binding-ports",
+        "capability": "array-identity-and-scopes",
+        "requirement": "RenderScope 是公开只读的实例定位契约",
+        "scenario": "RenderScope 不提供 writer"
+      },
+      "publicEntry": "@form/core/runtime",
+      "evidenceIds": [
+        "V1-PRE-RENDER-BINDING"
+      ]
+    },
+    {
+      "id": "PRE-BLUR-PORT",
+      "status": "resolved",
+      "owner": {
+        "changeId": "add-renderer-interaction-and-binding-ports",
+        "capability": "transactional-form-runtime",
+        "requirement": "基础 value 与交互命令具有明确语义",
+        "scenario": "blur 清除目标 View 的 focused"
+      },
+      "publicEntry": "@form/core",
+      "evidenceIds": [
+        "V1-PRE-BLUR-PORT"
+      ]
+    },
+    {
+      "id": "PRE-WIDGET-INTERACTION",
+      "status": "resolved",
+      "owner": {
+        "changeId": "compile-static-form-model",
+        "capability": "core-plugin-environment",
+        "requirement": "WidgetDefinition 声明框架无关的 semantic interaction contract",
+        "scenario": "默认 Widget 提供完整 semantic action capability"
+      },
+      "publicEntry": "@form/core/extension",
+      "evidenceIds": [
+        "V1-PRE-WIDGET-INTERACTION"
+      ]
+    },
+    {
+      "id": "PRE-REQUIRED-PRESENTATION",
+      "status": "resolved",
+      "owner": {
+        "changeId": "add-renderer-interaction-and-binding-ports",
+        "capability": "rules-and-schema-dynamics",
+        "requirement": "effective状态具有固定组合优先级且active不等于visible",
+        "scenario": "静态required直接投影"
+      },
+      "publicEntry": "@form/core",
+      "evidenceIds": [
+        "V1-PRE-REQUIRED-PRESENTATION"
+      ]
+    },
+    {
+      "id": "PRE-VIEW-STATE",
+      "status": "resolved",
+      "owner": {
+        "changeId": "add-renderer-interaction-and-binding-ports",
+        "capability": "transactional-form-runtime",
+        "requirement": "基础 value 与交互命令具有明确语义",
+        "scenario": "collapsed 与 activeTab 属于具体 View"
+      },
+      "publicEntry": "@form/core",
+      "evidenceIds": [
+        "V1-PRE-VIEW-STATE"
+      ]
+    },
+    {
+      "id": "PRE-CORE-LAYOUT",
+      "status": "resolved",
+      "owner": {
+        "changeId": "align-core-contributions-and-layout",
+        "capability": "package-architecture",
+        "requirement": "Core 内部目录按架构生命周期领域组织",
+        "scenario": "顶层目录与架构一致"
+      },
+      "publicEntry": "check:boundaries",
+      "evidenceIds": [
+        "V1-PRE-CORE-LAYOUT"
+      ]
+    },
+    {
+      "id": "PRE-CONTRIBUTION-PORTS",
+      "status": "resolved",
+      "owner": {
+        "changeId": "align-core-contributions-and-layout",
+        "capability": "core-plugin-environment",
+        "requirement": "Rule Function 与Serializer provider是纯同步只读边界",
+        "scenario": "Plugin注册dialect、extension与initializer providers"
+      },
+      "publicEntry": "@form/core/extension",
+      "evidenceIds": [
+        "V1-PRE-CONTRIBUTION-PORTS"
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "id": "V1-PRE-WIDGET-HELPER",
+      "kind": "contract",
+      "file": "tests/architecture/v1-preflight.test.ts",
+      "title": "V1-PRE-WIDGET-HELPER defineWidget is an identity helper on the extension entry",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-PRE-RENDER-BINDING",
+      "kind": "contract",
+      "file": "tests/architecture/v1-preflight.test.ts",
+      "title": "V1-PRE-RENDER-BINDING exposes readonly RenderScope from the runtime entry",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-PRE-BLUR-PORT",
+      "kind": "contract",
+      "file": "tests/architecture/v1-preflight.test.ts",
+      "title": "V1-PRE-BLUR-PORT blur is a no-op that does not touch Field state",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-PRE-WIDGET-INTERACTION",
+      "kind": "contract",
+      "file": "tests/architecture/v1-preflight.test.ts",
+      "title": "V1-PRE-WIDGET-INTERACTION default widgets declare the four semantic actions",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-PRE-REQUIRED-PRESENTATION",
+      "kind": "contract",
+      "file": "tests/architecture/v1-preflight.test.ts",
+      "title": "V1-PRE-REQUIRED-PRESENTATION effective required follows static and inactive fields",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-PRE-VIEW-STATE",
+      "kind": "contract",
+      "file": "tests/architecture/v1-preflight.test.ts",
+      "title": "V1-PRE-VIEW-STATE collapsed and activeTab are View source state",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-PRE-CORE-LAYOUT",
+      "kind": "contract",
+      "file": "tests/architecture/v1-preflight.test.ts",
+      "title": "V1-PRE-CORE-LAYOUT reuses the core-layout boundary rule",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-PRE-CONTRIBUTION-PORTS",
+      "kind": "contract",
+      "file": "tests/architecture/v1-preflight.test.ts",
+      "title": "V1-PRE-CONTRIBUTION-PORTS dialect and initializer contracts are extension-owned",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-OWNER-AUDIT",
+      "kind": "contract",
+      "file": "tests/architecture/v1-preflight.test.ts",
+      "title": "V1-OWNER-AUDIT public FormInstance surface is not owned by acceptance",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-MATRIX-PARSE-OK",
+      "kind": "unit",
+      "file": "tests/architecture/v1-parser.test.ts",
+      "title": "V1-MATRIX-PARSE-OK loads a well-formed coverage object",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-MATRIX-UNKNOWN-FIELD",
+      "kind": "unit",
+      "file": "tests/architecture/v1-parser.test.ts",
+      "title": "V1-MATRIX-UNKNOWN-FIELD rejects unknown fields",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-MATRIX-DUPLICATE-ID",
+      "kind": "unit",
+      "file": "tests/architecture/v1-parser.test.ts",
+      "title": "V1-MATRIX-DUPLICATE-ID rejects duplicate catalog ids",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-MATRIX-INVALID-STATUS",
+      "kind": "unit",
+      "file": "tests/architecture/v1-parser.test.ts",
+      "title": "V1-MATRIX-INVALID-STATUS rejects an unknown catalog status",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-EXTRACTOR-EXACT-SET",
+      "kind": "unit",
+      "file": "tests/architecture/v1-extractor.test.ts",
+      "title": "V1-EXTRACTOR-EXACT-SET extracts the 12/10/8 architecture sets",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-EXTRACTOR-DRIFT",
+      "kind": "unit",
+      "file": "tests/architecture/v1-extractor.test.ts",
+      "title": "V1-EXTRACTOR-DRIFT reports entry id and section when architecture text changes",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-OWNER-ACTIVE-ARCHIVE-DURABLE",
+      "kind": "unit",
+      "file": "tests/architecture/v1-owner-resolver.test.ts",
+      "title": "V1-OWNER-ACTIVE-ARCHIVE-DURABLE resolves active, archive, and durable specs",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-OWNER-AMBIGUOUS-SCENARIO",
+      "kind": "unit",
+      "file": "tests/architecture/v1-owner-resolver.test.ts",
+      "title": "V1-OWNER-AMBIGUOUS-SCENARIO requires a requirement qualifier for duplicate titles",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-OWNER-DANGLING",
+      "kind": "unit",
+      "file": "tests/architecture/v1-owner-resolver.test.ts",
+      "title": "V1-OWNER-DANGLING reports a missing owner reference",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-TEST-RESOLVER-UNIQUE",
+      "kind": "unit",
+      "file": "tests/architecture/v1-test-resolver.test.ts",
+      "title": "V1-TEST-RESOLVER-UNIQUE accepts a unique V1 id in the registered file",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-TEST-RESOLVER-MISSING-FILE",
+      "kind": "unit",
+      "file": "tests/architecture/v1-test-resolver.test.ts",
+      "title": "V1-TEST-RESOLVER-MISSING-FILE rejects a missing file or title",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-TEST-RESOLVER-DUPLICATE",
+      "kind": "unit",
+      "file": "tests/architecture/v1-test-resolver.test.ts",
+      "title": "V1-TEST-RESOLVER-DUPLICATE rejects a repeated test id literal",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-COMMAND-ARBITRARY-SHELL",
+      "kind": "unit",
+      "file": "tests/architecture/v1-test-resolver.test.ts",
+      "title": "V1-COMMAND-ARBITRARY-SHELL rejects commands that are not root scripts or builtins",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-MATRIX-PRODUCT-OWNER",
+      "kind": "unit",
+      "file": "tests/architecture/v1-matrix.test.ts",
+      "title": "V1-MATRIX-PRODUCT-OWNER rejects acceptance as a product owner",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-MATRIX-POSITIVE-NOT-DEFERRED",
+      "kind": "unit",
+      "file": "tests/architecture/v1-matrix.test.ts",
+      "title": "V1-MATRIX-POSITIVE-NOT-DEFERRED keeps delivered contracts out of deferred",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-MATRIX-PREFLIGHT",
+      "kind": "unit",
+      "file": "tests/architecture/v1-matrix.test.ts",
+      "title": "V1-MATRIX-PREFLIGHT fails unresolved prerequisites before cross-stack work",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-MATRIX-UNRESOLVED-PRE",
+      "kind": "unit",
+      "file": "tests/architecture/v1-matrix.test.ts",
+      "title": "V1-MATRIX-UNRESOLVED-PRE does not load shims or deep imports",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-WORKSPACE-LAYOUT",
+      "kind": "contract",
+      "file": "tests/architecture/v1-workspace.test.ts",
+      "title": "V1-WORKSPACE-LAYOUT accepts the current six packages and examples",
+      "commandId": "check:boundaries"
+    },
+    {
+      "id": "V1-WORKSPACE-MISSING",
+      "kind": "contract",
+      "file": "tests/architecture/v1-workspace.test.ts",
+      "title": "V1-WORKSPACE-MISSING reports catalog id and path for a deleted example",
+      "commandId": "check:boundaries"
+    },
+    {
+      "id": "V1-DEP-ALLOWLIST",
+      "kind": "contract",
+      "file": "tests/architecture/v1-workspace.test.ts",
+      "title": "V1-DEP-ALLOWLIST keeps the five product edges and host peers",
+      "commandId": "check:boundaries"
+    },
+    {
+      "id": "V1-DEP-FAULT",
+      "kind": "contract",
+      "file": "tests/architecture/v1-workspace.test.ts",
+      "title": "V1-DEP-FAULT fails reverse, cross-framework, AJV, and MUI X violations",
+      "commandId": "check:boundaries"
+    },
+    {
+      "id": "V1-EXPORT-SURFACE",
+      "kind": "contract",
+      "file": "tests/architecture/v1-workspace.test.ts",
+      "title": "V1-EXPORT-SURFACE compares package exports, runtime keys, and declarations",
+      "commandId": "check:boundaries"
+    },
+    {
+      "id": "V1-PUBLIC-API-DEFAULT",
+      "kind": "contract",
+      "file": "tests/architecture/v1-public-api.test.ts",
+      "title": "V1-PUBLIC-API-DEFAULT composes the default Environment path",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-PUBLIC-API-EXPLICIT",
+      "kind": "contract",
+      "file": "tests/architecture/v1-public-api.test.ts",
+      "title": "V1-PUBLIC-API-EXPLICIT composes an explicit Environment",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-PUBLIC-API-ENGINE",
+      "kind": "contract",
+      "file": "tests/architecture/v1-public-api.test.ts",
+      "title": "V1-PUBLIC-API-ENGINE composes FormEngine compile and create",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-DEFERRED-ABSENCE",
+      "kind": "absence",
+      "file": "tests/architecture/v1-deferred.test.ts",
+      "title": "V1-DEFERRED-ABSENCE keeps deferred capabilities out of exports and docs",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-EXPORT-DEEP-DENY",
+      "kind": "absence",
+      "file": "tests/architecture/v1-deferred.test.ts",
+      "title": "V1-EXPORT-DEEP-DENY rejects undeclared deep imports",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-DIAGNOSTIC-SOURCES",
+      "kind": "contract",
+      "file": "tests/architecture/v1-diagnostics.test.ts",
+      "title": "V1-DIAGNOSTIC-SOURCES covers schema compiler plugin adapter and runtime",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-DIAGNOSTIC-STABLE",
+      "kind": "contract",
+      "file": "tests/architecture/v1-diagnostics.test.ts",
+      "title": "V1-DIAGNOSTIC-STABLE repeats redacted metadata and source order",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-FIXTURE-PUBLIC-ONLY",
+      "kind": "type",
+      "file": "tests/v1/fixture.test.ts",
+      "title": "V1-FIXTURE-PUBLIC-ONLY stays framework-neutral",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-MODEL-REUSE-FINGERPRINT",
+      "kind": "integration",
+      "file": "tests/v1/lifecycle.test.ts",
+      "title": "V1-MODEL-REUSE-FINGERPRINT keeps compile inspection deterministic",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-MODEL-REUSE-ISOLATION",
+      "kind": "integration",
+      "file": "tests/v1/lifecycle.test.ts",
+      "title": "V1-MODEL-REUSE-ISOLATION keeps FormInstance state independent",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-ARRAY-MOVE-STATE",
+      "kind": "integration",
+      "file": "tests/v1/array-move.test.ts",
+      "title": "V1-ARRAY-MOVE-STATE follows ArrayItemId through move remove replace and reset",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-STABLE-TX",
+      "kind": "integration",
+      "file": "tests/v1/stable-tx.test.ts",
+      "title": "V1-STABLE-TX publishes one commit after computed and sync validation",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-PRECISION-FIELD",
+      "kind": "integration",
+      "file": "tests/v1/precision.test.ts",
+      "title": "V1-PRECISION-FIELD does not recompute an unrelated field selector",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-PRECISION-ARRAY",
+      "kind": "integration",
+      "file": "tests/v1/precision.test.ts",
+      "title": "V1-PRECISION-ARRAY does not notify a sibling item selector",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-ADAPTER-PORT",
+      "kind": "integration",
+      "file": "tests/v1/adapter-port.test.ts",
+      "title": "V1-ADAPTER-PORT records only approved commands",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-CROSS-STACK-VUE",
+      "kind": "integration",
+      "file": "tests/v1/vue-stack.test.ts",
+      "title": "V1-CROSS-STACK-VUE renders the shared fixture through Element Plus",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-CROSS-STACK-REACT",
+      "kind": "integration",
+      "file": "tests/v1/react-stack.test.tsx",
+      "title": "V1-CROSS-STACK-REACT renders the shared fixture through MUI",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-CROSS-STACK-COMPARE",
+      "kind": "integration",
+      "file": "tests/v1/cross-stack.test.ts",
+      "title": "V1-CROSS-STACK-COMPARE equates Core observations without opaque ids",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-CROSS-STACK-DIFF",
+      "kind": "integration",
+      "file": "tests/v1/cross-stack.test.ts",
+      "title": "V1-CROSS-STACK-DIFF locates a business difference",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-ADAPTER-CHROME",
+      "kind": "integration",
+      "file": "tests/v1/chrome.test.tsx",
+      "title": "V1-ADAPTER-CHROME keeps native widgets from writing Core truth",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-RENDER-PRECISION",
+      "kind": "integration",
+      "file": "tests/v1/render-precision.test.tsx",
+      "title": "V1-RENDER-PRECISION does not rerender an unrelated leaf",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-EXAMPLES",
+      "kind": "integration",
+      "file": "tests/v1/examples.test.ts",
+      "title": "V1-EXAMPLES builds and smokes both public example apps",
+      "commandId": "example:vue"
+    },
+    {
+      "id": "V1-PORTABILITY-DEPS",
+      "kind": "contract",
+      "file": "tests/v1/portability.test.ts",
+      "title": "V1-PORTABILITY-DEPS keeps browser runners out of product packages",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-PORTABILITY-NODE",
+      "kind": "contract",
+      "file": "tests/v1/portability.test.ts",
+      "title": "V1-PORTABILITY-NODE loads built Core exports without host libraries",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-PORTABILITY-BROWSER",
+      "kind": "integration",
+      "file": "tests/v1/host/browser.test.ts",
+      "title": "V1-PORTABILITY-BROWSER loads public Core ESM in Chromium",
+      "commandId": "test:v1:host"
+    },
+    {
+      "id": "V1-PORTABILITY-WORKER",
+      "kind": "integration",
+      "file": "tests/v1/host/browser.test.ts",
+      "title": "V1-PORTABILITY-WORKER runs Core inside a module Worker",
+      "commandId": "test:v1:host"
+    },
+    {
+      "id": "V1-SSR-VUE",
+      "kind": "integration",
+      "file": "tests/v1/ssr.test.tsx",
+      "title": "V1-SSR-VUE server-renders a readonly snapshot",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-SSR-REACT",
+      "kind": "integration",
+      "file": "tests/v1/ssr.test.tsx",
+      "title": "V1-SSR-REACT hydrates and stays precise after StrictMode",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-GATE-COMMAND-CATALOG",
+      "kind": "unit",
+      "file": "tests/architecture/v1-gate.test.ts",
+      "title": "V1-GATE-COMMAND-CATALOG uses only root scripts and builtins",
+      "commandId": "check:v1-matrix"
+    },
+    {
+      "id": "V1-EVIDENCE-ATOMIC",
+      "kind": "unit",
+      "file": "tests/architecture/v1-gate.test.ts",
+      "title": "V1-EVIDENCE-ATOMIC publishes evidence only after success",
+      "commandId": "verify:v1"
+    },
+    {
+      "id": "V1-EVIDENCE-FAILURE",
+      "kind": "unit",
+      "file": "tests/architecture/v1-gate.test.ts",
+      "title": "V1-EVIDENCE-FAILURE removes the pass marker and keeps a failure summary",
+      "commandId": "verify:v1"
+    },
+    {
+      "id": "V1-CI-FROZEN-LOCKFILE",
+      "kind": "docs",
+      "file": "tests/architecture/v1-gate.test.ts",
+      "title": "V1-CI-FROZEN-LOCKFILE keeps the local gate from reinstalling the workspace",
+      "commandId": "test"
+    },
+    {
+      "id": "V1-DOCS-INDEX",
+      "kind": "docs",
+      "file": "tests/architecture/v1-docs.test.ts",
+      "title": "V1-DOCS-INDEX documents public paths, examples, gate, and deferred items",
+      "commandId": "test:v1:docs"
+    },
+    {
+      "id": "V1-SCENARIO-MAP",
+      "kind": "docs",
+      "file": "tests/architecture/v1-scenario-map.test.ts",
+      "title": "V1-SCENARIO-MAP maps each acceptance scenario to a V1 test",
+      "commandId": "test:v1:docs"
+    }
+  ],
+  "commands": [
+    {
+      "id": "test",
+      "kind": "root-script",
+      "name": "test"
+    },
+    {
+      "id": "check:boundaries",
+      "kind": "root-script",
+      "name": "check:boundaries"
+    },
+    {
+      "id": "check:v1-matrix",
+      "kind": "root-script",
+      "name": "check:v1-matrix"
+    },
+    {
+      "id": "verify:v1",
+      "kind": "root-script",
+      "name": "verify:v1"
+    },
+    {
+      "id": "example:vue",
+      "kind": "root-script",
+      "name": "example:vue"
+    },
+    {
+      "id": "test:v1:host",
+      "kind": "root-script",
+      "name": "test:v1:host"
+    },
+    {
+      "id": "test:v1:docs",
+      "kind": "root-script",
+      "name": "test:v1:docs"
+    },
+    {
+      "id": "matrix-validate",
+      "kind": "builtin",
+      "name": "matrix-validate"
+    }
+  ]
+}

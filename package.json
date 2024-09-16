@@ -12,6 +12,13 @@
     "typecheck": "tsc -b --pretty false && tsc --noEmit -p packages/core/tsconfig.type-tests.json --pretty false && tsc --noEmit -p packages/vue/tsconfig.type-tests.json --pretty false && tsc --noEmit -p packages/react/tsconfig.type-tests.json --pretty false && tsc --noEmit -p tests/contracts/positive/tsconfig.json --pretty false",
     "test": "vitest run",
     "check:boundaries": "tsx tools/architecture-check/cli.ts",
+    "check:v1-matrix": "tsx tools/architecture-check/v1-cli.ts --mode matrix",
+    "check:v1-workspace": "tsx tools/architecture-check/v1-cli.ts --mode workspace",
+    "generate:v1-coverage": "tsx tools/architecture-check/v1/write-coverage.ts",
+    "test:v1:integration": "vitest run tests/v1/fixture.test.ts tests/v1/lifecycle.test.ts tests/v1/array-move.test.ts tests/v1/stable-tx.test.ts tests/v1/precision.test.ts tests/v1/adapter-port.test.ts tests/v1/vue-stack.test.ts tests/v1/react-stack.test.tsx tests/v1/cross-stack.test.ts tests/v1/chrome.test.tsx tests/v1/render-precision.test.tsx tests/v1/portability.test.ts",
+    "test:v1:host": "vitest run --config vitest.host.config.ts",
+    "test:v1:docs": "vitest run tests/architecture/v1-docs.test.ts tests/architecture/v1-scenario-map.test.ts tests/architecture/v1-deferred.test.ts",
+    "verify:v1": "tsx tools/architecture-check/v1-cli.ts --mode gate",
     "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm check:boundaries && pnpm example:vue && pnpm example:react",
     "example:vue": "pnpm --filter @form/example-vue-element-plus typecheck && tsx examples/vue-element-plus/src/smoke.ts",
     "example:react": "pnpm --filter @form/example-react-mui typecheck && tsx examples/react-mui/src/smoke.ts"
@@ -36,6 +43,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "vue": "^3.5.0",
+    "playwright": "^1.55.0",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"

@@ -1,0 +1,10 @@
+export { parseCoverageMatrix } from "./parser.ts";
+export { extractArchitecture, digestArchitecture, normalizeArchitectureText } from "./extractor.ts";
+export { resolveOwner, parseSpec } from "./owner-resolver.ts";
+export { resolveTests, resolveCommands } from "./test-resolver.ts";
+export { loadCoverageMatrix, validateCoverageMatrix } from "./matrix.ts";
+export { checkV1Workspace, checkWorkspaceLayout, checkExportSurfaces, checkBundleGraph } from "./workspace.ts";
+export { collectEvidence, toolVersions, gitRevision, EVIDENCE_DIR, EVIDENCE_FILE, PASS_MARKER } from "./evidence.ts";
+export { runV1Gate, GATE_STAGES } from "./gate.ts";
+export { renderCoverageIndex, writeCoverageIndex } from "./docs.ts";
+export * from "./types.ts";

@@ -176,3 +176,30 @@ Workspace 必须（MUST）包含 React headless contract、StrictMode subscripti
 - **GIVEN** 同一 React fixture 可在 server renderer 和浏览器测试环境运行
 - **WHEN** 执行 render-to-string、hydrate、StrictMode remount 与后续 commit
 - **THEN** 初始 markup 一致、订阅无泄漏且 selector 精准更新契约持续成立
+
+### Requirement: v1 架构门禁覆盖完整发布工作区
+工作区必须（SHALL）在既有仓库验证之外提供完整 v1 架构门禁，覆盖全部六个首期 package、`examples/vue-element-plus`、`examples/react-mui`、架构约定的顶层目录、批准的 package exports、产品与 peer dependency、Core 环境可移植性、headless/integration contract、SSR/hydration 以及机器可检查的 architecture traceability。Gate 必须（MUST）只通过公开 package 入口运行消费者场景；缺失 package/example/目录、manifest 与 declaration/runtime export 不一致、未声明 deep import 可达或跨框架/反向依赖必须（MUST）使其失败。
+
+#### Scenario: 完整工作区从公开入口通过
+- **GIVEN** 一个安装锁定依赖的干净 checkout，包含六个 package、两个 example 和全部已登记验收入口
+- **WHEN** 运行 v1 architecture gate
+- **THEN** build、typecheck、boundary、contract、integration、SSR/hydration、examples 与 traceability 全部通过，且每个运行时 export 都有对应 declaration
+
+#### Scenario: 缺失 example 或非法 export 阻断发布
+- **GIVEN** 任一 example 缺失/无法构建，或 package 暴露未批准 deep path、内部 writer、跨 framework 类型
+- **WHEN** 运行 v1 architecture gate
+- **THEN** gate 以失败状态指出 package、路径与违反的架构条目，基础单元测试通过也不能覆盖该失败
+
+### Requirement: v1 gate 保持产品依赖与宿主边界
+完整 v1 门禁必须（MUST）复用并加强既有产品依赖 allowlist：`@form/core` 保持无产品依赖，`@form/validator-ajv`、`@form/vue`、`@form/react` 只指向 Core，两个 UI library package只指向各自 Renderer与Core；Vue、React及UI libraries继续作为对应集成包的 peer，AJV只属于 validator package。Example与test所需host dependencies可以（MAY）位于非发布工作区，但不得（MUST NOT）改变 package产物、declaration或产品依赖图。
+
+#### Scenario: 测试宿主依赖不污染发布包
+- **GIVEN** 两个examples和SSR/browser tests安装Vue、React、Element Plus、MUI、AJV及测试宿主
+- **WHEN** 检查六个package的manifest、构建产物与declarations
+- **THEN** host libraries只出现在允许位置且保持external，Core与另一framework链路不获得传递产品依赖
+
+#### Scenario: MUI X 或跨框架依赖被拒绝
+- **GIVEN** 默认MUI adapter引入MUI X，或任一React/Vue链路导入另一framework/UI library package
+- **WHEN** 执行v1 dependency和bundle检查
+- **THEN** gate失败并定位不在allowlist中的dependency/import，不能以example能够运行作为豁免
+
