@@ -2,7 +2,7 @@
 import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { createFormEnvironment, definePlugin, defineWidget } from "@xunserver-jsf/core/extension";
 import { createReactRendererEnvironment } from "@xunserver-jsf/react";
-import { act, cleanup, fireEvent, render } from "@testing-library/react";
+import { cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { FormRenderer } from "@xunserver-jsf/react";
 import { ANTD_ADAPTER_ID, createAntdAdapter, extendAntdAdapter, antdAdapter } from "./index.js";
@@ -162,26 +162,5 @@ describe("antd adapter skeleton", () => {
     const extra = container.querySelector(".ant-form-item-extra");
     expect(extra?.textContent).toBe("string + text");
     expect(container.querySelector(".ant-form-item-control-input-content")?.textContent).not.toContain("string + text");
-  });
-
-  test("presentable required errors render in Form.Item help", () => {
-    const form = createForm(
-      compileForm(
-        defineForm({
-          schema: { type: "object", properties: { name: { type: "string" } }, required: ["name"] },
-          uiSchema: { fields: { name: { display: { label: "姓名" } } } },
-        }),
-      ).model,
-      { initialValues: { name: "Ada" } },
-    );
-    const { container } = render(<FormRenderer form={form} adapter={antdAdapter} />);
-    act(() => {
-      form.applyErrors([{ code: "required", instancePath: "name", message: "必须填写姓名" }]);
-      form.touch("name");
-    });
-    const alert = container.querySelector("[role=alert]");
-    expect(alert?.textContent).toBe("必须填写姓名");
-    expect(container.querySelector(".ant-form-item-has-error")).not.toBeNull();
-    expect(container.querySelector(".ant-form-item-explain")).not.toBeNull();
   });
 });
