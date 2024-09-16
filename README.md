@@ -1,19 +1,15 @@
 # JSON Schema Form
 
-以 JSON Schema 为数据契约的表单引擎。当前仓库完成的是 pnpm/TypeScript 工作区、首期 package 边界与扩展 UI Adapter，以及 `@xunserver-jsf/core` 的框架无关公共契约：无副作用的 `defineForm()`、可诊断的冻结 `FormEnvironment`、把 Draft 2020-12 Schema / UI Schema / Rule AST / Schema Dynamics 编译为不可变静态模型的 `compileForm()`，事务化的 `createForm()` / `createFormEngine()` Runtime（含 Rule 求值、activation、effective state 与 `serialize()`），以及 Core 拥有的 Validation pipeline（`validate()` / `applyErrors()` / `submit()`，AJV 只存在于 `@xunserver-jsf/validator-ajv`）。Vue/Element Plus、React/Ant Design、Arco Vue、Arco React、shadcn 渲染链路已交付；可浏览对照台见 `examples/playground`，共享 catalog 见 `examples/shared`。
+以 JSON Schema 为数据契约的表单引擎。同一份 Form Definition 可驱动 Vue 与 React，并提供 Element Plus、Ant Design、Arco Vue、Arco React、shadcn 适配器。Core 负责定义、静态编译、事务 Runtime 与校验；UI Adapter 只负责外观。
 
-完整使用文档与 Playground 通过 GitHub Pages 发布（文档在站点根路径，Playground 在 `/playground/`）：
-
-```text
-https://xunserver.github.io/json-schema-form/
-https://xunserver.github.io/json-schema-form/playground/
-```
-
-仓库 Settings → Pages → Source 必须选择 GitHub Actions。若 GitHub 仓库名不是 `json-schema-form`，改 `.github/workflows/pages.yml` 中的 `DOCS_BASE`。本地预览文档用 `pnpm docs:dev`；拼接静态站点用 `pnpm site:build`。
+- 文档：https://xunserver.github.io/json-schema-form/
+- Playground：https://xunserver.github.io/json-schema-form/playground/
 
 产品 package 以 `@xunserver-jsf/*` 发布到 npm。安装示例见 [快速开始](https://xunserver.github.io/json-schema-form/guide/getting-started.html)。发布流程见 [`docs/release.md`](docs/release.md)。
 
 架构基线见 [`docs/architecture.md`](docs/architecture.md)。工作区命令、package 职责、公共 export 规则以及 `packages/core/src` 的领域目录见 [`docs/workspace.md`](docs/workspace.md)。用户文档源在 [`docs/pages`](docs/pages)。
+
+仓库 Settings → Pages → Source 必须选择 GitHub Actions。若 GitHub 仓库名不是 `json-schema-form`，改 `.github/workflows/pages.yml` 中的 `DOCS_BASE`。本地预览文档用 `pnpm docs:dev`；拼接静态站点用 `pnpm site:build`。
 
 ## 首期 package
 
@@ -67,7 +63,7 @@ pnpm site:build
 
 ### Playground 工作台
 
-`pnpm playground` 启动单个 Vite 多页面工作台（http://127.0.0.1:5173/）：
+`pnpm playground` 启动 `examples/playground` 里的单个 Vite 多页面工作台（http://127.0.0.1:5173/）：
 
 - `index.html`：左侧 Monaco JSON 编辑器与 Inspector（React + shadcn 工作台 chrome）
 - `element-plus.html` / `antd.html` / `arco-vue.html` / `arco-react.html` / `shadcn.html`：右侧 Adapter Tab 预览（各 iframe 同时挂载并持续渲染，Tab 只切换可见帧与 Inspector 焦点）

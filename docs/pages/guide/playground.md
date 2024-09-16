@@ -2,6 +2,10 @@
 
 Playground 用来对照同一份 Form Definition 在多套 Adapter 上的渲染。它是非发布 example，不是产品 package。
 
+- 在线：https://xunserver.github.io/json-schema-form/playground/
+- 文档：https://xunserver.github.io/json-schema-form/
+- 仓库：https://github.com/xunserver/json-schema-form
+
 ## 本地
 
 ```bash

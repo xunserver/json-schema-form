@@ -12,7 +12,7 @@ import {
   type PreviewId,
 } from "@xunserver-jsf/example-shared";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
@@ -37,6 +37,9 @@ import { JsonWorkbenchEditor } from "./json-workbench-editor";
 import { usePlaygroundSnapshot } from "./use-playground-snapshot";
 
 const PREVIEW_IDS = new Set<string>(PREVIEW_CHROME.map((item) => item.id));
+
+const DOCS_URL = "https://xunserver.github.io/json-schema-form/";
+const REPO_URL = "https://github.com/xunserver/json-schema-form";
 
 function isPreviewId(value: string): value is PreviewId {
   return PREVIEW_IDS.has(value);
@@ -175,6 +178,12 @@ export function PlaygroundApp() {
           <CardDescription>多适配器演练场</CardDescription>
         </div>
         <div className="flex items-center gap-3">
+          <a className={buttonVariants({ variant: "outline" })} href={DOCS_URL}>
+            文档
+          </a>
+          <a className={buttonVariants({ variant: "outline" })} href={REPO_URL} target="_blank" rel="noreferrer">
+            仓库
+          </a>
           <Field orientation="horizontal" className="w-auto">
             <FieldLabel htmlFor="playground-example">示例</FieldLabel>
             <Select

@@ -56,6 +56,10 @@ export default defineConfig({
       { text: "Vue", link: "/vue/renderer" },
       { text: "React", link: "/react/renderer" },
       { text: "Playground", link: "/playground/" },
+      { text: "仓库", link: "https://github.com/xunserver/json-schema-form" },
+    ],
+    socialLinks: [
+      { icon: "github", link: "https://github.com/xunserver/json-schema-form" },
     ],
     sidebar: {
       "/guide/": [

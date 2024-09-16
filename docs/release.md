@@ -3,7 +3,8 @@
 产品 package 以 `@xunserver-jsf/*` 公开发布。根仓库与 `examples/*` 保持 `private`，不会被 publish。九个产品包固定同一 semver。
 
 GitHub 仓库：https://github.com/xunserver/json-schema-form  
-文档站：https://xunserver.github.io/json-schema-form/
+文档站：https://xunserver.github.io/json-schema-form/  
+Playground：https://xunserver.github.io/json-schema-form/playground/
 
 ## 账号侧一次性配置
 
