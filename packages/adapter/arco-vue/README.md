@@ -9,4 +9,5 @@ pnpm add vue @arco-design/web-vue
 
 导出 `arcoVueAdapter`、`createArcoVueAdapter()`、`extendArcoVueAdapter()`。`vue` 与 `@arco-design/web-vue` 是 peer dependency。
 
-文档：https://xunserver.github.io/json-schema-form/
+文档：https://xunserver.github.io/json-schema-form/guide/getting-started.html
+API：https://xunserver.github.io/json-schema-form/api/

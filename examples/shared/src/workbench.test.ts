@@ -79,6 +79,43 @@ describe("playground workbench", () => {
       if (meta.id === "kitchen-sink") {
         expect(result.form.getValue("meeting")).toBe("2026-09-15T12:00:00+00:00");
       }
+      if (meta.id === "all-fields") {
+        expect(example.uiSchema).toBeDefined();
+        expect(example.uiSchema && "layout" in example.uiSchema).toBe(false);
+        expect(result.definition.uiSchema?.layout).toBeUndefined();
+        const widgets = new Set(
+          [...result.form.model.ui.fields.values()].map((field) => field.widget),
+        );
+        expect([...widgets].toSorted()).toEqual(
+          [
+            "checkbox",
+            "company.currency",
+            "date",
+            "datetime",
+            "multi-select",
+            "number",
+            "select",
+            "switch",
+            "text",
+            "textarea",
+          ],
+        );
+        expect(result.form.serialize()).toMatchObject({
+          name: "Ada",
+          age: 36,
+          score: 98.5,
+          role: "admin",
+          tags: ["a", "c"],
+          nickname: null,
+          address: { city: "London" },
+          aliases: ["A.L.", "Ada L."],
+          products: [
+            { title: "Widget", quantity: 2, price: 10 },
+            { title: "Gadget", quantity: 1, price: 25.5 },
+          ],
+          span: [1, 10],
+        });
+      }
     }
   });
 

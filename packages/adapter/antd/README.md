@@ -9,4 +9,5 @@ pnpm add react antd
 
 导出 `antdAdapter`、`createAntdAdapter()`、`extendAntdAdapter()`。`react` 与 `antd` 是 peer dependency。
 
-文档：https://xunserver.github.io/json-schema-form/
+文档：https://xunserver.github.io/json-schema-form/guide/getting-started.html
+API：https://xunserver.github.io/json-schema-form/api/

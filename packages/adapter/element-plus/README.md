@@ -9,4 +9,5 @@ pnpm add vue element-plus
 
 导出 `elementPlusAdapter`、`createElementPlusAdapter()`、`extendElementPlusAdapter()`。`vue` 与 `element-plus` 是 peer dependency。
 
-文档：https://xunserver.github.io/json-schema-form/
+文档：https://xunserver.github.io/json-schema-form/guide/getting-started.html
+API：https://xunserver.github.io/json-schema-form/api/

@@ -146,6 +146,7 @@ export interface ScopedFormInstance {
   scope(path: InstancePathLike): ScopedFormInstance;
 }
 
+/** 事务化表单实例。公开 snapshot 只读；mutation 必须走下列 command。 */
 export interface FormInstance {
   readonly model: CompiledFormModel;
   getValue(path: InstancePathLike): JsonValue | undefined;

@@ -1,3 +1,8 @@
+/**
+ * shadcn UI Adapter。无默认单例，必须注入宿主组件。
+ *
+ * @module @xunserver-jsf/shadcn
+ */
 export {
   SHADCN_ADAPTER_ID,
   createShadcnAdapter,

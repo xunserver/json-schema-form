@@ -9,4 +9,5 @@ pnpm add react @arco-design/web-react
 
 导出 `arcoReactAdapter`、`createArcoReactAdapter()`、`extendArcoReactAdapter()`。`react` 与 `@arco-design/web-react` 是 peer dependency。
 
-文档：https://xunserver.github.io/json-schema-form/
+文档：https://xunserver.github.io/json-schema-form/guide/getting-started.html
+API：https://xunserver.github.io/json-schema-form/api/

@@ -6,6 +6,9 @@ import { widgetBindings } from "./widgets/bindings.js";
 
 export const ELEMENT_PLUS_ADAPTER_ID = "element-plus";
 
+/**
+ * 创建 Element Plus Adapter。`widgets` / `layouts` 只追加新 key，不会覆盖内置 binding。
+ */
 export function createElementPlusAdapter(options?: {
   readonly widgets?: Readonly<Record<string, WidgetBinding>>;
   readonly layouts?: Readonly<Record<string, LayoutBinding>>;

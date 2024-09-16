@@ -1,3 +1,8 @@
+/**
+ * Extension API：Plugin、冻结 Environment、逻辑 Widget 与 validator。
+ *
+ * @module @xunserver-jsf/core/extension
+ */
 export { definePlugin } from "./plugin.js";
 export type { FormPlugin, PluginContributions } from "./plugin.js";
 

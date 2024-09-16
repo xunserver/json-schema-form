@@ -23,6 +23,7 @@ export interface FormRendererProps {
   readonly onDiagnostic?: (diagnostic: Diagnostic) => void;
 }
 
+/** 根渲染器。`adapter` 与 `environment`+`adapterId` 必须二选一。 */
 export function FormRenderer(props: FormRendererProps): ReactElement {
   const identifierPrefix = useFormIdentifierPrefix(props.identifierPrefix);
   const focusedView = useRef<FormRendererContext["focusedView"]["current"]>(undefined);

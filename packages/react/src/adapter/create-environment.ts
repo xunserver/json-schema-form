@@ -43,6 +43,7 @@ interface AdapterSnapshot {
 
 const ROLE_KEYS = ["form", "fieldChrome", "widgets", "layouts"] as const;
 
+/** 校验 adapter / contribution / override 后冻结 React Renderer Environment。 */
 export function createReactRendererEnvironment(
   options: CreateReactRendererEnvironmentOptions,
 ): ReactRendererEnvironment {

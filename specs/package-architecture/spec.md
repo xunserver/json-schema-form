@@ -203,3 +203,11 @@ Workspace 必须（MUST）包含 React headless contract、StrictMode subscripti
 - **WHEN** 执行v1 dependency和bundle检查
 - **THEN** gate失败并定位不在allowlist中的dependency/import，不能以example能够运行作为豁免
 
+### Requirement: TypeDoc 与文档站保持非产品依赖
+根工作区必须（SHALL）提供 TypeDoc 生成命令，并在 `docs:dev` 与 `site:build` 中先于 VitePress 运行。`typedoc` 及其 Markdown/VitePress 插件必须（MUST）只出现在根 `devDependencies`，不得（MUST NOT）进入产品 package 依赖图或 `verify:v1` 门禁。
+
+#### Scenario: 文档生成命令不进入 v1 门禁
+- **GIVEN** 根 `package.json` 脚本与 `verify:v1` 命令图
+- **WHEN** 检查 TypeDoc 与 VitePress 相关脚本
+- **THEN** 存在独立的 API 生成脚本，且 `verify:v1` 不调用 TypeDoc 或 `docs:build`
+

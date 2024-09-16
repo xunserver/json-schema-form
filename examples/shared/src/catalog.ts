@@ -1,5 +1,6 @@
 import type { CatalogExample, CatalogExampleMeta, WorkbenchDocument } from "./types.js";
 import simple from "../catalog/simple.json" with { type: "json" };
+import allFields from "../catalog/all-fields.json" with { type: "json" };
 import kitchenSink from "../catalog/kitchen-sink.json" with { type: "json" };
 import validation from "../catalog/validation.json" with { type: "json" };
 import conditional from "../catalog/conditional.json" with { type: "json" };
@@ -7,6 +8,7 @@ import computedArray from "../catalog/computed-array.json" with { type: "json" }
 
 const EXAMPLES: readonly CatalogExample[] = [
   simple as CatalogExample,
+  allFields as CatalogExample,
   kitchenSink as CatalogExample,
   validation as CatalogExample,
   conditional as CatalogExample,

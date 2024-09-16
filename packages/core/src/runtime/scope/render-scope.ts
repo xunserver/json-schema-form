@@ -19,6 +19,7 @@ import type { RuntimeNodeId } from "../form/runtime-node-id.js";
 
 const SCOPES = new WeakMap<FormRuntime, Map<RuntimeNodeId, RenderScope>>();
 
+/** 返回只读 RenderScope，把模板 ModelPath 解析为当前 InstancePath。 */
 export function getRenderScope(target: FormInstance | ScopedFormInstance): RenderScope {
   const handle = resolveRuntimeHandle(target);
   return renderScopeFor(handle.runtime, handle.runtimeId);

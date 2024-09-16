@@ -45,7 +45,7 @@ fs.rmSync(playgroundDest, { recursive: true, force: true });
 fs.cpSync(playgroundDist, playgroundDest, { recursive: true });
 fs.writeFileSync(path.join(docsDist, ".nojekyll"), "");
 
-const required = ["index.html", "playground/index.html", "playground/element-plus.html"];
+const required = ["index.html", "api/index.html", "playground/index.html", "playground/element-plus.html"];
 for (const relative of required) {
   const full = path.join(docsDist, relative);
   if (!fs.existsSync(full)) {

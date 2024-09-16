@@ -19,6 +19,10 @@ import { runSchemaFrontend } from "./schema/frontend.js";
 import { analyzeShapes } from "./shape/analyze.js";
 import { compileUIModel } from "./ui/ui-model.js";
 
+/**
+ * 把 Form Definition 编译为不可变 `CompiledFormModel`。
+ * 显式 `environment` 必须与后续 `createForm` 使用同一对象 identity。
+ */
 export function compileForm(definition: FormDefinition, options?: CompileOptions): CompileResult {
   const diagnostics = new DiagnosticBag();
   const snapshot = snapshotDefinition(definition, diagnostics);

@@ -60,6 +60,7 @@ type RegistryStores = {
   [K in RegistryKind]: Map<string, RegistryEntryInspection<unknown>>;
 };
 
+/** 校验并冻结 Core Plugin Registry。失败抛 `EnvironmentBuildError`，不发布 partial Registry。 */
 export function createFormEnvironment(options?: CreateFormEnvironmentOptions): FormEnvironment {
   const userPlugins = options?.plugins === undefined ? [] : [...options.plugins];
   const overrides = options?.overrides === undefined ? [] : [...options.overrides];

@@ -8,4 +8,5 @@ pnpm add @xunserver-jsf/core @xunserver-jsf/validator-ajv
 
 导出 `createAjvValidator()` 与 `AJV_VALIDATOR_KEY`。
 
-文档：https://xunserver.github.io/json-schema-form/
+文档：https://xunserver.github.io/json-schema-form/guide/getting-started.html  
+API：https://xunserver.github.io/json-schema-form/api/

@@ -1,3 +1,8 @@
+/**
+ * Application API：Definition、编译、Runtime 实例与公开类型。
+ *
+ * @module @xunserver-jsf/core
+ */
 export type {
   InstancePath,
   InstancePathLike,

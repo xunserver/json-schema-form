@@ -9,4 +9,5 @@ pnpm add react
 
 导出 `createShadcnAdapter({ components })` 与 `extendShadcnAdapter()`。`react` 是 peer dependency。
 
-文档：https://xunserver.github.io/json-schema-form/
+文档：https://xunserver.github.io/json-schema-form/react/shadcn.html  
+API：https://xunserver.github.io/json-schema-form/api/

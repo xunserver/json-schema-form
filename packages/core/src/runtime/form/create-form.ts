@@ -27,6 +27,10 @@ export interface CreateFormInternals {
   readonly validationOwner?: (plan: AffectedValidationRulePlan) => void;
 }
 
+/**
+ * 从编译模型创建事务化 `FormInstance`。
+ * `options.environment` 必须与编译时相同；缺省则使用内置默认 Environment。
+ */
 export function createForm(model: CompiledFormModel, options?: CreateFormOptions): FormInstance {
   return instantiateForm(model, options);
 }

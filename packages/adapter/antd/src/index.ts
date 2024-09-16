@@ -1,3 +1,8 @@
+/**
+ * Ant Design UI Adapter。默认 ID 为 `antd`。
+ *
+ * @module @xunserver-jsf/antd
+ */
 export {
   ANTD_ADAPTER_ID,
   createAntdAdapter,

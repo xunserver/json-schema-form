@@ -16,6 +16,7 @@ registerViewRenderers();
 
 const ENVIRONMENT_CACHE = new WeakMap<VueUIAdapter, VueRendererEnvironment>();
 
+/** 根渲染器。`adapter` 与 `environment`+`adapterId` 必须二选一。 */
 export const FormRenderer = defineComponent({
   name: "FormRenderer",
   props: {

@@ -12,6 +12,7 @@ import { widgetBindings } from "./widgets/bindings.js";
 
 export const ARCO_REACT_ADAPTER_ID = "arco-react";
 
+/** 创建 Arco React Adapter。`widgets` / `layouts` 只追加新 key。 */
 export function createArcoReactAdapter(options?: {
   readonly widgets?: Readonly<Record<string, WidgetBinding>>;
   readonly layouts?: Readonly<Record<string, LayoutBinding>>;

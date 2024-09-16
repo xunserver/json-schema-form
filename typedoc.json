@@ -1,0 +1,34 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "JSON Schema Form API",
+  "entryPoints": [
+    "packages/core/src/index.ts",
+    "packages/core/src/runtime/index.ts",
+    "packages/core/src/extension/index.ts",
+    "packages/validator-ajv/src/index.ts",
+    "packages/vue/src/index.ts",
+    "packages/react/src/index.ts",
+    "packages/adapter/element-plus/src/index.ts",
+    "packages/adapter/antd/src/index.ts",
+    "packages/adapter/arco-vue/src/index.ts",
+    "packages/adapter/arco-react/src/index.ts",
+    "packages/adapter/shadcn/src/index.ts"
+  ],
+  "entryPointStrategy": "resolve",
+  "tsconfig": "tsconfig.typedoc.json",
+  "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
+  "out": "docs/pages/api",
+  "docsRoot": "docs/pages",
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "excludeExternals": true,
+  "exclude": ["**/*.test.ts", "**/*.test-utils.ts", "**/test-utils/**"],
+  "disableSources": false,
+  "skipErrorChecking": true,
+  "githubPages": false,
+  "sidebar": {
+    "autoConfiguration": true,
+    "pretty": false
+  }
+}

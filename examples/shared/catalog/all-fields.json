@@ -1,0 +1,135 @@
+{
+  "id": "all-fields",
+  "title": "全字段（无布局）",
+  "description": "九个内置 Widget、自定义货币控件，以及 string/number/integer/boolean/object/array/tuple/null，使用默认 ViewTree，不含 layout",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "bio": { "type": "string" },
+      "age": { "type": "integer" },
+      "score": { "type": "number" },
+      "role": { "type": "string", "enum": ["admin", "user", "guest"] },
+      "tags": { "type": "array", "items": { "type": "string", "enum": ["a", "b", "c"] } },
+      "active": { "type": "boolean" },
+      "alerts": { "type": "boolean" },
+      "joined": { "type": "string", "format": "date" },
+      "meeting": { "type": "string", "format": "date-time" },
+      "currency": { "type": "string" },
+      "nickname": { "type": ["string", "null"] },
+      "address": {
+        "type": "object",
+        "properties": {
+          "street": { "type": "string" },
+          "city": { "type": "string" },
+          "zip": { "type": "string" }
+        },
+        "required": ["city"]
+      },
+      "aliases": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "products": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "quantity": { "type": "integer" },
+            "price": { "type": "number" }
+          },
+          "required": ["title"]
+        }
+      },
+      "span": {
+        "type": "array",
+        "prefixItems": [{ "type": "integer" }, { "type": "integer" }]
+      }
+    },
+    "required": ["name", "role"]
+  },
+  "uiSchema": {
+    "fields": {
+      "name": {
+        "widget": "text",
+        "display": { "label": "姓名", "help": "string + text" },
+        "props": { "placeholder": "全名" }
+      },
+      "bio": {
+        "widget": "textarea",
+        "display": { "label": "简介", "help": "string + textarea" },
+        "props": { "placeholder": "个人简介" }
+      },
+      "age": { "widget": "number", "display": { "label": "年龄", "help": "integer + number" } },
+      "score": { "widget": "number", "display": { "label": "分数", "help": "number + number" } },
+      "role": {
+        "widget": "select",
+        "display": { "label": "角色", "help": "string enum + select" },
+        "props": {
+          "options": [
+            { "value": "admin", "label": "管理员" },
+            { "value": "user", "label": "用户" },
+            { "value": "guest", "label": "访客" }
+          ]
+        }
+      },
+      "tags": {
+        "widget": "multi-select",
+        "display": { "label": "标签", "help": "array enum + multi-select" },
+        "props": {
+          "options": [
+            { "value": "a", "label": "标签 A" },
+            { "value": "b", "label": "标签 B" },
+            { "value": "c", "label": "标签 C" }
+          ]
+        }
+      },
+      "tags[]": { "field": false },
+      "active": { "widget": "checkbox", "display": { "label": "启用", "help": "boolean + checkbox" } },
+      "alerts": { "widget": "switch", "display": { "label": "提醒", "help": "boolean + switch" } },
+      "joined": { "widget": "date", "display": { "label": "入职日期", "help": "string format=date" } },
+      "meeting": { "widget": "datetime", "display": { "label": "会议时间", "help": "string format=date-time" } },
+      "currency": { "widget": "company.currency", "display": { "label": "货币", "help": "自定义 Widget" } },
+      "nickname": { "widget": "text", "display": { "label": "昵称", "help": "nullable string" } },
+      "address.street": { "widget": "text", "display": { "label": "街道" } },
+      "address.city": { "widget": "text", "display": { "label": "城市" } },
+      "address.zip": { "widget": "text", "display": { "label": "邮编" } },
+      "aliases[]": { "widget": "text", "display": { "label": "别名" } },
+      "products[].title": { "widget": "text", "display": { "label": "名称" } },
+      "products[].quantity": { "widget": "number", "display": { "label": "数量" } },
+      "products[].price": { "widget": "number", "display": { "label": "单价" } },
+      "span[#0]": { "widget": "number", "display": { "label": "下限" } },
+      "span[#1]": { "widget": "number", "display": { "label": "上限" } }
+    }
+  },
+  "rules": [],
+  "config": {
+    "schemaValidator": "ajv-2020"
+  },
+  "formData": {
+    "name": "Ada",
+    "bio": "Pioneer of computing",
+    "age": 36,
+    "score": 98.5,
+    "role": "admin",
+    "tags": ["a", "c"],
+    "active": true,
+    "alerts": false,
+    "joined": "2026-09-15",
+    "meeting": "2026-09-15T12:00:00+00:00",
+    "currency": "USD",
+    "nickname": null,
+    "address": {
+      "street": "12 Analytical Engine Rd",
+      "city": "London",
+      "zip": "SW1A"
+    },
+    "aliases": ["A.L.", "Ada L."],
+    "products": [
+      { "title": "Widget", "quantity": 2, "price": 10 },
+      { "title": "Gadget", "quantity": 1, "price": 25.5 }
+    ],
+    "span": [1, 10]
+  }
+}

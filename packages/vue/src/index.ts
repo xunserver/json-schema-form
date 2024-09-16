@@ -1,3 +1,8 @@
+/**
+ * Vue Renderer：`FormRenderer`、只读 composable 与 Adapter 契约。
+ *
+ * @module @xunserver-jsf/vue
+ */
 import { registerViewRenderers } from "./renderer/register.js";
 
 registerViewRenderers();

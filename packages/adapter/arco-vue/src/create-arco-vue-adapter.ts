@@ -6,6 +6,7 @@ import { widgetBindings } from "./widgets/bindings.js";
 
 export const ARCO_VUE_ADAPTER_ID = "arco-vue";
 
+/** 创建 Arco Vue Adapter。`widgets` / `layouts` 只追加新 key。 */
 export function createArcoVueAdapter(options?: {
   readonly widgets?: Readonly<Record<string, WidgetBinding>>;
   readonly layouts?: Readonly<Record<string, LayoutBinding>>;

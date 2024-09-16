@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM"],
+    "types": []
+  },
+  "include": [
+    "packages/core/src/**/*.ts",
+    "packages/validator-ajv/src/**/*.ts",
+    "packages/vue/src/**/*.ts",
+    "packages/react/src/**/*.ts",
+    "packages/adapter/element-plus/src/**/*.ts",
+    "packages/adapter/antd/src/**/*.ts",
+    "packages/adapter/arco-vue/src/**/*.ts",
+    "packages/adapter/arco-react/src/**/*.ts",
+    "packages/adapter/shadcn/src/**/*.ts"
+  ],
+  "exclude": ["**/*.test.ts", "**/*.test-utils.ts", "**/test-utils/**"]
+}

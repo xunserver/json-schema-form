@@ -35,8 +35,14 @@ describe("vue + element-plus integration", () => {
     expect(wrapper.html()).toContain("入职日期");
     expect(wrapper.html()).toContain("会议时间");
     expect(wrapper.html()).toContain("货币");
-    const labeled = wrapper.find("[aria-labelledby]");
+    const labeled = wrapper.find('input[aria-labelledby*="field:name"]');
     expect(labeled.exists()).toBe(true);
+    const nameItem = labeled.element.closest(".el-form-item");
+    expect(nameItem).not.toBeNull();
+    const nameLabel = nameItem?.querySelector(".el-form-item__label");
+    expect(nameLabel?.textContent).toContain("姓名");
+    expect(nameLabel?.querySelector("span")?.id).toBe(labeled.attributes("aria-labelledby"));
+    expect(nameItem?.querySelector(":scope > .el-form-item__content > span")).toBeNull();
     wrapper.unmount();
   });
 

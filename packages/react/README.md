@@ -9,4 +9,5 @@ pnpm add react
 
 `react` 是 peer dependency。UI 组件库通过独立 adapter 包注入，例如 `@xunserver-jsf/antd`。
 
-文档：https://xunserver.github.io/json-schema-form/
+文档：https://xunserver.github.io/json-schema-form/guide/getting-started.html  
+API：https://xunserver.github.io/json-schema-form/api/

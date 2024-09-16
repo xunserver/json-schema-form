@@ -47,6 +47,10 @@ function assertComponents(components: ShadcnAdapterComponents): void {
   }
 }
 
+/**
+ * 创建 shadcn Adapter。必须注入 `components`；缺槽抛 `ShadcnAdapterConfigurationError`。
+ * `widgets` / `layouts` 只追加新 key。
+ */
 export function createShadcnAdapter(options: {
   readonly components: ShadcnAdapterComponents;
   readonly widgets?: Readonly<Record<string, WidgetBinding>>;

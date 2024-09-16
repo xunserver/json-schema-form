@@ -5,6 +5,10 @@ import type { CompiledFormModel } from "../model/compiled-form-model.js";
 import type { CreateFormEngineOptions, FormEngine, FormInstance } from "../runtime/form/contracts.js";
 import { createForm } from "../runtime/form/create-form.js";
 
+/**
+ * 构建闭包持有同一冻结 Environment 的 engine。
+ * `compile()` 与 `create()` 共用该 Environment；engine 不保存实例 values。
+ */
 export function createFormEngine(options?: CreateFormEngineOptions): FormEngine {
   const environment = createFormEnvironment({
     ...(options?.plugins === undefined ? {} : { plugins: options.plugins }),

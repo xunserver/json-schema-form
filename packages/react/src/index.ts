@@ -1,3 +1,8 @@
+/**
+ * React Renderer：`FormRenderer`、只读 hook 与 Adapter 契约。
+ *
+ * @module @xunserver-jsf/react
+ */
 import { FormRenderer } from "./renderer/FormRenderer.js";
 import { ViewRenderer } from "./renderer/ViewRenderer.js";
 import { FieldRenderer } from "./renderer/FieldRenderer.js";

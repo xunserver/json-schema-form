@@ -1,3 +1,8 @@
+/**
+ * Element Plus UI Adapter。默认 ID 为 `element-plus`。
+ *
+ * @module @xunserver-jsf/element-plus
+ */
 export {
   ELEMENT_PLUS_ADAPTER_ID,
   createElementPlusAdapter,

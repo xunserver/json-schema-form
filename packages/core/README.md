@@ -12,6 +12,7 @@ pnpm add @xunserver-jsf/core
 - `@xunserver-jsf/core/runtime` — 只读 selector / subscription / RenderScope
 - `@xunserver-jsf/core/extension` — Plugin / Environment / Widget / Validator
 
-文档：https://xunserver.github.io/json-schema-form/
+文档：https://xunserver.github.io/json-schema-form/guide/getting-started.html  
+API：https://xunserver.github.io/json-schema-form/api/
 
 后续版本由 GitHub Actions `release.yml` 通过 npm Trusted Publishing 发布。

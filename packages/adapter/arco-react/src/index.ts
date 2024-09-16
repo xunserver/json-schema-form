@@ -1,3 +1,8 @@
+/**
+ * Arco Design React UI Adapter。默认 ID 为 `arco-react`。
+ *
+ * @module @xunserver-jsf/arco-react
+ */
 export {
   ARCO_REACT_ADAPTER_ID,
   createArcoReactAdapter,

@@ -12,6 +12,7 @@ import { widgetBindings } from "./widgets/bindings.js";
 
 export const ANTD_ADAPTER_ID = "antd";
 
+/** 创建 Ant Design Adapter。`widgets` / `layouts` 只追加新 key。 */
 export function createAntdAdapter(options?: {
   readonly widgets?: Readonly<Record<string, WidgetBinding>>;
   readonly layouts?: Readonly<Record<string, LayoutBinding>>;

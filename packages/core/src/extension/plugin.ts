@@ -32,6 +32,7 @@ type ExactKeys<T, Allowed> = {
   [K in Exclude<keyof T, keyof Allowed>]: never;
 };
 
+/** 声明 Plugin 贡献；不安装全局 Registry。 */
 export function definePlugin<const T extends FormPlugin>(
   plugin: T & ExactKeys<T, FormPlugin>,
 ): T {
