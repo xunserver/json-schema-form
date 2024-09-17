@@ -4,7 +4,6 @@ import { createFormEnvironment, definePlugin } from "../../extension/index.js";
 import { RUNTIME_DIAGNOSTIC_CODES } from "../diagnostic-codes.js";
 import {
   createSelector,
-  fieldSelector,
   formSelector,
   getRuntimeSnapshot,
   observeRuntimeDiagnostics,

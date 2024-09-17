@@ -4,7 +4,6 @@ import type {
   FieldDescriptor,
   FieldSnapshot,
   FieldView,
-  FormSnapshot,
   GroupView,
   JsonValue,
   LayoutView,

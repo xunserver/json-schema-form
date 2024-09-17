@@ -76,7 +76,7 @@ describe("v1 diagnostic sources", () => {
 
     const adapter = (() => {
       try {
-        const form = createForm(
+        createForm(
           compileForm(defineForm({ schema: { type: "object", properties: { when: { type: "string", format: "date-time" } } } })).model,
           { initialValues: { when: "2026-09-15T00:00:00Z" } },
         );

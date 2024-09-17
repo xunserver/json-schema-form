@@ -3,7 +3,6 @@ import {
   commitVisualIfFresh,
   createPlaygroundController,
   emptySupportedDefinitionTexts,
-  exportVisualDefinitionTexts,
   getFixture,
   importVisualDocument,
   isParentToPreviewMessage,

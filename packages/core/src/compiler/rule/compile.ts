@@ -1,4 +1,3 @@
-import type { FormConfig } from "../../definition/form-config.js";
 import type {
   ComputedRuleDefinition,
   EffectRuleDefinition,

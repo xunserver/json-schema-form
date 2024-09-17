@@ -17,6 +17,9 @@ describe("v1 examples", () => {
     expect(playgroundPkg).toContain("@xunserver-jsf/example-shared");
     expect(playgroundPkg).not.toContain("@mui/");
     expect(playgroundSrc).toContain("@xunserver-jsf/example-shared");
+    expect(fs.readFileSync(path.join(REPO_ROOT, "examples/shared/src/index.ts"), "utf8")).toContain(
+      "VisualGroupNode",
+    );
     expect(playgroundSrc).not.toMatch(/@xunserver-jsf\/vue\/src/);
     expect(playgroundSrc).not.toMatch(/@xunserver-jsf\/react\/src/);
     expect(sharedEnv).toContain("company.currency");

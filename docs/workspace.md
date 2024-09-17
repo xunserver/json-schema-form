@@ -9,6 +9,7 @@
 | `pnpm install` | 安装工作区依赖。发布校验使用 `pnpm install --frozen-lockfile`。 |
 | `pnpm build` | 按 TypeScript project references 构建全部 package，产出 ESM 与 declaration。 |
 | `pnpm typecheck` | 构建期类型检查，外加 Core 内部 type-test 与消费者正向契约检查。 |
+| `pnpm lint` | 对工作区 TypeScript/JavaScript 跑 ESLint。`git commit` 时 husky 会先对暂存文件跑 `lint-staged`，再对提交说明跑 commitlint。 |
 | `pnpm test` | 运行 unit、type-contract、export-isolation、Core-independence 与 fault-injection 测试。 |
 | `pnpm check:boundaries` | 用 TypeScript parser/module resolution 校验 manifest 与源码 import 是否符合规范依赖图。 |
 | `pnpm check:v1-matrix` | 校验 `tests/architecture/v1-coverage.json` 与 `docs/architecture.md` digest、owner/test/command 映射。 |

@@ -9,7 +9,7 @@ import {
   VISUAL_SCHEMA_EDITOR_SCENARIO_MAP,
 } from "./index.js";
 
-const specDir = path.resolve(fileURLToPath(new URL("../../../../openspec/changes/add-visual-schema-editor/specs", import.meta.url)));
+const specDir = path.resolve(fileURLToPath(new URL("../../../../openspec/specs", import.meta.url)));
 
 function readScenarios(file: string): string[] {
   const text = fs.readFileSync(file, "utf8");
@@ -30,9 +30,11 @@ describe("visual authoring fixtures", () => {
   });
 
   test("VSE-NODE-PURE-CONVERT maps package-architecture visual scenarios", () => {
-    const specScenarios = readScenarios(path.join(specDir, "package-architecture/spec.md"));
-    expect(PACKAGE_ARCHITECTURE_VISUAL_SCENARIO_MAP.map((item) => item.scenario).sort()).toEqual(
-      [...specScenarios].sort(),
-    );
+    const specScenarios = new Set(readScenarios(path.join(specDir, "package-architecture/spec.md")));
+    const mapped = PACKAGE_ARCHITECTURE_VISUAL_SCENARIO_MAP.map((item) => item.scenario);
+    expect(new Set(mapped).size).toBe(mapped.length);
+    for (const scenario of mapped) {
+      expect(specScenarios.has(scenario), scenario).toBe(true);
+    }
   });
 });

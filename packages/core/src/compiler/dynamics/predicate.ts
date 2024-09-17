@@ -49,23 +49,6 @@ const UNSUPPORTED_KEYWORDS = new Set([
   "contentSchema",
 ]);
 
-const IGNORED_KEYWORDS = new Set([
-  "$id",
-  "$schema",
-  "$anchor",
-  "$dynamicAnchor",
-  "$vocabulary",
-  "$comment",
-  "$defs",
-  "title",
-  "description",
-  "default",
-  "deprecated",
-  "readOnly",
-  "writeOnly",
-  "examples",
-]);
-
 export interface PredicateCompileSuccess {
   readonly ok: true;
   readonly predicate: ActivationPredicate;

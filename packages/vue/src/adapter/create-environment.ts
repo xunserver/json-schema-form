@@ -14,7 +14,6 @@ import type {
   FieldChromeAdapter,
   LayoutBinding,
   ResolvedVueAdapter,
-  VueAdapterContribution,
   VueRegistryEntryInspection,
   VueRegistryKind,
   VueRegistryOverride,
@@ -41,7 +40,7 @@ interface AdapterSnapshot {
   readonly layouts: Readonly<Record<string, unknown>>;
 }
 
-const ROLE_KEYS = ["form", "fieldChrome", "widgets", "layouts"] as const;
+type AdapterRole = "form" | "fieldChrome" | "widgets" | "layouts";
 
 /** 校验 adapter / contribution / override 后冻结 Vue Renderer Environment。 */
 export function createVueRendererEnvironment(
@@ -449,7 +448,7 @@ function snapshotAdapter(adapter: VueUIAdapter, ordinal: number): AdapterSnapsho
 
 function validateRole(
   snapshot: AdapterSnapshot,
-  role: (typeof ROLE_KEYS)[number],
+  role: AdapterRole,
   value: unknown,
   tracked: TrackedDiagnostic[],
   validate: (value: unknown) => boolean,

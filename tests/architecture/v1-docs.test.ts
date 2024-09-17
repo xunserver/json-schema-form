@@ -22,4 +22,12 @@ describe("v1 documentation", () => {
     expect(generated).toContain("DEF-01");
     expect(architecture).toContain("## 3. 架构不变量");
   });
+
+  test("V1-DOCS-PLAYGROUND-LINK ignores static playground paths during VitePress build", () => {
+    const config = fs.readFileSync(path.join(REPO_ROOT, "docs/.vitepress/config.ts"), "utf8");
+    expect(config).toContain("ignoreDeadLinks");
+    expect(config).toMatch(/\/playground/);
+    const theme = fs.readFileSync(path.join(REPO_ROOT, "docs/.vitepress/theme/index.ts"), "utf8");
+    expect(theme).toContain("isStaticPlayground");
+  });
 });

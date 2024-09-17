@@ -5,7 +5,6 @@ import {
   freezeVisualDocument,
   isModelPathSafeKey,
   ROOT_EDITOR_NODE_ID,
-  type EditorNodeId,
   type FieldPalette,
   type LayoutVariant,
   type VisualDocument,

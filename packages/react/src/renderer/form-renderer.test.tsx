@@ -272,8 +272,8 @@ describe("StrictMode lifecycle", () => {
   test("balances subscribe/unsubscribe and never exceeds one listener", () => {
     const form = createPersonForm();
     const selector = valueSelector("name");
-    let active = 0;
-    let max = 0;
+    const active = 0;
+    const max = 0;
     const originalSubscribe = subscribeRuntime;
     const seen: number[] = [];
     function Probe() {

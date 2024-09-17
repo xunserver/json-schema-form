@@ -3,11 +3,9 @@ import { compileForm, createForm, defineForm } from "../index.js";
 import { RUNTIME_DIAGNOSTIC_CODES } from "./diagnostic-codes.js";
 import {
   effectiveStateSelector,
-  fieldSelector,
   formSelector,
   observeRuntimeDiagnostics,
   subscribeRuntime,
-  valueSelector,
 } from "./index.js";
 import { compileRules, sampleProducts, taxEnvironment } from "./rules.test-utils.js";
 import { expectRuntimeError } from "./runtime.test-utils.js";

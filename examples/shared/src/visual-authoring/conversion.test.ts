@@ -3,7 +3,6 @@ import * as core from "@xunserver-jsf/core";
 import { describe, expect, test, vi } from "vitest";
 import { createDemoEnvironment } from "../environment.js";
 import {
-  VISUAL_DIAGNOSTIC_CODES,
   collectFieldNodes,
   createEmptyVisualDocument,
   createVisualIdAllocator,

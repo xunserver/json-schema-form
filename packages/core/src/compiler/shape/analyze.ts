@@ -23,7 +23,6 @@ import {
   type ScalarShape,
   type UnionShape,
   anyShape,
-  isScalarJsonType,
   neverShape,
 } from "./types.js";
 

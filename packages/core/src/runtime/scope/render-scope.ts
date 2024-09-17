@@ -9,7 +9,7 @@ import {
   type ModelPathLike,
 } from "../../model/path/index.js";
 import { bindTemplatePath, listIndexes, modelPathListCount } from "../../model/path/bind-path.js";
-import type { ArrayItemRef, FormInstance, InstanceBinding, RenderScope, ScopedFormInstance } from "../form/contracts.js";
+import type { FormInstance, InstanceBinding, RenderScope, ScopedFormInstance } from "../form/contracts.js";
 import { RUNTIME_DIAGNOSTIC_CODES } from "../diagnostic-codes.js";
 import { runtimeDiagnostic, sortRuntimeDiagnostics } from "../diagnostics.js";
 import { FormRuntimeError } from "../error.js";

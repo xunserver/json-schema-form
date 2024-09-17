@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { compileForm, createForm, createFormEngine, defineForm } from "../../index.js";
+import { createForm, createFormEngine, defineForm } from "../../index.js";
 import { createFormEnvironment, definePlugin } from "../../extension/index.js";
 import { RUNTIME_DIAGNOSTIC_CODES } from "../diagnostic-codes.js";
 import { formSelector, getRuntimeSnapshot, subscribeRuntime, valueSelector } from "../index.js";

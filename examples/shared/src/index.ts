@@ -88,6 +88,7 @@ export {
   type VisualDocument,
   type VisualEditorDiagnostic,
   type VisualFieldNode,
+  type VisualGroupNode,
   type VisualIdAllocator,
   type VisualLayoutNode,
   type VisualNode,

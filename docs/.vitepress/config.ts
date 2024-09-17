@@ -46,6 +46,7 @@ export default defineConfig({
   srcDir: "pages",
   cleanUrls: false,
   base,
+  ignoreDeadLinks: [/^\/playground(?:\/|$)/],
   lastUpdated: false,
   themeConfig: {
     nav: [

@@ -1588,7 +1588,6 @@ export class FormRuntime implements SelectorHost {
       this.validationIntent = undefined;
     }
     const mutation = this.mutationEpoch;
-    const version = this.form.version;
     await this.validation.waitForAttempt(this.currentAttempt, mutation);
     return this.validation.result(this.form.version, this.mutationEpoch !== mutation);
   }
@@ -1611,7 +1610,6 @@ export class FormRuntime implements SelectorHost {
         this.validationIntent = undefined;
       }
       const mutation = this.mutationEpoch;
-      const version = this.form.version;
       await this.validation.waitForAttempt(this.currentAttempt, mutation);
       const superseded = this.mutationEpoch !== mutation;
       const validation = this.validation.result(this.form.version, superseded);
@@ -2544,21 +2542,6 @@ function uniqueViewState(
     }
   }
   return [...ids];
-}
-
-function isAggregateTouched(path: InstancePath, touched: ReadonlyMap<string, true>): boolean {
-  if (touched.has(path)) {
-    return true;
-  }
-  for (const candidate of touched.keys()) {
-    if (candidate === path || (path === ROOT_INSTANCE_PATH && candidate.length > 0)) {
-      return true;
-    }
-    if (path !== ROOT_INSTANCE_PATH && (candidate === path || candidate.startsWith(`${path}.`) || candidate.startsWith(`${path}[`))) {
-      return true;
-    }
-  }
-  return false;
 }
 
 function isUnderInstancePath(path: InstancePath, ancestor: InstancePath): boolean {
