@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { PanelRightCloseIcon, PanelRightOpenIcon } from "lucide-react";
+import { usePanelRef } from "react-resizable-panels";
 import {
   createPlaygroundController,
   displayedWorkbenchDiagnostics,
@@ -92,7 +94,19 @@ export function PlaygroundApp() {
   const examples = useMemo(() => listCatalogExamples(), []);
   const framesRef = useRef(new Map<PreviewId, HTMLIFrameElement>());
   const lastBroadcastEpochRef = useRef(-1);
+  const previewPanelRef = usePanelRef();
   const [editorMode, setEditorMode] = useState<"text" | "visual">("text");
+  const [previewHidden, setPreviewHidden] = useState(false);
+
+  const setPreviewOpen = (open: boolean) => {
+    const panel = previewPanelRef.current;
+    if (open) {
+      panel?.expand();
+    } else {
+      panel?.collapse();
+    }
+    setPreviewHidden(!open);
+  };
 
   useEffect(() => {
     return () => {
@@ -202,6 +216,22 @@ export function PlaygroundApp() {
               </TabsList>
             </Tabs>
           </Field>
+          <Button
+            type="button"
+            variant="outline"
+            aria-controls="playground-preview"
+            aria-expanded={!previewHidden}
+            onClick={() => {
+              setPreviewOpen(previewHidden);
+            }}
+          >
+            {previewHidden ? (
+              <PanelRightOpenIcon data-icon="inline-start" />
+            ) : (
+              <PanelRightCloseIcon data-icon="inline-start" />
+            )}
+            {previewHidden ? "显示预览" : "隐藏预览"}
+          </Button>
           <Field orientation="horizontal" className="w-auto">
             <FieldLabel htmlFor="playground-example">示例</FieldLabel>
             <Select
@@ -237,7 +267,7 @@ export function PlaygroundApp() {
       <Separator />
 
       <ResizablePanelGroup orientation="horizontal" className="min-h-0 flex-1">
-        <ResizablePanel defaultSize="38%" minSize="24%" className="min-h-0">
+        <ResizablePanel id="playground-editor" defaultSize="38%" minSize="24%" className="min-h-0">
           {editorMode === "visual" ? (
             <VisualSchemaEditor
               workbench={snapshot.workbench}
@@ -278,9 +308,22 @@ export function PlaygroundApp() {
           )}
         </ResizablePanel>
 
-        <ResizableHandle withHandle />
+        <ResizableHandle withHandle className={previewHidden ? "hidden" : undefined} />
 
-        <ResizablePanel defaultSize="62%" minSize="36%" className="min-h-0">
+        <ResizablePanel
+          id="playground-preview"
+          panelRef={previewPanelRef}
+          collapsible
+          collapsedSize="0%"
+          defaultSize="62%"
+          minSize="36%"
+          className="min-h-0"
+          inert={previewHidden}
+          aria-hidden={previewHidden}
+          onResize={() => {
+            setPreviewHidden(previewPanelRef.current?.isCollapsed() === true);
+          }}
+        >
           <ResizablePanelGroup orientation="vertical">
             <ResizablePanel defaultSize="58%" minSize="28%" className="min-h-0">
               <Tabs

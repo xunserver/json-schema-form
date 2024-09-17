@@ -152,7 +152,14 @@ function CanvasHeading({
     id: node.id,
     data: { source: "node", nodeId: node.id },
   });
-  const label = node.kind === "group" ? "分组" : node.variant === "stack" ? "纵向" : node.variant === "row" ? "横向" : "网格";
+  const label =
+    node.kind === "group"
+      ? node.title?.trim() || "分组"
+      : node.variant === "stack"
+        ? "纵向"
+        : node.variant === "row"
+          ? "横向"
+          : "网格";
   return (
     <div className="flex items-center justify-between gap-2">
       <button

@@ -1,4 +1,4 @@
-import type { ArrayView, LayoutView, ObjectView } from "@xunserver-jsf/core";
+import type { ArrayView, GroupView, LayoutView, ObjectView } from "@xunserver-jsf/core";
 import type { LayoutBinding } from "@xunserver-jsf/react";
 import type { ReactNode } from "react";
 import type { ShadcnAdapterComponents } from "../components.js";
@@ -30,7 +30,16 @@ export function createLayoutBindings(
 
   const groupLayout: LayoutBinding = {
     render(input) {
-      return <Card data-layout="group">{input.children as ReactNode}</Card>;
+      const view = input.view as GroupView;
+      return (
+        <Card
+          data-layout="group"
+          {...(view.title === undefined ? {} : { title: view.title })}
+          {...(view.description === undefined ? {} : { description: view.description })}
+        >
+          {input.children as ReactNode}
+        </Card>
+      );
     },
   };
 

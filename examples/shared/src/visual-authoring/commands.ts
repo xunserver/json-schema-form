@@ -17,6 +17,7 @@ import {
   type VisualDocument,
   type VisualFieldConstraints,
   type VisualFieldNode,
+  type VisualGroupNode,
   type VisualIdAllocator,
   type VisualLayoutNode,
   type VisualNode,
@@ -61,6 +62,13 @@ export type UpdateFieldCommand = {
   readonly span?: number;
 };
 
+export type UpdateGroupCommand = {
+  readonly type: "UpdateGroup";
+  readonly nodeId: EditorNodeId;
+  readonly title?: string;
+  readonly description?: string;
+};
+
 export type UpdateLayoutCommand = {
   readonly type: "UpdateLayout";
   readonly nodeId: EditorNodeId;
@@ -68,7 +76,13 @@ export type UpdateLayoutCommand = {
   readonly span?: number;
 };
 
-export type VisualCommand = AddNodeCommand | RemoveNodeCommand | MoveNodeCommand | UpdateFieldCommand | UpdateLayoutCommand;
+export type VisualCommand =
+  | AddNodeCommand
+  | RemoveNodeCommand
+  | MoveNodeCommand
+  | UpdateFieldCommand
+  | UpdateGroupCommand
+  | UpdateLayoutCommand;
 
 export type VisualReduceResult =
   | {
@@ -96,6 +110,8 @@ export function reduceVisualDocument(
       return moveNode(document, command);
     case "UpdateField":
       return updateField(document, command);
+    case "UpdateGroup":
+      return updateGroup(document, command);
     case "UpdateLayout":
       return updateLayout(document, command);
   }
@@ -312,6 +328,40 @@ function updateField(document: VisualDocument, command: UpdateFieldCommand): Vis
     ...(command.disabled !== undefined ? { disabled: command.disabled } : {}),
     ...(command.readonly !== undefined ? { readonly: command.readonly } : {}),
     ...(command.span !== undefined ? { span: command.span } : {}),
+  };
+  const children = [...located.parent.children];
+  children[located.index] = updated;
+  writeChildren(located.parent, children);
+  return succeed(next, command.nodeId);
+}
+
+function updateGroup(document: VisualDocument, command: UpdateGroupCommand): VisualReduceResult {
+  const node = findNode(document, command.nodeId);
+  if (node === undefined || node.kind !== "group") {
+    return fail(document, [
+      visualDiagnostic(VISUAL_DIAGNOSTIC_CODES.invalidTarget, "只能更新 group 节点的标题和说明", {
+        nodeId: command.nodeId,
+      }),
+    ]);
+  }
+  const next = cloneVisualDocument(document);
+  const nextNode = findNode(next, command.nodeId);
+  if (nextNode === undefined || nextNode.kind !== "group") {
+    return fail(document, [visualDiagnostic(VISUAL_DIAGNOSTIC_CODES.missingNode, "group 不存在")]);
+  }
+  const located = findParent(next, command.nodeId);
+  if (located === undefined) {
+    return fail(document, [visualDiagnostic(VISUAL_DIAGNOSTIC_CODES.missingNode, "group 不存在")]);
+  }
+  const updated: VisualGroupNode = {
+    id: nextNode.id,
+    kind: "group",
+    children: nextNode.children,
+    ...(command.title !== undefined && command.title !== "" ? { title: command.title } : {}),
+    ...(command.description !== undefined && command.description !== ""
+      ? { description: command.description }
+      : {}),
+    ...(nextNode.span !== undefined ? { span: nextNode.span } : {}),
   };
   const children = [...located.parent.children];
   children[located.index] = updated;

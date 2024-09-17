@@ -195,6 +195,14 @@ function FieldGroup(props: ShadcnFieldGroupProps) {
 function Card(props: ShadcnCardProps) {
   return (
     <section data-layout={props["data-layout"]} className="rounded-xl border border-border p-4">
+      {props.title !== undefined || props.description !== undefined ? (
+        <div className="mb-3 space-y-1">
+          {props.title === undefined ? null : <div className="text-sm font-medium">{props.title}</div>}
+          {props.description === undefined ? null : (
+            <p className="text-sm text-muted-foreground">{props.description}</p>
+          )}
+        </div>
+      ) : null}
       <div className="flex flex-col gap-3">{props.children}</div>
     </section>
   );

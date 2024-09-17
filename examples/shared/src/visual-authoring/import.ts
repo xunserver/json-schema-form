@@ -45,7 +45,7 @@ const UI_ROOT_KEYS = new Set(["fields", "layout"]);
 const FIELD_UI_KEYS = new Set(["widget", "display", "behavior"]);
 const DISPLAY_KEYS = new Set(["label", "help", "tooltip", "labelMode"]);
 const BEHAVIOR_KEYS = new Set(["visible", "disabled", "readonly"]);
-const LAYOUT_KEYS = new Set(["type", "path", "children", "columns", "span"]);
+const LAYOUT_KEYS = new Set(["type", "path", "children", "columns", "span", "title", "description"]);
 const SUPPORTED_WIDGETS = new Set<VisualWidget>(["text", "textarea", "number", "checkbox", "switch", "select"]);
 
 export type VisualImportResult =
@@ -377,6 +377,8 @@ function importLayoutNode(
       id: allocator.next(),
       kind: "group",
       children,
+      ...(typeof node.title === "string" && node.title !== "" ? { title: node.title } : {}),
+      ...(typeof node.description === "string" && node.description !== "" ? { description: node.description } : {}),
       ...(node.span !== undefined ? { span: node.span } : {}),
     };
     return group;

@@ -97,7 +97,7 @@ export const v1Definition: FormDefinition = defineForm({
     layout: {
       type: "object",
       children: [
-        { type: "group", children: [{ type: "field", path: "name" }, { type: "field", path: "bio" }] },
+        { type: "group", title: "基本资料", description: "姓名与个人简介", children: [{ type: "field", path: "name" }, { type: "field", path: "bio" }] },
         {
           type: "layout",
           columns: 2,

@@ -238,6 +238,11 @@ const SCENARIOS: readonly { spec: string; scenario: string; files: readonly stri
   },
   {
     spec: "static-ui-model",
+    scenario: "group 保留标题和说明",
+    files: ["packages/core/src/compiler/ui/ui-model.test.ts"],
+  },
+  {
+    spec: "static-ui-model",
     scenario: "同一 Field 多次呈现",
     files: ["packages/core/src/compiler/ui/ui-model.test.ts"],
   },
@@ -343,7 +348,7 @@ const SCENARIOS: readonly { spec: string; scenario: string; files: readonly stri
 
 describe("compile-static-form-model scenario coverage", () => {
   test("maps every delta spec scenario to an existing unit, type, contract, or integration test", () => {
-    expect(SCENARIOS).toHaveLength(59);
+    expect(SCENARIOS).toHaveLength(60);
     for (const entry of SCENARIOS) {
       expect(entry.files.length, entry.scenario).toBeGreaterThan(0);
       for (const relative of entry.files) {

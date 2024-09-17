@@ -53,6 +53,8 @@ export interface ArrayView extends ViewNodeBase {
 export interface GroupView extends ViewNodeBase {
   readonly kind: "group";
   readonly children: readonly ViewNode[];
+  readonly title?: string;
+  readonly description?: string;
 }
 
 export interface LayoutView extends ViewNodeBase {

@@ -90,7 +90,7 @@ export const SUPPORTED_FIXTURES: readonly NamedFixture[] = Object.freeze([
         type: "layout",
         columns: 1,
         children: [
-          { type: "group", children: [{ type: "field", path: "first" }] },
+          { type: "group", children: [{ type: "field", path: "first" }], title: "第一组" },
           {
             type: "layout",
             columns: 2,

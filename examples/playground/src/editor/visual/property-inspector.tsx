@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import type {
   EditorNodeId,
   UpdateFieldCommand,
+  UpdateGroupCommand,
   UpdateLayoutCommand,
   VisualDocument,
   VisualEditorDiagnostic,
   VisualFieldNode,
+  VisualGroupNode,
   VisualLayoutNode,
   VisualSchemaType,
   VisualWidget,
@@ -21,6 +23,7 @@ export function PropertyInspector({
   selectedId,
   diagnostics,
   onApplyField,
+  onApplyGroup,
   onApplyLayout,
   onCancel,
 }: {
@@ -28,6 +31,7 @@ export function PropertyInspector({
   readonly selectedId: EditorNodeId | null;
   readonly diagnostics: readonly VisualEditorDiagnostic[];
   readonly onApplyField: (command: UpdateFieldCommand) => void;
+  readonly onApplyGroup: (command: UpdateGroupCommand) => void;
   readonly onApplyLayout: (command: UpdateLayoutCommand) => void;
   readonly onCancel: () => void;
 }) {
@@ -41,10 +45,11 @@ export function PropertyInspector({
   }
   if (node.kind === "group") {
     return (
-      <aside aria-label="属性检查器" data-testid="visual-inspector" className="p-3 text-sm">
-        <p className="font-medium">分组</p>
-        <p className="text-muted-foreground">分组只改变呈现，不改变 JSON Schema 数据层级。</p>
-      </aside>
+      <GroupInspector
+        node={node}
+        onApply={onApplyGroup}
+        onCancel={onCancel}
+      />
     );
   }
   if (node.kind === "layout") {
@@ -225,6 +230,61 @@ function FieldInspector({
             };
             onApply(command);
           }}
+        >
+          应用
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel}>
+          取消
+        </Button>
+      </div>
+    </aside>
+  );
+}
+
+function GroupInspector({
+  node,
+  onApply,
+  onCancel,
+}: {
+  readonly node: VisualGroupNode;
+  readonly onApply: (command: UpdateGroupCommand) => void;
+  readonly onCancel: () => void;
+}) {
+  const [title, setTitle] = useState(node.title ?? "");
+  const [description, setDescription] = useState(node.description ?? "");
+
+  useEffect(() => {
+    setTitle(node.title ?? "");
+    setDescription(node.description ?? "");
+  }, [node]);
+
+  return (
+    <aside aria-label="属性检查器" data-testid="visual-inspector" className="flex h-full min-h-0 flex-col gap-3 overflow-auto p-3">
+      <p className="text-sm font-medium">分组配置</p>
+      <p className="text-sm text-muted-foreground">分组只改变呈现，不改变 JSON Schema 数据层级。标题和说明写在 uiSchema.layout 的 group 节点上。</p>
+      <Field>
+        <FieldLabel htmlFor="visual-group-title">标题</FieldLabel>
+        <Input id="visual-group-title" value={title} onChange={(event) => setTitle(event.target.value)} />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="visual-group-description">说明</FieldLabel>
+        <Textarea
+          id="visual-group-description"
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+        />
+      </Field>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          onClick={() =>
+            onApply({
+              type: "UpdateGroup",
+              nodeId: node.id,
+              ...(title.trim() !== "" ? { title: title.trim() } : {}),
+              ...(description.trim() !== "" ? { description: description.trim() } : {}),
+            })
+          }
         >
           应用
         </Button>

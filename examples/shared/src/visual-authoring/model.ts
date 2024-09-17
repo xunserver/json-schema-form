@@ -45,6 +45,8 @@ export interface VisualGroupNode {
   readonly id: EditorNodeId;
   readonly kind: "group";
   readonly children: readonly VisualNode[];
+  readonly title?: string;
+  readonly description?: string;
   readonly span?: number;
 }
 

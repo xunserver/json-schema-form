@@ -82,6 +82,7 @@ export {
   type EditorNodeId,
   type PaletteKind,
   type UpdateFieldCommand,
+  type UpdateGroupCommand,
   type UpdateLayoutCommand,
   type VisualCommand,
   type VisualDocument,

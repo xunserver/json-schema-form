@@ -135,6 +135,8 @@ export interface ShadcnFieldGroupProps {
 export interface ShadcnCardProps {
   readonly children?: ReactNode;
   readonly className?: string;
+  readonly title?: string;
+  readonly description?: string;
   readonly "data-layout"?: string;
 }
 

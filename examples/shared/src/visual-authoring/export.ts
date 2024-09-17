@@ -190,6 +190,8 @@ function buildGroupNode(node: VisualGroupNode): LayoutNode {
   return {
     type: "group",
     children: node.children.map(buildLayoutNode),
+    ...(node.title !== undefined && node.title !== "" ? { title: node.title } : {}),
+    ...(node.description !== undefined && node.description !== "" ? { description: node.description } : {}),
     ...(node.span !== undefined && node.span !== 1 ? { span: node.span } : {}),
   };
 }

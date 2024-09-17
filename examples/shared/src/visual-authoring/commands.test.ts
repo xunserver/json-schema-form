@@ -294,6 +294,36 @@ describe("visual authoring commands", () => {
     expect(requiredSelect.ok).toBe(true);
   });
 
+  test("UpdateGroup writes title and description", () => {
+    const allocator = createVisualIdAllocator();
+    const added = add(createEmptyVisualDocument(), "group", allocator);
+    expect(added.ok).toBe(true);
+    if (!added.ok) {
+      return;
+    }
+    const group = added.document.root.children[0];
+    expect(group?.kind).toBe("group");
+    if (group === undefined || group.kind !== "group") {
+      return;
+    }
+    const updated = reduceVisualDocument(
+      added.document,
+      { type: "UpdateGroup", nodeId: group.id, title: "基本资料", description: "姓名与个人简介" },
+      allocator,
+    );
+    expect(updated.ok).toBe(true);
+    if (!updated.ok) {
+      return;
+    }
+    const next = updated.document.root.children[0];
+    expect(next?.kind).toBe("group");
+    if (next === undefined || next.kind !== "group") {
+      return;
+    }
+    expect(next.title).toBe("基本资料");
+    expect(next.description).toBe("姓名与个人简介");
+  });
+
   test("UpdateLayout maps stack/row/grid and rejects illegal columns/span", () => {
     const allocator = createVisualIdAllocator();
     const added = add(createEmptyVisualDocument(), "grid", allocator);

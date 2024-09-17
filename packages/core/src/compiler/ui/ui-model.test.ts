@@ -348,6 +348,32 @@ describe("UIModel compiler", () => {
     expect(JSON.stringify(result.model.ui)).not.toMatch(/focused|collapsed|component|onClick|effectiveVisible/);
   });
 
+  test("projects group title and description from explicit layout", () => {
+    const result = compileForm({
+      schema: {
+        type: "object",
+        properties: { name: { type: "string" } },
+      },
+      uiSchema: {
+        layout: {
+          type: "layout",
+          children: [
+            {
+              type: "group",
+              title: "基本资料",
+              description: "姓名与简介",
+              children: [{ type: "field", path: "name" }],
+            },
+          ],
+        },
+      },
+    });
+    const tree = result.model.ui.viewTree as { children: GroupView[] };
+    expect(tree.children[0]?.kind).toBe("group");
+    expect(tree.children[0]?.title).toBe("基本资料");
+    expect(tree.children[0]?.description).toBe("姓名与简介");
+  });
+
   test("projects required and optional Object property sources onto FieldDescriptors", () => {
     const result = compileForm({
       schema: {

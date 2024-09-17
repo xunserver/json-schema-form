@@ -43,6 +43,7 @@ export type {
   MoveNodeCommand,
   RemoveNodeCommand,
   UpdateFieldCommand,
+  UpdateGroupCommand,
   UpdateLayoutCommand,
   VisualCommand,
   VisualReduceResult,

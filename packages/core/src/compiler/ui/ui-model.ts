@@ -340,6 +340,7 @@ function compileLayoutNode(
     return {
       kind: "group",
       id: nextViewId(occurrence, "group", ""),
+      ...layoutPresentation(layout),
       children: compileLayoutChildren(layout.children, data, fields, diagnostics, occurrence, used, scope),
     };
   }
@@ -441,6 +442,13 @@ function fieldView(path: ModelPath, occurrence: { current: number }): ViewNode {
     kind: "field",
     id: nextViewId(occurrence, "field", path),
     fieldPath: path,
+  };
+}
+
+function layoutPresentation(layout: LayoutNode): { readonly title?: string; readonly description?: string } {
+  return {
+    ...(typeof layout.title === "string" && layout.title !== "" ? { title: layout.title } : {}),
+    ...(typeof layout.description === "string" && layout.description !== "" ? { description: layout.description } : {}),
   };
 }
 

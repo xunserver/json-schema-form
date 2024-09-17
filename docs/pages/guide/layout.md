@@ -11,7 +11,7 @@
 | `field` | 挂一个 `path`（ModelPath） |
 | `object` | 对象容器 |
 | `array` | 数组容器，需要 `path` |
-| `group` | 视觉分组（卡片/盒子，默认不折叠） |
+| `group` | 视觉分组（卡片/盒子，默认不折叠）。用 `title` / `description` 写分组标题和说明 |
 | `layout` | 栅格；可用 `columns` |
 | `remaining-fields` | 插入尚未出现在 layout 里的字段 |
 
@@ -30,6 +30,8 @@ uiSchema: {
     children: [
       {
         type: "group",
+        title: "基本资料",
+        description: "姓名与个人简介",
         children: [
           { type: "field", path: "name" },
           { type: "field", path: "bio" },

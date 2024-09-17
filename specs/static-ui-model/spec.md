@@ -109,6 +109,11 @@ UIModel 必须（SHALL）按 `ModelPath` 提供独立于 DataNode 和 ViewNode �
 - **WHEN** 编译 ViewTree
 - **THEN** 其余可呈现 Field 按确定顺序展开，最终树中不存在 `remaining-fields` 节点
 
+#### Scenario: group 保留标题和说明
+- **GIVEN** 显式 layout 的 `group` 声明 `title` 与 `description`
+- **WHEN** 编译 ViewTree
+- **THEN** 对应 `GroupView` 携带相同静态标题和说明，不绑定 Data path
+
 #### Scenario: 同一 Field 多次呈现
 - **GIVEN** 显式 layout 在两个 presentation group 中引用同一 Field
 - **WHEN** 编译 ViewTree

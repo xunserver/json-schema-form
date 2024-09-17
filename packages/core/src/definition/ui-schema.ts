@@ -44,6 +44,9 @@ export interface LayoutNode {
   readonly children?: readonly LayoutNode[];
   readonly columns?: number;
   readonly span?: number;
+  /** Presentation copy for `group` nodes. */
+  readonly title?: string;
+  readonly description?: string;
 }
 
 export interface UISchema {

@@ -273,6 +273,7 @@ export function VisualSchemaEditor({
               selectedId={selectedId}
               diagnostics={commandDiagnostics}
               onApplyField={(command) => applyCommand(command)}
+              onApplyGroup={(command) => applyCommand(command)}
               onApplyLayout={(command) => applyCommand(command)}
               onCancel={() => setCommandDiagnostics([])}
             />

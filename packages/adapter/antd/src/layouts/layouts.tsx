@@ -1,4 +1,4 @@
-import type { ArrayView, LayoutView, ObjectView } from "@xunserver-jsf/core";
+import type { ArrayView, GroupView, LayoutView, ObjectView } from "@xunserver-jsf/core";
 import type { LayoutBinding } from "@xunserver-jsf/react";
 import { Card } from "antd";
 import type { ReactNode } from "react";
@@ -25,8 +25,14 @@ export const arrayLayout: LayoutBinding = {
 
 export const groupLayout: LayoutBinding = {
   render(input) {
+    const view = input.view as GroupView;
     return (
-      <Card size="small" data-layout="group">
+      <Card size="small" data-layout="group" {...(view.title === undefined ? {} : { title: view.title })}>
+        {view.description === undefined ? null : (
+          <p style={{ margin: "0 0 12px", color: "rgba(0,0,0,0.45)" }}>
+            {view.description}
+          </p>
+        )}
         {input.children as ReactNode}
       </Card>
     );

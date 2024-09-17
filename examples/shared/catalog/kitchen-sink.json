@@ -60,6 +60,8 @@
       "children": [
         {
           "type": "group",
+          "title": "基本资料",
+          "description": "姓名与个人简介",
           "children": [
             { "type": "field", "path": "name" },
             { "type": "field", "path": "bio" }
