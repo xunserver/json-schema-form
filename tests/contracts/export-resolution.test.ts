@@ -77,8 +77,6 @@ describe("runtime export resolution", () => {
     );
     expect(resolveWithNode("@xunserver-jsf/react").stdout.trim()).toMatch(/packages\/react\/dist\/index\.js$/);
     expect(resolveWithNode("@xunserver-jsf/antd").stdout.trim()).toMatch(/packages\/adapter\/antd\/dist\/index\.js$/);
-    expect(resolveWithNode("@xunserver-jsf/arco-vue").stdout.trim()).toMatch(/packages\/adapter\/arco-vue\/dist\/index\.js$/);
-    expect(resolveWithNode("@xunserver-jsf/arco-react").stdout.trim()).toMatch(/packages\/adapter\/arco-react\/dist\/index\.js$/);
     expect(resolveWithNode("@xunserver-jsf/shadcn").stdout.trim()).toMatch(/packages\/adapter\/shadcn\/dist\/index\.js$/);
     const vueDeep = resolveWithNode("@xunserver-jsf/vue/src/renderer/FormRenderer.js");
     expect(vueDeep.status).not.toBe(0);
@@ -88,10 +86,6 @@ describe("runtime export resolution", () => {
     expect(reactDeep.status).not.toBe(0);
     const antdDeep = resolveWithNode("@xunserver-jsf/antd/src/widgets/mapper.js");
     expect(antdDeep.status).not.toBe(0);
-    const arcoVueDeep = resolveWithNode("@xunserver-jsf/arco-vue/src/widgets/mapper.js");
-    expect(arcoVueDeep.status).not.toBe(0);
-    const arcoReactDeep = resolveWithNode("@xunserver-jsf/arco-react/src/widgets/mapper.js");
-    expect(arcoReactDeep.status).not.toBe(0);
     const shadcnDeep = resolveWithNode("@xunserver-jsf/shadcn/src/widgets/mapper.js");
     expect(shadcnDeep.status).not.toBe(0);
   });

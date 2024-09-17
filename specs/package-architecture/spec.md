@@ -7,7 +7,7 @@
 ## Requirements
 
 ### Requirement: 首期工作区 package
-工作区必须（SHALL）以一个 pnpm/TypeScript monorepo 管理并暴露可构建的 `@xunserver-jsf/core`、`@xunserver-jsf/validator-ajv`、`@xunserver-jsf/vue`、`@xunserver-jsf/react` 和 `@xunserver-jsf/element-plus` package。工作区可以（MAY）额外包含沿相同边界模式的 UI Adapter package（例如 `@xunserver-jsf/antd`、`@xunserver-jsf/arco-vue`、`@xunserver-jsf/arco-react`、`@xunserver-jsf/shadcn`），它们必须（MUST）出现在产品依赖 allowlist 中。
+工作区必须（SHALL）以一个 pnpm/TypeScript monorepo 管理并暴露可构建的 `@xunserver-jsf/core`、`@xunserver-jsf/validator-ajv`、`@xunserver-jsf/vue`、`@xunserver-jsf/react` 和 `@xunserver-jsf/element-plus` package。工作区可以（MAY）额外包含沿相同边界模式的 UI Adapter package（例如 `@xunserver-jsf/antd`、`@xunserver-jsf/shadcn`），它们必须（MUST）出现在产品依赖 allowlist 中。
 
 #### Scenario: 发现全部首期 package
 - **GIVEN** 一个已安装工作区依赖的干净 checkout
@@ -20,7 +20,7 @@
 - **THEN** 该 project 继承共享编译契约，并且只解析该 package 显式声明的输入
 
 ### Requirement: Package 依赖方向
-Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@xunserver-jsf/validator-ajv` 指向 `@xunserver-jsf/core`，`@xunserver-jsf/vue` 指向 `@xunserver-jsf/core`，`@xunserver-jsf/react` 指向 `@xunserver-jsf/core`，`@xunserver-jsf/element-plus` 指向 `@xunserver-jsf/vue` 与 `@xunserver-jsf/core`，`@xunserver-jsf/antd` 指向 `@xunserver-jsf/react` 与 `@xunserver-jsf/core`，`@xunserver-jsf/arco-vue` 指向 `@xunserver-jsf/vue` 与 `@xunserver-jsf/core`，`@xunserver-jsf/arco-react` 指向 `@xunserver-jsf/react` 与 `@xunserver-jsf/core`，`@xunserver-jsf/shadcn` 指向 `@xunserver-jsf/react` 与 `@xunserver-jsf/core`。任何首期或额外 UI Adapter package 都不得（SHALL NOT）引入反向或跨框架产品依赖。
+Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@xunserver-jsf/validator-ajv` 指向 `@xunserver-jsf/core`，`@xunserver-jsf/vue` 指向 `@xunserver-jsf/core`，`@xunserver-jsf/react` 指向 `@xunserver-jsf/core`，`@xunserver-jsf/element-plus` 指向 `@xunserver-jsf/vue` 与 `@xunserver-jsf/core`，`@xunserver-jsf/antd` 指向 `@xunserver-jsf/react` 与 `@xunserver-jsf/core`，`@xunserver-jsf/shadcn` 指向 `@xunserver-jsf/react` 与 `@xunserver-jsf/core`。任何首期或额外 UI Adapter package 都不得（SHALL NOT）引入反向或跨框架产品依赖。
 
 #### Scenario: 接受合法依赖图
 - **GIVEN** manifest 和 import 只包含允许的产品依赖边（含 `@xunserver-jsf/shadcn -> @xunserver-jsf/react + @xunserver-jsf/core`）
@@ -38,12 +38,12 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **THEN** 检查失败，并指出不受支持的依赖边
 
 ### Requirement: 框架宿主使用 peer dependency
-框架集成 package 必须（SHALL）将宿主框架和 UI library 要求表达为 peer dependency；工作区内的 `@xunserver-jsf/*` 关系必须遵循允许的产品依赖图。`@xunserver-jsf/shadcn` 必须（MUST）将 `react` 列为 peer；因其通过消费方注入组件而非 npm UI 库，不得（MUST NOT）要求 `antd`/`@arco-design/*` 类 UI library peer，也不得（MUST NOT）把 Tailwind 或 `@base-ui/react` 写入产品依赖。
+框架集成 package 必须（SHALL）将宿主框架和 UI library 要求表达为 peer dependency；工作区内的 `@xunserver-jsf/*` 关系必须遵循允许的产品依赖图。`@xunserver-jsf/shadcn` 必须（MUST）将 `react` 列为 peer；因其通过消费方注入组件而非 npm UI 库，不得（MUST NOT）要求 `antd` 类 UI library peer，也不得（MUST NOT）把 Tailwind 或 `@base-ui/react` 写入产品依赖。
 
 #### Scenario: 检查框架 package manifest
 - **GIVEN** 五个首期 package 与已登记 UI Adapter package 的 manifest
 - **WHEN** 校验依赖策略
-- **THEN** Vue、React、Element Plus、Ant Design、Arco Design 等宿主要求出现在对应集成 package 的 peer dependency 中，且 `@xunserver-jsf/shadcn` 仅要求 `react` peer
+- **THEN** Vue、React、Element Plus、Ant Design 等宿主要求出现在对应集成 package 的 peer dependency 中，且 `@xunserver-jsf/shadcn` 仅要求 `react` peer
 
 #### Scenario: 拒绝打包宿主框架
 - **GIVEN** 某框架集成 package 将其宿主框架或 UI library 放入会被打包的生产依赖
@@ -139,7 +139,7 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **THEN** UI只通过semantic commands更新Core，identity/presentable errors/ARIA正确，workspace build/typecheck/test/boundary checks均通过
 
 ### Requirement: React 与 UI adapter 渲染包只公开受支持入口
-`@xunserver-jsf/react` 根入口必须（MUST）公开 React renderers、readonly hooks、`ReactUIAdapter` 与 `ReactRendererEnvironment` 的创建/组合契约及结构化 diagnostics。Ant Design、Arco React、shadcn 等 UI adapter 通过各自根入口公开冻结 adapter（或 factory）及其受支持的组合/扩展入口。内部 Context、component factories、registry storage、mapper helpers 与 UI library implementation types 不得（MUST NOT）成为可依赖 deep import；`RenderScope`/`InstanceBinding` 等 Core-owned共享类型必须（MUST）从其 Core owning 入口导入，React包只消费而不得重新定义或建立第二个owner。
+`@xunserver-jsf/react` 根入口必须（MUST）公开 React renderers、readonly hooks、`ReactUIAdapter` 与 `ReactRendererEnvironment` 的创建/组合契约及结构化 diagnostics。Ant Design、shadcn 等 UI adapter 通过各自根入口公开冻结 adapter（或 factory）及其受支持的组合/扩展入口。内部 Context、component factories、registry storage、mapper helpers 与 UI library implementation types 不得（MUST NOT）成为可依赖 deep import；`RenderScope`/`InstanceBinding` 等 Core-owned共享类型必须（MUST）从其 Core owning 入口导入，React包只消费而不得重新定义或建立第二个owner。
 
 #### Scenario: 消费者只使用根入口
 - **GIVEN** 外部应用使用 TypeScript NodeNext 编译 React+shadcn 表单
@@ -152,7 +152,7 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **THEN** 该 deep import 不可解析，而受支持公开 adapter types 可从根入口解析
 
 ### Requirement: React 与 UI adapter 依赖方向保持单向
-`@xunserver-jsf/react` 必须（MUST）只依赖 `@xunserver-jsf/core` 并把 React 声明为兼容 peer；`@xunserver-jsf/antd` / `@xunserver-jsf/arco-react` / `@xunserver-jsf/shadcn` 必须（MUST）只依赖 `@xunserver-jsf/core`、`@xunserver-jsf/react` 并把各自宿主要求声明为兼容 peer（shadcn 仅 `react`）。React、React DOM、Ant Design 等 host runtime 不得（MUST NOT）被打包进库产物，Core 不得（MUST NOT）新增 React/UI library/DOM 依赖；默认 adapter 不得（MUST NOT）强制依赖日期对象库。
+`@xunserver-jsf/react` 必须（MUST）只依赖 `@xunserver-jsf/core` 并把 React 声明为兼容 peer；`@xunserver-jsf/antd` / `@xunserver-jsf/shadcn` 必须（MUST）只依赖 `@xunserver-jsf/core`、`@xunserver-jsf/react` 并把各自宿主要求声明为兼容 peer（shadcn 仅 `react`）。React、React DOM、Ant Design 等 host runtime 不得（MUST NOT）被打包进库产物，Core 不得（MUST NOT）新增 React/UI library/DOM 依赖；默认 adapter 不得（MUST NOT）强制依赖日期对象库。
 
 #### Scenario: manifest 与产物边界通过
 - **GIVEN** workspace 构建 `@xunserver-jsf/react` 与 `@xunserver-jsf/shadcn`
@@ -165,7 +165,7 @@ Package 元数据和源码 import 只允许以下产品依赖边（SHALL）：`@
 - **THEN** `@xunserver-jsf/react` 不要求 Ant Design、Vue、Element Plus、shadcn 组件或浏览器 validation store 即可工作
 
 ### Requirement: React 与 UI adapter 提供完整集成验收入口
-Workspace 必须（MUST）包含 React headless contract、StrictMode subscription cleanup、SSR/hydration、Ant Design / Arco React / shadcn 九种 Widget/codec/props/ARIA/layout 集成测试。公开消费者示例是 `examples/playground`（含独立 shadcn 预览帧）；React 端到端行为由 integration tests 覆盖。跨栈验收必须（MUST）复用与 Vue/Element Plus 相同的 Core Definition/Plugin fixture 来比较 values、identity、effective state、validation 与 submit 结果，但不得（MUST NOT）让 React/UI 包导入 Vue 协议或建立 Universal Renderer。
+Workspace 必须（MUST）包含 React headless contract、StrictMode subscription cleanup、SSR/hydration、Ant Design / shadcn 九种 Widget/codec/props/ARIA/layout 集成测试。公开消费者示例是 `examples/playground`（含独立 shadcn 预览帧）；React 端到端行为由 integration tests 覆盖。跨栈验收必须（MUST）复用与 Vue/Element Plus 相同的 Core Definition/Plugin fixture 来比较 values、identity、effective state、validation 与 submit 结果，但不得（MUST NOT）让 React/UI 包导入 Vue 协议或建立 Universal Renderer。
 
 #### Scenario: React+Ant Design 示例覆盖端到端行为
 - **GIVEN** integration tests 编译并实例化含嵌套 object/array、动态 visible、validation 与九种 Widget 的 Definition
@@ -199,12 +199,12 @@ Workspace 必须（MUST）包含 React headless contract、StrictMode subscripti
 完整 v1 门禁必须（MUST）复用并加强既有产品依赖 allowlist：`@xunserver-jsf/core` 保持无产品依赖，`@xunserver-jsf/validator-ajv`、`@xunserver-jsf/vue`、`@xunserver-jsf/react` 只指向 Core，UI library package只指向各自 Renderer与Core；Vue、React及UI libraries继续作为对应集成包的 peer，AJV只属于 validator package。Example与test所需host dependencies可以（MAY）位于非发布工作区，但不得（MUST NOT）改变 package产物、declaration或产品依赖图。
 
 #### Scenario: 测试宿主依赖不污染发布包
-- **GIVEN** playground 与 SSR/browser tests安装Vue、React、Element Plus、Ant Design、Arco Design、AJV及测试宿主
+- **GIVEN** playground 与 SSR/browser tests安装Vue、React、Element Plus、Ant Design、AJV及测试宿主
 - **WHEN** 检查产品 package 的manifest、构建产物与declarations
 - **THEN** host libraries只出现在允许位置且保持external，Core与另一framework链路不获得传递产品依赖
 
 #### Scenario: MUI X 或跨框架依赖被拒绝
-- **GIVEN** 默认 Ant Design/Arco adapter引入日期对象库或未批准的日期选择器包，或任一React/Vue链路导入另一framework/UI library package
+- **GIVEN** 默认 Ant Design adapter引入日期对象库或未批准的日期选择器包，或任一React/Vue链路导入另一framework/UI library package
 - **WHEN** 执行v1 dependency和bundle检查
 - **THEN** gate失败并定位不在allowlist中的dependency/import，不能以example能够运行作为豁免
 
@@ -217,7 +217,7 @@ Workspace 必须（MUST）包含 React headless contract、StrictMode subscripti
 - **THEN** 存在独立的 API 生成脚本，且 `verify:v1` 不调用 TypeDoc 或 `docs:build`
 
 ### Requirement: Playground 编辑器 chrome 隔离于产品依赖与预览帧
-公开消费者示例 `examples/playground` 的编辑器页可以（MAY）使用 React、shadcn/ui、Tailwind、Monaco 与可访问拖拽库作为非发布工作台 chrome。这些宿主依赖必须（MUST）仅出现在 `@xunserver-jsf/example-playground`（或同等非发布 example），不得（MUST NOT）进入产品 package 的 manifest、产物或依赖 allowlist，也不得（MUST NOT）成为 `@xunserver-jsf/shadcn` 或任何 UI Adapter 的实现源。编辑器页的全局样式与拖拽 overlay 必须（MUST）不得污染 Element Plus / Ant Design / Arco Vue / Arco React / shadcn 预览 iframe 的文档样式或事件上下文。`examples/shared` 必须（MUST）保持框架与 DOM 无关，继续提供 catalog、workbench 编译、controller、`form-playground-v1` 协议，以及可视化 authoring 文档的纯转换与诊断；React 组件、DOM event、拖拽 sensor 和浏览器下载 API 只能（MUST）由 playground chrome 持有。
+公开消费者示例 `examples/playground` 的编辑器页可以（MAY）使用 React、shadcn/ui、Tailwind、Monaco 与可访问拖拽库作为非发布工作台 chrome。这些宿主依赖必须（MUST）仅出现在 `@xunserver-jsf/example-playground`（或同等非发布 example），不得（MUST NOT）进入产品 package 的 manifest、产物或依赖 allowlist，也不得（MUST NOT）成为 `@xunserver-jsf/shadcn` 或任何 UI Adapter 的实现源。编辑器页的全局样式与拖拽 overlay 必须（MUST）不得污染 Element Plus / Ant Design / shadcn 预览 iframe 的文档样式或事件上下文。`examples/shared` 必须（MUST）保持框架与 DOM 无关，继续提供 catalog、workbench 编译、controller、`form-playground-v1` 协议，以及可视化 authoring 文档的纯转换与诊断；React 组件、DOM event、拖拽 sensor 和浏览器下载 API 只能（MUST）由 playground chrome 持有。
 
 #### Scenario: Playground typecheck 允许 chrome 宿主依赖但不污染产品包
 - **GIVEN** 一个已安装依赖的工作区，`examples/playground` 声明 React、shadcn 相关 UI 依赖、Monaco 与拖拽依赖
@@ -245,12 +245,12 @@ Workspace 必须（MUST）包含 React headless contract、StrictMode subscripti
 #### Scenario: 本地开发仍使用根路径
 - **GIVEN** 未设置 playground base 环境变量
 - **WHEN** 启动 `pnpm playground`
-- **THEN** 开发服务器仍在 `http://127.0.0.1:5173/` 提供编辑器页与四个相对路径预览 HTML
+- **THEN** 开发服务器仍在 `http://127.0.0.1:5173/` 提供编辑器页与三个相对路径预览 HTML
 
 #### Scenario: production 构建使用子路径 base
 - **GIVEN** 设置 `PLAYGROUND_BASE=/json-schema-form/playground/`
 - **WHEN** 运行 playground production 构建
-- **THEN** 产物资源 URL 带该 base，且四个预览 HTML 仍能通过相对 href 从编辑器页加载
+- **THEN** 产物资源 URL 带该 base，且三个预览 HTML 仍能通过相对 href 从编辑器页加载
 
 #### Scenario: 文档工具不进入产品依赖图
 - **GIVEN** 根工作区声明文档站构建依赖与 `site:build` 命令

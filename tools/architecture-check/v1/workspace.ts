@@ -40,16 +40,6 @@ const PACKAGE_LAYOUT: Readonly<Record<string, { id: string; dirs: readonly strin
     dirs: ["widgets", "layouts", "field-chrome", "form"],
     files: ["create-antd-adapter.ts", "index.ts"],
   },
-  "@xunserver-jsf/arco-vue": {
-    id: "DIR-ARCO-VUE",
-    dirs: ["widgets", "layouts", "field-chrome", "form"],
-    files: ["create-arco-vue-adapter.ts", "index.ts"],
-  },
-  "@xunserver-jsf/arco-react": {
-    id: "DIR-ARCO-REACT",
-    dirs: ["widgets", "layouts", "field-chrome", "form"],
-    files: ["create-arco-react-adapter.ts", "index.ts"],
-  },
   "@xunserver-jsf/shadcn": {
     id: "DIR-SHADCN",
     dirs: ["widgets", "layouts", "field-chrome", "form"],
@@ -64,8 +54,6 @@ const PACKAGE_DIRS: Readonly<Record<string, string>> = {
   "@xunserver-jsf/react": "react",
   "@xunserver-jsf/element-plus": "adapter/element-plus",
   "@xunserver-jsf/antd": "adapter/antd",
-  "@xunserver-jsf/arco-vue": "adapter/arco-vue",
-  "@xunserver-jsf/arco-react": "adapter/arco-react",
   "@xunserver-jsf/shadcn": "adapter/shadcn",
 };
 
@@ -77,8 +65,6 @@ const FORBIDDEN_BUNDLE = [
   "react-dom",
   "element-plus",
   "antd",
-  "@arco-design/web-vue",
-  "@arco-design/web-react",
   "ajv",
 ] as const;
 

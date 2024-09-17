@@ -12,7 +12,7 @@
 #### Scenario: 文档站按使用、定制、概念、API 组织
 - **GIVEN** 工作区已安装依赖并生成 API 文档
 - **WHEN** 构建用户文档站点并检查导航与源页面
-- **THEN** 站点包含首页、使用 how-to、定制阶梯、概念页、TypeDoc API 入口，以及 Vue/React 与五个 Adapter 页面，且产物中不包含 `architecture.md` / `workspace.md` / `generated/v1-coverage.md` 作为站点页面
+- **THEN** 站点包含首页、使用 how-to、定制阶梯、概念页、TypeDoc API 入口，以及 Vue/React 与三个 Adapter 页面，且产物中不包含 `architecture.md` / `workspace.md` / `generated/v1-coverage.md` 作为站点页面
 
 #### Scenario: 文档不承诺 deferred API 但覆盖 shadcn
 - **GIVEN** 用户文档源页面
@@ -46,4 +46,4 @@ API 频道必须（MUST）由 TypeDoc 从各产品 package 的 `package.json` `e
 #### Scenario: API 站按 package 入口分组
 - **GIVEN** 已构建 declaration 的工作区
 - **WHEN** 运行 TypeDoc 生成命令
-- **THEN** 输出覆盖 `@xunserver-jsf/core`、`core/runtime`、`core/extension`、`validator-ajv`、`vue`、`react` 与五个 Adapter 根入口，且不把未导出内部模块列为文档入口
+- **THEN** 输出覆盖 `@xunserver-jsf/core`、`core/runtime`、`core/extension`、`validator-ajv`、`vue`、`react` 与三个 Adapter 根入口，且不把未导出内部模块列为文档入口

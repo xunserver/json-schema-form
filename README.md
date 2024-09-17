@@ -1,6 +1,6 @@
 # JSON Schema Form
 
-以 JSON Schema 为数据契约的表单引擎。同一份 Form Definition 可驱动 Vue 与 React，并提供 Element Plus、Ant Design、Arco Vue、Arco React、shadcn 适配器。Core 负责定义、静态编译、事务 Runtime 与校验；UI Adapter 只负责外观。
+以 JSON Schema 为数据契约的表单引擎。同一份 Form Definition 可驱动 Vue 与 React，并提供 Element Plus、Ant Design、shadcn 适配器。Core 负责定义、静态编译、事务 Runtime 与校验；UI Adapter 只负责外观。
 
 - 文档：https://xunserver.github.io/json-schema-form/
 - Playground：https://xunserver.github.io/json-schema-form/playground/
@@ -21,8 +21,6 @@
 | `@xunserver-jsf/react` | React Renderer 边界，只依赖 Core 与 React peer |
 | `@xunserver-jsf/element-plus` | Element Plus UI Adapter 边界，位于 Vue Renderer 之上 |
 | `@xunserver-jsf/antd` | Ant Design UI Adapter 边界，位于 React Renderer 之上 |
-| `@xunserver-jsf/arco-vue` | Arco Design Vue UI Adapter 边界，位于 Vue Renderer 之上 |
-| `@xunserver-jsf/arco-react` | Arco Design React UI Adapter 边界，位于 React Renderer 之上 |
 | `@xunserver-jsf/shadcn` | shadcn UI Adapter 边界（消费方注入组件），位于 React Renderer 之上 |
 
 ## 允许的依赖方向
@@ -33,8 +31,6 @@
 @xunserver-jsf/react --------------> @xunserver-jsf/core
 @xunserver-jsf/element-plus -------> @xunserver-jsf/vue + @xunserver-jsf/core
 @xunserver-jsf/antd ---------------> @xunserver-jsf/react + @xunserver-jsf/core
-@xunserver-jsf/arco-vue -----------> @xunserver-jsf/vue + @xunserver-jsf/core
-@xunserver-jsf/arco-react ---------> @xunserver-jsf/react + @xunserver-jsf/core
 @xunserver-jsf/shadcn -------------> @xunserver-jsf/react + @xunserver-jsf/core
 ```
 
@@ -66,9 +62,9 @@ pnpm site:build
 `pnpm playground` 启动 `examples/playground` 里的单个 Vite 多页面工作台（http://127.0.0.1:5173/）：
 
 - `index.html`：左侧 Monaco JSON 编辑器与 Inspector（React + shadcn 工作台 chrome）
-- `element-plus.html` / `antd.html` / `arco-vue.html` / `arco-react.html` / `shadcn.html`：右侧 Adapter Tab 预览（各 iframe 同时挂载并持续渲染，Tab 只切换可见帧与 Inspector 焦点）
+- `element-plus.html` / `antd.html` / `shadcn.html`：右侧 Adapter Tab 预览（各 iframe 同时挂载并持续渲染，Tab 只切换可见帧与 Inspector 焦点）
 
-左侧可编辑 `schema` / `uiSchema` / `rules` / `config` / `formData`；四个预览页各自独立 `createForm`。切换右侧 Adapter Tab 设焦点后，Inspector 显示该帧的 live values / `serialize()` / submit；已打开过的预览帧保持挂载。共享例子与编译管线在 `examples/shared`。playground 的 shadcn 组件仅用于工作台 chrome，不是表单 Widget 源，也不构成 `@xunserver-jsf/shadcn` adapter。
+左侧可编辑 `schema` / `uiSchema` / `rules` / `config` / `formData`；三个预览页各自独立 `createForm`。切换右侧 Adapter Tab 设焦点后，Inspector 显示该帧的 live values / `serialize()` / submit；已打开过的预览帧保持挂载。共享例子与编译管线在 `examples/shared`。playground 的 shadcn 组件仅用于工作台 chrome，不是表单 Widget 源，也不构成 `@xunserver-jsf/shadcn` adapter。
 
 公开入口：`@xunserver-jsf/core`、`@xunserver-jsf/core/runtime`、`@xunserver-jsf/core/extension`，以及各 Renderer/Adapter package 的根入口。未声明 deep import 会被拒绝。浏览器/Worker 宿主测试依赖根目录 dev-only `playwright`，不会进入发布 package。架构第 20 节列出的八项能力（完整 JSON Schema 自动 UI、运行时改 Model、async rule / 内置远程 DataSource、万能 hooks、独立 nested store、DevTools mutable graph、compiler/runtime 拆包、一次性全 UI Adapter）保持 deferred / optional-unsupported，不作为 v1 产品 API。
 

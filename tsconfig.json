@@ -7,8 +7,6 @@
     { "path": "./packages/react" },
     { "path": "./packages/adapter/element-plus" },
     { "path": "./packages/adapter/antd" },
-    { "path": "./packages/adapter/arco-vue" },
-    { "path": "./packages/adapter/arco-react" },
     { "path": "./packages/adapter/shadcn" }
   ]
 }

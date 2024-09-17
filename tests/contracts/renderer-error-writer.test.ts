@@ -8,8 +8,6 @@ const RENDERER_PACKAGES = [
   "react",
   "adapter/element-plus",
   "adapter/antd",
-  "adapter/arco-vue",
-  "adapter/arco-react",
   "adapter/shadcn",
 ] as const;
 const FORBIDDEN = [

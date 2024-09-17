@@ -37,8 +37,6 @@
     "@types/react-dom": "^19.1.6",
     "@vue/test-utils": "^2.4.6",
     "@xunserver-jsf/antd": "workspace:*",
-    "@xunserver-jsf/arco-react": "workspace:*",
-    "@xunserver-jsf/arco-vue": "workspace:*",
     "@xunserver-jsf/core": "workspace:*",
     "@xunserver-jsf/element-plus": "workspace:*",
     "@xunserver-jsf/react": "workspace:*",

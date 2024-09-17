@@ -18,10 +18,10 @@
 | `pnpm test:v1:docs` | README、workspace、generated coverage 与 deferred 声明审计。 |
 | `pnpm verify` | `build && typecheck && test && check:boundaries`。 |
 | `pnpm verify:v1` | 架构 v1 发布门禁。本地不重装依赖；证据写入 `artifacts/v1/`（该目录已 gitignore）。 |
-| `pnpm changeset` | 记录一次产品包版本变更；九个 `@xunserver-jsf/*` 产品包固定同一版本。 |
+| `pnpm changeset` | 记录一次产品包版本变更；七个 `@xunserver-jsf/*` 产品包固定同一版本。 |
 | `pnpm pack:check` | 构建后对产品包执行 `npm pack --dry-run`，检查将上传的 tarball 内容。 |
 | `pnpm release` | `changeset publish`。CI 在 `verify:v1` 通过后调用。账号与 Trusted Publishing 见 [`release.md`](./release.md)。 |
-| `pnpm playground` | 启动单 Vite MPA 工作台（http://127.0.0.1:5173/）：React + shadcn + Monaco 编辑器，右侧 Adapter Tab 对照 Element Plus / Ant Design / Arco Vue / Arco React / shadcn。 |
+| `pnpm playground` | 启动单 Vite MPA 工作台（http://127.0.0.1:5173/）：React + shadcn + Monaco 编辑器，右侧 Adapter Tab 对照 Element Plus / Ant Design / shadcn。 |
 | `pnpm docs:api` | 从产品 package `exports` 入口生成 TypeDoc Markdown 到 `docs/pages/api/`（gitignore）。 |
 | `pnpm docs:dev` | 先生成 API，再启动 VitePress 用户文档站（`docs/pages`）。贡献者 `architecture.md` / `workspace.md` / `generated/` 不进入该站点。 |
 | `pnpm docs:build` | 先生成 API，再构建 VitePress 静态产物到 `docs/.vitepress/dist`。`DOCS_BASE` 默认 `/json-schema-form/`。 |
@@ -39,11 +39,9 @@
 | `@xunserver-jsf/react` | `packages/react` | React Renderer 边界 | `FormRenderer` / `ViewRenderer` / `FieldRenderer`、readonly hooks、`defineReactUIAdapter()` / `createReactRendererEnvironment()` 与 adapter diagnostics；peer 为 `react` |
 | `@xunserver-jsf/element-plus` | `packages/adapter/element-plus` | Element Plus Adapter 边界 | `elementPlusAdapter` / `createElementPlusAdapter()` / `extendElementPlusAdapter()`；依赖 `@xunserver-jsf/vue` 与 `@xunserver-jsf/core`，peer 为 `vue` 与 `element-plus` |
 | `@xunserver-jsf/antd` | `packages/adapter/antd` | Ant Design Adapter 边界 | `antdAdapter` / `createAntdAdapter()` / `extendAntdAdapter()`；依赖 `@xunserver-jsf/react` 与 `@xunserver-jsf/core`，peer 为 `react` 与 `antd` |
-| `@xunserver-jsf/arco-vue` | `packages/adapter/arco-vue` | Arco Design Vue Adapter 边界 | `arcoVueAdapter` / `createArcoVueAdapter()` / `extendArcoVueAdapter()`；依赖 `@xunserver-jsf/vue` 与 `@xunserver-jsf/core`，peer 为 `vue` 与 `@arco-design/web-vue` |
-| `@xunserver-jsf/arco-react` | `packages/adapter/arco-react` | Arco Design React Adapter 边界 | `arcoReactAdapter` / `createArcoReactAdapter()` / `extendArcoReactAdapter()`；依赖 `@xunserver-jsf/react` 与 `@xunserver-jsf/core`，peer 为 `react` 与 `@arco-design/web-react` |
 | `@xunserver-jsf/shadcn` | `packages/adapter/shadcn` | shadcn UI Adapter 边界（组件由消费方注入） | `createShadcnAdapter({ components })` / `extendShadcnAdapter()`；依赖 `@xunserver-jsf/react` 与 `@xunserver-jsf/core`，peer 仅 `react` |
 
-叶子 package 中 `@xunserver-jsf/vue` / `@xunserver-jsf/element-plus` / `@xunserver-jsf/arco-vue` 与 `@xunserver-jsf/react` / `@xunserver-jsf/antd` / `@xunserver-jsf/arco-react` / `@xunserver-jsf/shadcn` 分别提供框架渲染链路。`@xunserver-jsf/core` 已提供 `defineForm()`、`compileForm()` 静态编译（含 Rule AST 与 Schema Dynamics）、事务 Runtime、array identity / `array()` / `scope()`、`blur()` / `setCollapsed()` / `setActiveTab()`、`RenderScope` / `InstanceBinding`、effective state（含 `required`）、`serialize()` 以及 Validation owner（`validate()` / `applyErrors()` / `submit()`）。AJV 只允许出现在 `@xunserver-jsf/validator-ajv`。可浏览 playground 在 `examples/playground`（共享 catalog 在 `examples/shared`），复用 `tests/fixtures/v1/` 的业务 Definition/Plugin。用户文档站源在 [`pages/`](./pages/index.md)，按使用 / 定制 / 概念 / TypeDoc API 组织；Renderer 用法见该站点的 Vue / React 页面，仓库内 [`vue-element-plus.md`](./vue-element-plus.md) 等仅为短链。GitHub Pages 把文档放在站点根路径、playground 放在 `/playground/`；Pages source 必须设为 GitHub Actions。第 20 节 deferred 项不得作为产品入口出现。
+叶子 package 中 `@xunserver-jsf/vue` / `@xunserver-jsf/element-plus` 与 `@xunserver-jsf/react` / `@xunserver-jsf/antd` / `@xunserver-jsf/shadcn` 分别提供框架渲染链路。`@xunserver-jsf/core` 已提供 `defineForm()`、`compileForm()` 静态编译（含 Rule AST 与 Schema Dynamics）、事务 Runtime、array identity / `array()` / `scope()`、`blur()` / `setCollapsed()` / `setActiveTab()`、`RenderScope` / `InstanceBinding`、effective state（含 `required`）、`serialize()` 以及 Validation owner（`validate()` / `applyErrors()` / `submit()`）。AJV 只允许出现在 `@xunserver-jsf/validator-ajv`。可浏览 playground 在 `examples/playground`（共享 catalog 在 `examples/shared`），复用 `tests/fixtures/v1/` 的业务 Definition/Plugin。用户文档站源在 [`pages/`](./pages/index.md)，按使用 / 定制 / 概念 / TypeDoc API 组织；Renderer 用法见该站点的 Vue / React 页面，仓库内 [`vue-element-plus.md`](./vue-element-plus.md) 等仅为短链。GitHub Pages 把文档放在站点根路径、playground 放在 `/playground/`；Pages source 必须设为 GitHub Actions。第 20 节 deferred 项不得作为产品入口出现。
 
 ## 允许的依赖图
 
@@ -55,8 +53,6 @@
 @xunserver-jsf/react --------------> @xunserver-jsf/core
 @xunserver-jsf/element-plus -------> @xunserver-jsf/vue + @xunserver-jsf/core
 @xunserver-jsf/antd ---------------> @xunserver-jsf/react + @xunserver-jsf/core
-@xunserver-jsf/arco-vue -----------> @xunserver-jsf/vue + @xunserver-jsf/core
-@xunserver-jsf/arco-react ---------> @xunserver-jsf/react + @xunserver-jsf/core
 @xunserver-jsf/shadcn -------------> @xunserver-jsf/react + @xunserver-jsf/core
 ```
 

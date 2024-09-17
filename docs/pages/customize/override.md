@@ -4,7 +4,7 @@
 
 ## L5：追加，不覆盖
 
-`createElementPlusAdapter({ widgets })`（以及 Antd / Arco / shadcn 的对应工厂）用 `mergeExclusive`：**已有内置 key 不会被覆盖**，只能加新 key。
+`createElementPlusAdapter({ widgets })`（以及 Antd / shadcn 的对应工厂）用 `mergeExclusive`：**已有内置 key 不会被覆盖**，只能加新 key。
 
 ```ts
 import { createElementPlusAdapter } from "@xunserver-jsf/element-plus";

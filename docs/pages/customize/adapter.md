@@ -1,6 +1,6 @@
 # 自建 Adapter（L7）
 
-换整套 UI：把 `elementPlusAdapter` 换成 `antdAdapter` / `arco*` / `createShadcnAdapter({ components })`。同一 Core `FormInstance` 可交给不同叶子包。
+换整套 UI：把 `elementPlusAdapter` 换成 `antdAdapter` / `createShadcnAdapter({ components })`。同一 Core `FormInstance` 可交给不同叶子包。
 
 要换 label 外壳（FieldChrome）或 `<form>` 外壳，`create*Adapter()` **不够**：工厂不能替换 `fieldChrome` / `form`。必须 `defineVueUIAdapter` / `defineReactUIAdapter` 提供四个角色：
 

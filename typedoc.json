@@ -10,8 +10,6 @@
     "packages/react/src/index.ts",
     "packages/adapter/element-plus/src/index.ts",
     "packages/adapter/antd/src/index.ts",
-    "packages/adapter/arco-vue/src/index.ts",
-    "packages/adapter/arco-react/src/index.ts",
     "packages/adapter/shadcn/src/index.ts"
   ],
   "entryPointStrategy": "resolve",

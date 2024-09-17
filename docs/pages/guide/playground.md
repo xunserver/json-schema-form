@@ -12,7 +12,7 @@ Playground 用来对照同一份 Form Definition 在多套 Adapter 上的渲染�
 pnpm playground
 ```
 
-打开 http://127.0.0.1:5173/ 。顶栏可在 **文本** 与 **可视化** 模式间切换。文本模式用 Monaco 编辑 `schema` / `uiSchema` / `rules` / `config` / `formData`；可视化模式用组件面板、设计画布和属性检查器生成 Schema 与 UI Schema。右侧 iframe 对照 Element Plus / Ant Design / Arco Vue / Arco React / shadcn。
+打开 http://127.0.0.1:5173/ 。顶栏可在 **文本** 与 **可视化** 模式间切换。文本模式用 Monaco 编辑 `schema` / `uiSchema` / `rules` / `config` / `formData`；可视化模式用组件面板、设计画布和属性检查器生成 Schema 与 UI Schema。右侧 iframe 对照 Element Plus / Ant Design / shadcn。需要专注编辑时，可在顶栏点 **隐藏预览** 收起右侧预览与检查器，编辑区会占满剩余宽度；点 **显示预览** 即可恢复，预览帧会保持挂载。
 
 两种模式共享同一份 `WorkbenchDocument`。可视化提交只改写 schema/uiSchema 文本，并走既有编译、诊断与 `form-playground-v1` 广播；rules、config、formData 保持原样。
 

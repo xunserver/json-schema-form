@@ -51,7 +51,7 @@ export type WorkbenchDiagnoseResult =
       readonly diagnostics: readonly Diagnostic[];
     };
 
-export type PreviewId = "element-plus" | "antd" | "arco-vue" | "arco-react" | "shadcn";
+export type PreviewId = "element-plus" | "antd" | "shadcn";
 
 export interface PreviewChrome {
   readonly id: PreviewId;
@@ -62,7 +62,5 @@ export interface PreviewChrome {
 export const PREVIEW_CHROME: readonly PreviewChrome[] = Object.freeze([
   Object.freeze({ id: "element-plus", label: "Element Plus", href: "element-plus.html" }),
   Object.freeze({ id: "antd", label: "Ant Design", href: "antd.html" }),
-  Object.freeze({ id: "arco-vue", label: "Arco Vue", href: "arco-vue.html" }),
-  Object.freeze({ id: "arco-react", label: "Arco React", href: "arco-react.html" }),
   Object.freeze({ id: "shadcn", label: "shadcn", href: "shadcn.html" }),
 ]);

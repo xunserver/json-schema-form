@@ -11,8 +11,6 @@ const FIRST_PARTY_PACKAGES = [
   "@xunserver-jsf/react",
   "@xunserver-jsf/element-plus",
   "@xunserver-jsf/antd",
-  "@xunserver-jsf/arco-vue",
-  "@xunserver-jsf/arco-react",
   "@xunserver-jsf/shadcn",
 ] as const;
 
@@ -47,8 +45,6 @@ describe("workspace contract", () => {
       "./packages/react",
       "./packages/adapter/element-plus",
       "./packages/adapter/antd",
-      "./packages/adapter/arco-vue",
-      "./packages/adapter/arco-react",
       "./packages/adapter/shadcn",
     ]);
   });

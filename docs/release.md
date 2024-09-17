@@ -1,6 +1,6 @@
 # npm 发布
 
-产品 package 以 `@xunserver-jsf/*` 公开发布。根仓库与 `examples/*` 保持 `private`，不会被 publish。九个产品包固定同一 semver。
+产品 package 以 `@xunserver-jsf/*` 公开发布。根仓库与 `examples/*` 保持 `private`，不会被 publish。七个产品包固定同一 semver。
 
 GitHub 仓库：https://github.com/xunserver/json-schema-form  
 文档站：https://xunserver.github.io/json-schema-form/  
@@ -11,7 +11,7 @@ Playground：https://xunserver.github.io/json-schema-form/playground/
 这些步骤只能在 npm / GitHub 网页或本机交互式 CLI 完成，不进代码。Granular access token（即使勾了 Bypass 2FA）**不能**登记 Trusted Publisher。
 
 1. 在 [npm](https://www.npmjs.com/) 登录有 2FA 的账号，创建 organization **`xunserver-jsf`**（与已有的 `@xunserver` 不是同一个 org）。
-2. 九个产品包必须已经存在于 registry（首次可用本机 `npm publish --access public`）。Trusted Publisher 不能挂到还不存在的包上。
+2. 七个产品包必须已经存在于 registry（首次可用本机 `npm publish --access public`）。Trusted Publisher 不能挂到还不存在的包上。
 3. 为每个产品包登记 Trusted Publisher，指向本仓库的 release workflow。字段必须完全一致（大小写敏感）：
    - Provider：GitHub Actions
    - Organization or user：`xunserver`
@@ -34,8 +34,6 @@ for pkg in \
   @xunserver-jsf/react \
   @xunserver-jsf/element-plus \
   @xunserver-jsf/antd \
-  @xunserver-jsf/arco-vue \
-  @xunserver-jsf/arco-react \
   @xunserver-jsf/shadcn
 do
   npm trust github "$pkg" \

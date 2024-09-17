@@ -323,8 +323,6 @@ function checkManifestPolicy(pkg: DiscoveredPackage): ArchitectureDiagnostic[] {
     if (
       (pkg.name === "@xunserver-jsf/react" ||
         pkg.name === "@xunserver-jsf/antd" ||
-        pkg.name === "@xunserver-jsf/arco-react" ||
-        pkg.name === "@xunserver-jsf/arco-vue" ||
         pkg.name === "@xunserver-jsf/shadcn") &&
       isMuiForbiddenPackage(target)
     ) {
@@ -420,8 +418,6 @@ function checkSourceImports(
       if (
         (pkg.name === "@xunserver-jsf/react" ||
           pkg.name === "@xunserver-jsf/antd" ||
-          pkg.name === "@xunserver-jsf/arco-react" ||
-          pkg.name === "@xunserver-jsf/arco-vue" ||
           pkg.name === "@xunserver-jsf/shadcn") &&
         isMuiForbiddenPackage(targetName)
       ) {

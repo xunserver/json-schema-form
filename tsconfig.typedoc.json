@@ -17,8 +17,6 @@
     "packages/react/src/**/*.ts",
     "packages/adapter/element-plus/src/**/*.ts",
     "packages/adapter/antd/src/**/*.ts",
-    "packages/adapter/arco-vue/src/**/*.ts",
-    "packages/adapter/arco-react/src/**/*.ts",
     "packages/adapter/shadcn/src/**/*.ts"
   ],
   "exclude": ["**/*.test.ts", "**/*.test-utils.ts", "**/test-utils/**"]

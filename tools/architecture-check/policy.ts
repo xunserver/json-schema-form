@@ -5,8 +5,6 @@ export const FIRST_PARTY_PACKAGES = [
   "@xunserver-jsf/react",
   "@xunserver-jsf/element-plus",
   "@xunserver-jsf/antd",
-  "@xunserver-jsf/arco-vue",
-  "@xunserver-jsf/arco-react",
   "@xunserver-jsf/shadcn",
 ] as const;
 
@@ -19,8 +17,6 @@ export const ALLOWED_EDGES: Readonly<Record<FirstPartyPackage, readonly FirstPar
   "@xunserver-jsf/react": ["@xunserver-jsf/core"],
   "@xunserver-jsf/element-plus": ["@xunserver-jsf/core", "@xunserver-jsf/vue"],
   "@xunserver-jsf/antd": ["@xunserver-jsf/core", "@xunserver-jsf/react"],
-  "@xunserver-jsf/arco-vue": ["@xunserver-jsf/core", "@xunserver-jsf/vue"],
-  "@xunserver-jsf/arco-react": ["@xunserver-jsf/core", "@xunserver-jsf/react"],
   "@xunserver-jsf/shadcn": ["@xunserver-jsf/core", "@xunserver-jsf/react"],
 };
 
@@ -29,8 +25,6 @@ export const REQUIRED_PEERS: Readonly<Partial<Record<FirstPartyPackage, readonly
   "@xunserver-jsf/react": ["react"],
   "@xunserver-jsf/element-plus": ["vue", "element-plus"],
   "@xunserver-jsf/antd": ["react", "antd"],
-  "@xunserver-jsf/arco-vue": ["vue", "@arco-design/web-vue"],
-  "@xunserver-jsf/arco-react": ["react", "@arco-design/web-react"],
   "@xunserver-jsf/shadcn": ["react"],
 };
 
@@ -41,8 +35,6 @@ export const HOST_PACKAGES = [
   "element-plus",
   "antd",
   "@ant-design/icons",
-  "@arco-design/web-vue",
-  "@arco-design/web-react",
 ] as const;
 
 export const MUI_FORBIDDEN_PACKAGES = [
@@ -140,8 +132,7 @@ export function isReverseEdge(source: FirstPartyPackage, target: FirstPartyPacka
 export function frameworkFamily(packageName: string): "vue" | "react" | undefined {
   if (
     packageName === "@xunserver-jsf/vue" ||
-    packageName === "@xunserver-jsf/element-plus" ||
-    packageName === "@xunserver-jsf/arco-vue"
+    packageName === "@xunserver-jsf/element-plus"
   ) {
     return "vue";
   }
@@ -149,7 +140,6 @@ export function frameworkFamily(packageName: string): "vue" | "react" | undefine
   if (
     packageName === "@xunserver-jsf/react" ||
     packageName === "@xunserver-jsf/antd" ||
-    packageName === "@xunserver-jsf/arco-react" ||
     packageName === "@xunserver-jsf/shadcn"
   ) {
     return "react";

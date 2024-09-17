@@ -53,8 +53,6 @@ describe("architecture checker", () => {
     expect(ALLOWED_EDGES["@xunserver-jsf/react"]).toEqual(["@xunserver-jsf/core"]);
     expect(ALLOWED_EDGES["@xunserver-jsf/element-plus"]).toEqual(["@xunserver-jsf/core", "@xunserver-jsf/vue"]);
     expect(ALLOWED_EDGES["@xunserver-jsf/antd"]).toEqual(["@xunserver-jsf/core", "@xunserver-jsf/react"]);
-    expect(ALLOWED_EDGES["@xunserver-jsf/arco-vue"]).toEqual(["@xunserver-jsf/core", "@xunserver-jsf/vue"]);
-    expect(ALLOWED_EDGES["@xunserver-jsf/arco-react"]).toEqual(["@xunserver-jsf/core", "@xunserver-jsf/react"]);
     expect(ALLOWED_EDGES["@xunserver-jsf/shadcn"]).toEqual(["@xunserver-jsf/core", "@xunserver-jsf/react"]);
   });
 

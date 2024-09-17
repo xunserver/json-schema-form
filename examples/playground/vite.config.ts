@@ -30,8 +30,6 @@ export default defineConfig({
         main: path.resolve(root, "index.html"),
         "element-plus": path.resolve(root, "element-plus.html"),
         antd: path.resolve(root, "antd.html"),
-        "arco-vue": path.resolve(root, "arco-vue.html"),
-        "arco-react": path.resolve(root, "arco-react.html"),
         shadcn: path.resolve(root, "shadcn.html"),
       },
     },
@@ -39,8 +37,6 @@ export default defineConfig({
   optimizeDeps: {
     include: [
       "antd",
-      "@arco-design/web-react",
-      "@arco-design/web-vue",
       "element-plus",
       "react",
       "react-dom",

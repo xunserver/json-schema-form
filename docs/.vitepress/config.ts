@@ -116,7 +116,6 @@ export default defineConfig({
           items: [
             { text: "Renderer", link: "/vue/renderer" },
             { text: "Element Plus", link: "/vue/element-plus" },
-            { text: "Arco Vue", link: "/vue/arco-vue" },
           ],
         },
       ],
@@ -126,7 +125,6 @@ export default defineConfig({
           items: [
             { text: "Renderer", link: "/react/renderer" },
             { text: "Ant Design", link: "/react/antd" },
-            { text: "Arco React", link: "/react/arco-react" },
             { text: "shadcn", link: "/react/shadcn" },
           ],
         },

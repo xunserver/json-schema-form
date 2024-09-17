@@ -64,7 +64,7 @@ describe("playground visual editor production bundle", () => {
   test("VSE-IFRAME-STYLE-ISOLATION production bundle keeps editor chrome out of preview entries", () => {
     const assets = fs.readdirSync(path.join(dist, "assets"));
     const previewAssets = assets.filter((name) =>
-      /element-plus|antd|arco-vue|arco-react|shadcn/.test(name),
+      /element-plus|antd|shadcn/.test(name),
     );
     expect(previewAssets.length).toBeGreaterThan(0);
     for (const file of previewAssets) {

@@ -10,8 +10,6 @@ const FORBIDDEN = [
   "react-dom",
   "element-plus",
   "antd",
-  "@arco-design/web-vue",
-  "@arco-design/web-react",
   "ajv",
 ];
 
@@ -26,8 +24,6 @@ describe("v1 core portability", () => {
       "react",
       "adapter/element-plus",
       "adapter/antd",
-      "adapter/arco-vue",
-      "adapter/arco-react",
       "adapter/shadcn",
     ]) {
       const manifest = readJson<{

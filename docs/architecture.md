@@ -521,7 +521,7 @@ WidgetDefinition 不包含 Vue/React component、native props/events、UI librar
 ```text
 Core logical protocol
   +-- @xunserver-jsf/vue   -> VueUIAdapter   -> Element Plus / Ant Design Vue / ...
-  `-- @xunserver-jsf/react -> ReactUIAdapter -> Ant Design React / Arco Design React / shadcn / ...
+  `-- @xunserver-jsf/react -> ReactUIAdapter -> Ant Design React / shadcn / ...
 ```
 
 VueRenderer 和 ReactRenderer 独立实现树遍历、生命周期和订阅，但共享 ViewTree、Runtime、Snapshot 和行为规范。
@@ -699,8 +699,6 @@ Public object 优先暴露 interface + factory，不暴露可直接 `new` 的内
 
 ```text
 @xunserver-jsf/antd
-@xunserver-jsf/arco-vue
-@xunserver-jsf/arco-react
 @xunserver-jsf/shadcn
 ```
 
@@ -716,8 +714,6 @@ Public object 优先暴露 interface + factory，不暴露可直接 `new` 的内
 @xunserver-jsf/react --------------> @xunserver-jsf/core
 @xunserver-jsf/element-plus -------> @xunserver-jsf/vue + @xunserver-jsf/core
 @xunserver-jsf/antd ---------------> @xunserver-jsf/react + @xunserver-jsf/core
-@xunserver-jsf/arco-vue -----------> @xunserver-jsf/vue + @xunserver-jsf/core
-@xunserver-jsf/arco-react ---------> @xunserver-jsf/react + @xunserver-jsf/core
 @xunserver-jsf/shadcn -------------> @xunserver-jsf/react + @xunserver-jsf/core
 ```
 
@@ -735,12 +731,10 @@ repo/
   |    |- adapter/
   |    |    |- element-plus/
   |    |    |- antd/
-  |    |    |- arco-vue/
-  |    |    |- arco-react/
   |    |    `- shadcn/
   |- examples/
   |    |- shared/            # playground catalog 与框架无关编译管线
-  |    `- playground/        # 单 Vite MPA：shadcn React + Monaco 编辑器 + 四 UI 预览 iframe
+  |    `- playground/        # 单 Vite MPA：shadcn React + Monaco 编辑器 + 三 UI 预览 iframe
   |- tests/
   |- docs/
   |- package.json
@@ -830,22 +824,6 @@ packages/adapter/antd/src/
   |- field-chrome/
   |- form/
   |- create-antd-adapter.ts
-  `- index.ts
-
-packages/adapter/arco-vue/src/
-  |- widgets/
-  |- layouts/
-  |- field-chrome/
-  |- form/
-  |- create-arco-vue-adapter.ts
-  `- index.ts
-
-packages/adapter/arco-react/src/
-  |- widgets/
-  |- layouts/
-  |- field-chrome/
-  |- form/
-  |- create-arco-react-adapter.ts
   `- index.ts
 
 packages/adapter/shadcn/src/

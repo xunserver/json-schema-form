@@ -28,8 +28,6 @@ pnpm add react react-dom antd
 
 | 目标 | 额外安装 |
 |---|---|
-| Vue + Arco | `@xunserver-jsf/arco-vue`、`@arco-design/web-vue` |
-| React + Arco | `@xunserver-jsf/arco-react`、`@arco-design/web-react` |
 | React + shadcn | `@xunserver-jsf/shadcn`；组件由你注入，见 [shadcn Adapter](/react/shadcn) |
 
 ## Vue：第一个能提交的表单

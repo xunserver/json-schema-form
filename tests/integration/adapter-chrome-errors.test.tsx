@@ -4,7 +4,6 @@ import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { compileForm, createForm, defineForm } from "@xunserver-jsf/core";
 import { FormRenderer } from "@xunserver-jsf/react";
 import { antdAdapter } from "@xunserver-jsf/antd";
-import { arcoReactAdapter } from "@xunserver-jsf/arco-react";
 
 afterEach(() => {
   cleanup();
@@ -50,18 +49,5 @@ describe("adapter presentable errors", () => {
     expect(alert?.textContent).toBe("必须填写姓名");
     expect(container.querySelector(".ant-form-item-has-error")).not.toBeNull();
     expect(container.querySelector(".ant-form-item-explain")).not.toBeNull();
-  });
-
-  test("arco-react renders Core errors in Form.Item help", () => {
-    const form = requiredNameForm();
-    const { container } = render(<FormRenderer form={form} adapter={arcoReactAdapter} />);
-    act(() => {
-      form.applyErrors([{ code: "required", instancePath: "name", message: "必须填写姓名" }]);
-      form.touch("name");
-    });
-    const alert = container.querySelector("[role=alert]");
-    expect(alert?.textContent).toBe("必须填写姓名");
-    expect(container.querySelector(".arco-form-item-error")).not.toBeNull();
-    expect(alert?.closest(".arco-form-message")).not.toBeNull();
   });
 });
