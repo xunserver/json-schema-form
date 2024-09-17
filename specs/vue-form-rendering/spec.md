@@ -110,6 +110,19 @@ Renderer 与 FieldChrome 必须（MUST）消费 Core readonly presentable errors
 - **WHEN** Renderer 呈现 FieldChrome
 - **THEN** Chrome 不展示该 raw error，Renderer 不自行检查 touched、submitCount 或 error source 覆盖 Core 选择
 
+### Requirement: Layout 与容器 Renderer 校验非法 tab
+Group/Layout/Object/Array binding 若声明 `tabs`，Renderer 必须（MUST）在调用 `setActiveTab` 前校验 tab key；非法 key 必须（MUST）产生 `adapter.invalid-tab` diagnostic 且不得（MUST NOT）写入 Core。未声明 `tabs` 时行为保持既有直通。
+
+#### Scenario: Layout 拒绝非法 tab
+- **GIVEN** Layout adapter 声明 tabs `["basic", "advanced"]`
+- **WHEN** binding 请求 `setActiveTab("other")`
+- **THEN** 报告 adapter diagnostic，Core `activeTab` 不变
+
+#### Scenario: Object/Array 同等守卫
+- **GIVEN** Object 或 Array layout binding 声明 tabs
+- **WHEN** 传入未声明 tab key
+- **THEN** 与 Group 相同，不写入 Core
+
 ### Requirement: SSR 与 hydration 无 DOM 假设且结果确定
 Vue Renderer 必须（SHALL）支持服务端 render：setup/render 期间不得（MUST NOT）读取 `window`、`document`、element ref 或安装长期 Runtime subscription；服务端只读取一次 committed readonly snapshot。相同 model、runtime snapshot、adapter 与 scope 必须（MUST）产生稳定的 View/Array keys 和等价结构，客户端 mount 后才安装 subscription，并能在 hydration 前状态已变化时收敛到最新 commit。
 

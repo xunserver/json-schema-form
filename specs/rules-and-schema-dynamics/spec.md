@@ -43,7 +43,7 @@ Compiler 必须（MUST）规范化每条 State、Computed、Validation 与 Effec
 - **THEN** transaction回滚values/rule state/version且不通知普通subscriber，Runtime Diagnostic不包含原始exception对象
 
 ### Requirement: DependencyScheduler 按实例scope精确调度
-Schema Dynamics、State/Computed/Effect Rule与后续Validation Rule plan必须（MUST）复用同一个transaction-owned dependency scheduler和committed change set。静态Rule template在每个materialized array/recursive binding中形成独立rule instance；具有共同`[]`祖先的target/dependency必须（MUST）解析到相同`ArrayItemId` chain，root/ancestor dependency保持共享语义。无关path或sibling item不得（MUST NOT）重新求值。
+Schema Dynamics、State/Computed/Effect Rule与后续Validation Rule plan必须（MUST）复用同一个transaction-owned dependency scheduler和committed change set。该 scheduler 是内部协调器：根据 value/field change set、Schema activation `false→true` 翻转集合以及 `forceAll`/`reset` 标志，计算本轮应求值的 Rule instance 与应交 Validation 的 plan binding；必须（MUST）复用既有 BindingIndex 与 `ArrayItemId` chain 语义，不得（MUST NOT）成为公开 Application/Runtime/Extension API。静态Rule template在每个materialized array/recursive binding中形成独立rule instance；具有共同`[]`祖先的target/dependency必须（MUST）解析到相同`ArrayItemId` chain，root/ancestor dependency保持共享语义。无关path或sibling item不得（MUST NOT）重新求值。公共 mutation 必须（MUST）经 `FormRuntime` 事务入口进入 phase 流水线，而不是要求消费者持有 `TransactionManager` 类型。
 
 #### Scenario: array item Rule绑定同一item
 - **GIVEN** Rule target为`products[].total`且读取`products[].price`与`products[].quantity`
@@ -64,6 +64,11 @@ Schema Dynamics、State/Computed/Effect Rule与后续Validation Rule plan必须�
 - **GIVEN** initial values触发activation、State、Computed和Effect Rule
 - **WHEN** `createForm()`成功返回
 - **THEN** 首个公开snapshot已达到稳定结果、未发布中间态，稳定后的初始baseline为dirty/reset比较基准且public version从0开始
+
+#### Scenario: activation翻转触发精确重调度
+- **GIVEN** inactive branch 上的 Computed/Effect 在 inactive 期间其依赖已变化且保留 draft values
+- **WHEN** Schema activation 使该 branch 变为 active
+- **THEN** dependency scheduler 在同一 transaction 内重新调度该 branch 的 State/Computed/Effect 与后续 Validation plan，无关 sibling 不重算，subscriber 只看到最终稳定 snapshot
 
 ### Requirement: State Rule 只产生独立的rule-owned状态结果
 State Rule必须（MUST）只产生`active`、`visible`、`disabled`或`readonly`的boolean rule-owned结果，不得（MUST NOT）直接修改value、UIModel、ViewTree或其他source namespace。缺省`when`视为true；`when`为false时该Rule对目标属性提供neutral结果。非boolean状态结果必须（MUST）使当前transaction失败而不发布partial effective snapshot。
@@ -151,7 +156,7 @@ Dynamics compiler必须（MUST）把static superset中`oneOf`、`anyOf`、`if/th
 - **THEN** 编译产生带Schema来源的能力Diagnostic并阻断需要猜测的activation plan
 
 ### Requirement: Runtime activation 只切换实例状态并保留inactive内容
-Activation phase必须（MUST）在State/Computed/Effect前同步求值：oneOf恰好一个匹配branch active，anyOf的每个匹配branch active，if在then/else间选择，dependentSchema按property presence切换；common/base node保持active，branch共享node在任一owner branch active时active。branch切换不得（MUST NOT）增加、删除或修改Compiled Model node，也不得清除inactive values、Field/View state或Array identity。
+Activation phase必须（MUST）在State/Computed/Effect前同步求值：oneOf恰好一个匹配branch active，anyOf的每个匹配branch active，if在then/else间选择，dependentSchema按property presence切换；common/base node保持active，branch共享node在任一owner branch active时active。branch切换不得（MUST NOT）增加、删除或修改Compiled Model node，也不得清除inactive values、Field/View state或Array identity。重新 active 时必须（MUST）通过共享 dependency scheduler 按保留值重新调度该 subtree 的 State/Computed/Effect 与后续 Validation plans。
 
 #### Scenario: branch切换保留draft state
 - **GIVEN** then branch中的Field已有value、touched和View state

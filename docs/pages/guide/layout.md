@@ -11,7 +11,7 @@
 | `field` | 挂一个 `path`（ModelPath） |
 | `object` | 对象容器 |
 | `array` | 数组容器，需要 `path` |
-| `group` | 可折叠分组 |
+| `group` | 视觉分组（卡片/盒子，默认不折叠） |
 | `layout` | 栅格；可用 `columns` |
 | `remaining-fields` | 插入尚未出现在 layout 里的字段 |
 

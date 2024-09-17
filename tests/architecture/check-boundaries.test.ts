@@ -215,4 +215,46 @@ describe("architecture checker", () => {
       ),
     ).toBe(true);
   });
+
+  test("VSE-BOUNDARY-CHROME allows playground dnd-kit but rejects shared/product leaks", () => {
+    const diagnostics = checkArchitecture(REPO_ROOT);
+    expect(diagnostics).toEqual([]);
+    const playground = readJson<{ dependencies?: Record<string, string> }>(
+      path.join(REPO_ROOT, "examples/playground/package.json"),
+    );
+    const shared = readJson<{ dependencies?: Record<string, string> }>(
+      path.join(REPO_ROOT, "examples/shared/package.json"),
+    );
+    expect(playground.dependencies?.["@dnd-kit/react"]).toBeTypeOf("string");
+    expect(shared.dependencies?.["@dnd-kit/react"]).toBeUndefined();
+    expect(shared.dependencies?.react).toBeUndefined();
+
+    const root = copyRepoPackages();
+    fs.mkdirSync(path.join(root, "examples", "shared", "src"), { recursive: true });
+    writeText(
+      path.join(root, "examples", "shared", "package.json"),
+      `${JSON.stringify({ name: "@xunserver-jsf/example-shared", dependencies: { react: "^19.0.0" } }, null, 2)}\n`,
+    );
+    writeText(path.join(root, "examples", "shared", "src", "leak.ts"), 'import { useState } from "react";\nexport const n = useState;\n');
+    mutateManifest(root, "core", (manifest) => {
+      manifest.dependencies = { ...(manifest.dependencies ?? {}), "@dnd-kit/react": "^0.5.0" };
+    });
+    const leaked = checkArchitecture(root);
+    expect(
+      leaked.some(
+        (diagnostic) =>
+          diagnostic.rule === RULE.exampleChromeLeak &&
+          diagnostic.sourcePackage === "@xunserver-jsf/example-shared" &&
+          diagnostic.targetPackage === "react",
+      ),
+    ).toBe(true);
+    expect(
+      leaked.some(
+        (diagnostic) =>
+          diagnostic.rule === RULE.exampleChromeLeak &&
+          diagnostic.sourcePackage === "@xunserver-jsf/core" &&
+          diagnostic.targetPackage === "@dnd-kit/react",
+      ),
+    ).toBe(true);
+  });
 });

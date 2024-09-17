@@ -1,4 +1,4 @@
-import type { ArrayView, GroupView, LayoutView, ObjectView } from "@xunserver-jsf/core";
+import type { ArrayView, LayoutView, ObjectView } from "@xunserver-jsf/core";
 import type { LayoutBinding } from "@xunserver-jsf/react";
 import type { ReactNode } from "react";
 import type { ShadcnAdapterComponents } from "../components.js";
@@ -6,7 +6,7 @@ import type { ShadcnAdapterComponents } from "../components.js";
 export function createLayoutBindings(
   components: ShadcnAdapterComponents,
 ): Readonly<Record<string, LayoutBinding>> {
-  const Collapsible = components.Collapsible;
+  const Card = components.Card;
 
   const objectLayout: LayoutBinding = {
     render(input) {
@@ -29,20 +29,8 @@ export function createLayoutBindings(
   };
 
   const groupLayout: LayoutBinding = {
-    collapsible: true,
     render(input) {
-      const view = input.view as GroupView;
-      return (
-        <Collapsible
-          open={!input.viewSnapshot.collapsed}
-          onOpenChange={(open) => {
-            input.actions.setCollapsed(!open);
-          }}
-          title={view.id}
-        >
-          {input.children as ReactNode}
-        </Collapsible>
-      );
+      return <Card data-layout="group">{input.children as ReactNode}</Card>;
     },
   };
 

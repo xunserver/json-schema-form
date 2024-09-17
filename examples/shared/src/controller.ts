@@ -43,6 +43,7 @@ export interface PlaygroundController {
   subscribe(listener: () => void): () => void;
   setActiveTab(tab: EditorKey): void;
   setEditorText(value: string): void;
+  replaceDefinitionTexts(input: { readonly schemaText: string; readonly uiSchemaText: string }): void;
   setExample(id: string): void;
   setFocusedPreview(id: PreviewId): void;
   requestSubmit(): void;
@@ -203,6 +204,15 @@ export function createPlaygroundController(): PlaygroundController {
     setEditorText(value) {
       const key = `${activeTab}Text` as const;
       workbench = { ...workbench, [key]: value };
+      scheduleCompile(false);
+      emit();
+    },
+    replaceDefinitionTexts(input) {
+      workbench = {
+        ...workbench,
+        schemaText: input.schemaText,
+        uiSchemaText: input.uiSchemaText,
+      };
       scheduleCompile(false);
       emit();
     },

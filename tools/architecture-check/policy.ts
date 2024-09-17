@@ -71,6 +71,7 @@ export const RULE = {
   hostPeerPlacement: "host-peer-placement",
   missingPeer: "missing-peer",
   coreLayout: "core-layout",
+  exampleChromeLeak: "example-chrome-leak",
 } as const;
 
 export type RuleId = (typeof RULE)[keyof typeof RULE];
@@ -106,6 +107,23 @@ export const CORE_RUNTIME_SUBDIRS = [
 ] as const;
 
 export const CORE_FORBIDDEN_TOP_LEVEL_DIRS = ["types", "services", "utils"] as const;
+
+export const EXAMPLE_CHROME_PACKAGES = [
+  "react",
+  "react-dom",
+  "monaco-editor",
+  "@monaco-editor/react",
+  "@dnd-kit/react",
+  "@dnd-kit/dom",
+  "@dnd-kit/abstract",
+  "@dnd-kit/core",
+  "@dnd-kit/sortable",
+  "tailwindcss",
+] as const;
+
+export function isExampleChromePackage(name: string): boolean {
+  return (EXAMPLE_CHROME_PACKAGES as readonly string[]).includes(name);
+}
 
 export function isFirstPartyPackage(name: string): name is FirstPartyPackage {
   return (FIRST_PARTY_PACKAGES as readonly string[]).includes(name);

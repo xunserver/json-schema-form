@@ -91,3 +91,24 @@ LayoutAdapterRegistry 必须（MUST）分别支持绑定数据 scope 的 Object/
 - **GIVEN** 用户编辑并 blur一个 text control
 - **WHEN** binding处理 Element Plus emits
 - **THEN** 它按策略发出 decoded `setValue`、`touch`、`focus`/`blur`，不把native event对象传入Definition、Core或domain values
+
+### Requirement: readonly 与 disabled 阻止写入
+标准 Element Plus Widget binding 必须（MUST）在 effective `readonly` 或 `disabled` 时拒绝 codec 写入：`applyCodecChange`（或等价路径）不得（MUST NOT）调用 `setValue`。对不尊重 native `readonly` 的控件（select、checkbox、switch 等），必须（MUST）将 native `disabled` 设为 `disabled || readonly`，或提供同等不可编辑表现。
+
+#### Scenario: readonly 文本不写入
+- **GIVEN** Field effective `readonly: true`
+- **WHEN** native 发出 `onUpdate:modelValue`
+- **THEN** Core values 与 version 不变
+
+#### Scenario: readonly select 不可编辑且不写入
+- **GIVEN** select Field effective `readonly: true`
+- **WHEN** 渲染并尝试更新 modelValue
+- **THEN** 控件以 disabled 表现，且 Core 不被写入
+
+### Requirement: FieldChrome 单一可见 label
+Element Plus FieldChrome 必须（MUST）为 label 提供恰好一份可见呈现，并保留稳定 `ids.label` 供控件 `aria-labelledby`；不得（MUST NOT）同时通过 `ElFormItem` label prop 与额外可见文本节点重复显示同一 label。
+
+#### Scenario: 单 label 与 ARIA
+- **GIVEN** Field 有 display label
+- **WHEN** 渲染 FieldChrome
+- **THEN** 页面上该 label 只出现一次，且 control 的 `aria-labelledby` 指向 `ids.label`

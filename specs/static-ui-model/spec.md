@@ -114,6 +114,19 @@ UIModel 必须（SHALL）按 `ModelPath` 提供独立于 DataNode 和 ViewNode �
 - **WHEN** 编译 ViewTree
 - **THEN** 两个 FieldView 拥有不同 `ViewNodeId`，但都引用同一个 FieldDescriptor/`ModelPath`
 
+### Requirement: Object/Array 可显式投影为 atomic Field
+UI compiler 必须（MUST）在 Object/Array DataNode 上，当 UI Schema 显式声明 `widget` **或** `field: true` 时生成 FieldDescriptor，使其可作为 atomic Field 进入 Field Registry 与 ViewTree；仅有容器语义且无上述声明时不得（MUST NOT）默认生成 Field。`field: false` 必须（MUST）在 compile time 禁止生成 Field。Widget resolution 仍按显式 widget > enum/const > format > type/shape > fallback。
+
+#### Scenario: field true 无 widget 也可投影
+- **GIVEN** Object path `address` 的 UI Schema 为 `{ field: true }` 且无 widget
+- **WHEN** 编译 UIModel
+- **THEN** 生成 `address` 的 FieldDescriptor，并按 matcher/fallback 解析 widget
+
+#### Scenario: 显式 widget 投影 Object
+- **GIVEN** Array path 声明 `widget: "json"`
+- **WHEN** 编译 UIModel
+- **THEN** 该 path 成为 atomic Field，默认不再展开 child views
+
 ### Requirement: DataNode、FieldDescriptor 与 ViewNode 不合并
 最终 UIModel 必须（MUST）保持 Data Tree、Field Registry 与 ViewTree 三种所有权边界；`ObjectView` 不得（MUST NOT）等同于纯 presentation `GroupView`，`ArrayView` 不得（MUST NOT）等同于 item repetition layout。Renderer 所需的 Field 引用、scope 与 layout 参数必须（MUST）在 compile 后 resolved，但不得包含 Framework component、DOM event、Adapter binding 或 Runtime effective snapshot。
 

@@ -132,12 +132,10 @@ export interface ShadcnFieldGroupProps {
   readonly className?: string;
 }
 
-export interface ShadcnCollapsibleProps {
-  readonly open: boolean;
-  readonly onOpenChange: (open: boolean) => void;
-  readonly title: ReactNode;
+export interface ShadcnCardProps {
   readonly children?: ReactNode;
   readonly className?: string;
+  readonly "data-layout"?: string;
 }
 
 /**
@@ -162,7 +160,7 @@ export interface ShadcnAdapterComponents {
   readonly FieldDescription: ComponentType<ShadcnFieldDescriptionProps>;
   readonly FieldError: ComponentType<ShadcnFieldErrorProps>;
   readonly FieldGroup: ComponentType<ShadcnFieldGroupProps>;
-  readonly Collapsible: ComponentType<ShadcnCollapsibleProps>;
+  readonly Card: ComponentType<ShadcnCardProps>;
 }
 
 export const REQUIRED_SHADCN_SLOTS = Object.freeze([
@@ -183,7 +181,7 @@ export const REQUIRED_SHADCN_SLOTS = Object.freeze([
   "FieldDescription",
   "FieldError",
   "FieldGroup",
-  "Collapsible",
+  "Card",
 ] as const satisfies readonly (keyof ShadcnAdapterComponents)[]);
 
 export type RequiredShadcnSlot = (typeof REQUIRED_SHADCN_SLOTS)[number];

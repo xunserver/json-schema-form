@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   createPlaygroundController,
   displayedWorkbenchDiagnostics,
@@ -35,6 +35,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { JsonWorkbenchEditor } from "./json-workbench-editor";
 import { usePlaygroundSnapshot } from "./use-playground-snapshot";
+import { VisualSchemaEditor } from "./visual/visual-schema-editor";
 
 const PREVIEW_IDS = new Set<string>(PREVIEW_CHROME.map((item) => item.id));
 
@@ -91,6 +92,7 @@ export function PlaygroundApp() {
   const examples = useMemo(() => listCatalogExamples(), []);
   const framesRef = useRef(new Map<PreviewId, HTMLIFrameElement>());
   const lastBroadcastEpochRef = useRef(-1);
+  const [editorMode, setEditorMode] = useState<"text" | "visual">("text");
 
   useEffect(() => {
     return () => {
@@ -185,6 +187,22 @@ export function PlaygroundApp() {
             仓库
           </a>
           <Field orientation="horizontal" className="w-auto">
+            <FieldLabel htmlFor="playground-editor-mode">编辑模式</FieldLabel>
+            <Tabs
+              value={editorMode}
+              onValueChange={(value) => {
+                if (value === "text" || value === "visual") {
+                  setEditorMode(value);
+                }
+              }}
+            >
+              <TabsList>
+                <TabsTrigger value="text">文本</TabsTrigger>
+                <TabsTrigger value="visual">可视化</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </Field>
+          <Field orientation="horizontal" className="w-auto">
             <FieldLabel htmlFor="playground-example">示例</FieldLabel>
             <Select
               value={snapshot.exampleId}
@@ -220,6 +238,15 @@ export function PlaygroundApp() {
 
       <ResizablePanelGroup orientation="horizontal" className="min-h-0 flex-1">
         <ResizablePanel defaultSize="38%" minSize="24%" className="min-h-0">
+          {editorMode === "visual" ? (
+            <VisualSchemaEditor
+              workbench={snapshot.workbench}
+              snapshot={snapshot}
+              onReplaceDefinition={(input) => {
+                controller.replaceDefinitionTexts(input);
+              }}
+            />
+          ) : (
           <Tabs
             value={snapshot.activeTab}
             onValueChange={(value) => {
@@ -248,6 +275,7 @@ export function PlaygroundApp() {
               />
             </div>
           </Tabs>
+          )}
         </ResizablePanel>
 
         <ResizableHandle withHandle />

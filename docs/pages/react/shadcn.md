@@ -33,7 +33,7 @@ const adapter = createShadcnAdapter({
     FieldDescription,
     FieldError,
     FieldGroup,
-    Collapsible,
+    Card,
   } satisfies ShadcnAdapterComponents,
 });
 ```

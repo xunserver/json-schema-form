@@ -1,8 +1,17 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
+
+const playgroundSrc = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "examples/playground/src");
 
 export default defineConfig({
   esbuild: {
     jsx: "automatic",
+  },
+  resolve: {
+    alias: {
+      "@": playgroundSrc,
+    },
   },
   test: {
     include: [
@@ -11,6 +20,8 @@ export default defineConfig({
       "packages/adapter/*/src/**/*.test.ts",
       "packages/adapter/*/src/**/*.test.tsx",
       "examples/shared/src/**/*.test.ts",
+      "examples/playground/src/**/*.test.ts",
+      "examples/playground/src/**/*.test.tsx",
       "tests/**/*.test.ts",
       "tests/**/*.test.tsx",
     ],

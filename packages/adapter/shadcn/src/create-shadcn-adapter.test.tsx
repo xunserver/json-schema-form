@@ -172,20 +172,8 @@ function StubCombobox(props: {
   );
 }
 
-function StubCollapsible(props: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  title: ReactNode;
-  children?: ReactNode;
-}) {
-  return (
-    <section>
-      <button type="button" onClick={() => props.onOpenChange(!props.open)}>
-        {props.title}
-      </button>
-      {props.open ? <div>{props.children}</div> : null}
-    </section>
-  );
+function StubCard(props: { children?: ReactNode; className?: string }) {
+  return <section className={props.className}>{props.children}</section>;
 }
 
 function createStubComponents(
@@ -209,7 +197,7 @@ function createStubComponents(
     FieldDescription: StubPassthrough,
     FieldError: StubPassthrough,
     FieldGroup: ({ children }) => <div>{children}</div>,
-    Collapsible: StubCollapsible,
+    Card: StubCard,
     ...overrides,
   };
 }

@@ -18,6 +18,7 @@ import {
   isHostPackage,
   isMuiForbiddenPackage,
   isReverseEdge,
+  isExampleChromePackage,
   packageNameFromSpecifier,
   type FirstPartyPackage,
 } from "./policy.ts";
@@ -43,6 +44,8 @@ export function checkArchitecture(workspaceRoot: string): ArchitectureDiagnostic
       diagnostics.push(...checkCoreLayout(pkg));
     }
   }
+
+  diagnostics.push(...checkExampleChromeBoundaries(workspaceRoot, packages));
 
   return diagnostics;
 }
@@ -197,6 +200,71 @@ function checkExpectedPackageSet(packages: DiscoveredPackage[]): ArchitectureDia
         rule: RULE.forbiddenEdge,
         message: "Unexpected package under packages/*; first-period workspace allows only the nine @xunserver-jsf packages.",
       });
+    }
+  }
+
+  return diagnostics;
+}
+
+function checkExampleChromeBoundaries(workspaceRoot: string, packages: DiscoveredPackage[]): ArchitectureDiagnostic[] {
+  const diagnostics: ArchitectureDiagnostic[] = [];
+  for (const pkg of packages) {
+    if (!isFirstPartyPackage(pkg.name)) {
+      continue;
+    }
+    const productDeps = {
+      ...pkg.manifest.dependencies,
+      ...pkg.manifest.devDependencies,
+      ...pkg.manifest.peerDependencies,
+      ...pkg.manifest.optionalDependencies,
+    };
+    for (const dep of Object.keys(productDeps)) {
+      if (isExampleChromePackage(dep) && (dep.startsWith("@dnd-kit/") || dep.includes("monaco") || dep === "tailwindcss")) {
+        diagnostics.push({
+          sourcePackage: pkg.name,
+          targetPackage: dep,
+          rule: RULE.exampleChromeLeak,
+          message: "Product packages must not depend on playground editor chrome (Monaco, Tailwind, or drag-and-drop).",
+        });
+      }
+    }
+  }
+
+  const sharedDir = path.join(workspaceRoot, "examples", "shared");
+  const sharedManifestPath = path.join(sharedDir, "package.json");
+  if (fs.existsSync(sharedManifestPath)) {
+    const manifest = JSON.parse(fs.readFileSync(sharedManifestPath, "utf8")) as PackageManifest;
+    const deps = {
+      ...manifest.dependencies,
+      ...manifest.devDependencies,
+      ...manifest.peerDependencies,
+      ...manifest.optionalDependencies,
+    };
+    for (const dep of Object.keys(deps)) {
+      if (isExampleChromePackage(dep)) {
+        diagnostics.push({
+          sourcePackage: "@xunserver-jsf/example-shared",
+          targetPackage: dep,
+          rule: RULE.exampleChromeLeak,
+          message: "examples/shared must remain framework/DOM-neutral and must not depend on React, Monaco, or drag-and-drop.",
+        });
+      }
+    }
+    for (const file of collectSourceFiles(path.join(sharedDir, "src"))) {
+      const content = fs.readFileSync(file, "utf8");
+      for (const specifier of collectImportedSpecifiers(file, content)) {
+        const name = packageNameFromSpecifier(specifier);
+        if (name !== undefined && isExampleChromePackage(name)) {
+          diagnostics.push({
+            sourcePackage: "@xunserver-jsf/example-shared",
+            targetPackage: name,
+            rule: RULE.exampleChromeLeak,
+            message: "examples/shared source must not import React, DOM editor chrome, Monaco, or drag-and-drop.",
+            file,
+            specifier,
+          });
+        }
+      }
     }
   }
 

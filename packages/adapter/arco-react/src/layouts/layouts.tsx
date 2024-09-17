@@ -1,6 +1,6 @@
-import type { ArrayView, GroupView, LayoutView, ObjectView } from "@xunserver-jsf/core";
+import type { ArrayView, LayoutView, ObjectView } from "@xunserver-jsf/core";
 import type { LayoutBinding } from "@xunserver-jsf/react";
-import { Collapse } from "@arco-design/web-react";
+import { Card } from "@arco-design/web-react";
 import type { CSSProperties, ReactNode } from "react";
 
 export const objectLayout: LayoutBinding = {
@@ -24,21 +24,11 @@ export const arrayLayout: LayoutBinding = {
 };
 
 export const groupLayout: LayoutBinding = {
-  collapsible: true,
   render(input) {
-    const view = input.view as GroupView;
-    const activeKey = input.viewSnapshot.collapsed ? [] : [view.id];
     return (
-      <Collapse
-        activeKey={activeKey}
-        onChange={(_key, keys) => {
-          input.actions.setCollapsed(keys.length === 0);
-        }}
-      >
-        <Collapse.Item header={view.id} name={view.id}>
-          {input.children as ReactNode}
-        </Collapse.Item>
-      </Collapse>
+      <Card data-layout="group" bordered>
+        {input.children as ReactNode}
+      </Card>
     );
   },
 };

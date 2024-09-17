@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type {
   ShadcnAdapterComponents,
   ShadcnCheckboxProps,
-  ShadcnCollapsibleProps,
+  ShadcnCardProps,
   ShadcnComboboxProps,
   ShadcnFieldDescriptionProps,
   ShadcnFieldErrorProps,
@@ -192,18 +192,10 @@ function FieldGroup(props: ShadcnFieldGroupProps) {
   return <div className="flex flex-col gap-4">{props.children}</div>;
 }
 
-function Collapsible(props: ShadcnCollapsibleProps) {
+function Card(props: ShadcnCardProps) {
   return (
-    <section className="rounded-lg border border-border p-3">
-      <button
-        type="button"
-        className="mb-2 text-sm font-medium"
-        onClick={() => props.onOpenChange(!props.open)}
-      >
-        {props.open ? "▾ " : "▸ "}
-        {props.title}
-      </button>
-      {props.open ? <div className="flex flex-col gap-3">{props.children}</div> : null}
+    <section data-layout={props["data-layout"]} className="rounded-xl border border-border p-4">
+      <div className="flex flex-col gap-3">{props.children}</div>
     </section>
   );
 }
@@ -264,5 +256,5 @@ export const previewShadcnComponents: ShadcnAdapterComponents = {
   FieldDescription,
   FieldError,
   FieldGroup,
-  Collapsible,
+  Card,
 };

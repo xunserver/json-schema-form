@@ -162,4 +162,20 @@ describe("fault injection commands", () => {
     expect(result.stderr).toContain("engine");
     expect(result.stderr).toContain(RULE.coreLayout);
   });
+
+  test("shared React or DnD import fails the boundary command", () => {
+    const root = copyRepoPackages();
+    fs.mkdirSync(path.join(root, "examples", "shared", "src"), { recursive: true });
+    writeJson(path.join(root, "examples", "shared", "package.json"), {
+      name: "@xunserver-jsf/example-shared",
+      dependencies: { "@dnd-kit/react": "^0.5.0" },
+    });
+    writeText(path.join(root, "examples", "shared", "src", "leak.ts"), 'import { DragDropProvider } from "@dnd-kit/react";\nexport { DragDropProvider };\n');
+
+    const result = runBoundaryCheck(root);
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain("@xunserver-jsf/example-shared");
+    expect(result.stderr).toContain("@dnd-kit/react");
+    expect(result.stderr).toContain(RULE.exampleChromeLeak);
+  });
 });

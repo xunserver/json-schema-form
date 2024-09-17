@@ -21,8 +21,7 @@ const components = {
   FieldDescription: (props: { children?: ReactNode }) => createElement("p", null, props.children),
   FieldError: (props: { children?: ReactNode }) => createElement("p", null, props.children),
   FieldGroup: (props: { children?: ReactNode }) => createElement("div", null, props.children),
-  Collapsible: (props: { children?: ReactNode; title?: ReactNode }) =>
-    createElement("section", null, props.title, props.children),
+  Card: (props: { children?: ReactNode }) => createElement("section", null, props.children),
 } as unknown as ShadcnAdapterComponents;
 
 const form = createForm(

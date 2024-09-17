@@ -81,6 +81,19 @@ Core Schema Validator Adapter协议必须（MUST）要求同步`validateAll`接�
 - **WHEN** 检查依赖与公共类型
 - **THEN** 只有validator package依赖AJV，Core声明和Schema Adapter协议中不存在AJV-specific类型
 
+### Requirement: Sync Validation 在 Rule 稳定后消费受影响 plan
+Sync Validation phase必须（MUST）在 activation 与 Rule/effect 稳定之后，消费 transaction-owned dependency scheduler 给出的受影响 Validation Rule plan binding，以及 Schema activation `false→true` 翻转所触及的 target。已有 `activationChanged` 防御检测可以（MAY）保留，但不得（MUST NOT）成为唯一触发 activation 重校验的路径。无关 sibling item 与未翻转的 inactive subtree 不得（MUST NOT）仅因同数组其它路径变化而重新跑 Validation Rule。
+
+#### Scenario: activation翻转触发Validation plan
+- **GIVEN** conditional branch 上的 custom Validation Rule 在 inactive 期间依赖值已改变
+- **WHEN** Schema activation 使该 branch 重新 active 并完成本轮 Rule 稳定
+- **THEN** sync Validation 对该 binding 执行并只发布最终错误快照
+
+#### Scenario: sibling不误触发
+- **GIVEN** 两个 array item 各有 Validation Rule
+- **WHEN** 只修改第一个 item 的依赖字段
+- **THEN** 第二个 item 的 Validation Rule 不被调度
+
 ### Requirement: 同步validation观察Rule稳定后的同一transaction draft
 Schema validation、命中的sync Custom和Validation Rule必须（MUST）在activation及State/Computed/Effect达到稳定后读取同一个readonly final draft，并在原public mutation transaction内原子替换各自owner error set。普通validation failure只产生ValidationError并随value/state一起commit，不回滚业务mutation；provider/adapter throw、invalid result或协议失败必须（MUST）使整个transaction回滚且不发布partial errors。hidden、disabled与readonly不得（MUST NOT）改变Schema或Custom validation eligibility；Schema-inactive target/subtree必须（MUST）排除于effective validation。
 

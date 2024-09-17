@@ -208,4 +208,28 @@ describe("playground workbench", () => {
       vi.useRealTimers();
     }
   });
+
+  test("replaceDefinitionTexts updates schema and uiSchema together and preserves other editors", () => {
+    vi.useFakeTimers();
+    const controller = createPlaygroundController();
+    try {
+      controller.setExample("simple");
+      const before = controller.getSnapshot().workbench;
+      controller.replaceDefinitionTexts({
+        schemaText: '{"type":"object","properties":{"title":{"type":"string"}}}',
+        uiSchemaText: '{"fields":{"title":{"widget":"text"}}}',
+      });
+      vi.advanceTimersByTime(300);
+      const after = controller.getSnapshot();
+      expect(after.workbench.schemaText).toContain("title");
+      expect(after.workbench.uiSchemaText).toContain("text");
+      expect(after.workbench.rulesText).toBe(before.rulesText);
+      expect(after.workbench.configText).toBe(before.configText);
+      expect(after.workbench.formDataText).toBe(before.formDataText);
+      expect(after.broadcastDocument).not.toBeNull();
+    } finally {
+      controller.dispose();
+      vi.useRealTimers();
+    }
+  });
 });

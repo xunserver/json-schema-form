@@ -142,3 +142,8 @@ Schema Frontend 必须（SHALL）在 normalization 阶段识别冻结 `schemaExt
 - **WHEN** 编译
 - **THEN** 抛出带 `SchemaPath`、extension name 与 Plugin ID 的 `CompileError`，不发布 partial model，不泄漏原始异常
 
+#### Scenario: DataModel 后 split 获得 ModelPath
+- **GIVEN** Environment 安装了声明 `x-ui` 的 extension，其 `split()` 需要 `ModelPath`
+- **WHEN** 编译含该 keyword 的 Schema
+- **THEN** Frontend 只记录 occurrence；DataModel 完成后调用 `split()`，合并片段并从 canonical Schema 移除 keyword
+

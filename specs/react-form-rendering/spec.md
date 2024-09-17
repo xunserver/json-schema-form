@@ -95,6 +95,19 @@ React renderer、hooks、adapter mapper 与 custom render 输入准备必须（M
 - **WHEN** React 执行额外 setup、cleanup 与再次 setup
 - **THEN** 任一时刻最多存在一个有效 listener，最终卸载后 listener 数为零，且没有额外 Runtime commit
 
+### Requirement: Layout 与容器 Renderer 校验非法 tab
+Group/Layout/Object/Array binding 若声明 `tabs`，Renderer 必须（MUST）在调用 `setActiveTab` 前校验 tab key；非法 key 必须（MUST）产生 `adapter.invalid-tab` diagnostic 且不得（MUST NOT）写入 Core。未声明 `tabs` 时行为保持既有直通。
+
+#### Scenario: Layout 拒绝非法 tab
+- **GIVEN** Layout adapter 声明 tabs `["basic", "advanced"]`
+- **WHEN** binding 请求 `setActiveTab("other")`
+- **THEN** 报告 adapter diagnostic，Core `activeTab` 不变
+
+#### Scenario: Object/Array 同等守卫
+- **GIVEN** Object 或 Array layout binding 声明 tabs
+- **WHEN** 传入未声明 tab key
+- **THEN** 与 Group 相同，不写入 Core
+
 ### Requirement: SSR 与 hydration 使用一致的服务端快照
 React renderer 必须（MUST）支持无 DOM 读取的服务端渲染，并为 external-store consumer 提供引用稳定的 `getServerSnapshot`。当服务端与客户端使用相同 immutable model、adapter、初始 committed semantic state 和渲染顺序时，首个客户端 snapshot 必须（MUST）与服务端输出一致；数组内部 identity 不得（MUST NOT）作为不稳定 DOM 文本泄漏。公开契约必须（MUST）说明等价初始状态是 hydration 前置条件，且不得用组件本地状态掩盖不一致输入。
 

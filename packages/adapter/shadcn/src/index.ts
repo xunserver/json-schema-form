@@ -32,5 +32,5 @@ export {
   type ShadcnFieldDescriptionProps,
   type ShadcnFieldErrorProps,
   type ShadcnFieldGroupProps,
-  type ShadcnCollapsibleProps,
+  type ShadcnCardProps,
 } from "./components.js";
