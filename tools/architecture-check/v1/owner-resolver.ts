@@ -117,7 +117,7 @@ function collectOwnerFiles(
   const files: { file: string; source: ResolvedOwner["source"] }[] = [
     ...collectChangeSpecFiles(workspaceRoot, changeId, capability),
   ];
-  const durable = path.join(workspaceRoot, "openspec/specs", capability, "spec.md");
+  const durable = path.join(workspaceRoot, "specs", capability, "spec.md");
   if (fs.existsSync(durable)) {
     files.push({ file: durable, source: "durable" });
   }
@@ -130,11 +130,11 @@ function collectChangeSpecFiles(
   capability: string,
 ): readonly { file: string; source: "active" | "archive" }[] {
   const files: { file: string; source: "active" | "archive" }[] = [];
-  const active = path.join(workspaceRoot, "openspec/changes", changeId, "specs", capability, "spec.md");
+  const active = path.join(workspaceRoot, "changes", changeId, "specs", capability, "spec.md");
   if (fs.existsSync(active)) {
     files.push({ file: active, source: "active" });
   }
-  const archiveRoot = path.join(workspaceRoot, "openspec/changes/archive");
+  const archiveRoot = path.join(workspaceRoot, "changes/archive");
   if (fs.existsSync(archiveRoot)) {
     const archiveEntries = fs
       .readdirSync(archiveRoot, { withFileTypes: true })

@@ -12,3 +12,6 @@ docs/pages/api
 *.log
 .pnpm-debug.log*
 artifacts/
+.codebase-memory
+.cursor
+.agents

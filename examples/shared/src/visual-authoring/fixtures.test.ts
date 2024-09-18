@@ -9,7 +9,7 @@ import {
   VISUAL_SCHEMA_EDITOR_SCENARIO_MAP,
 } from "./index.js";
 
-const specDir = path.resolve(fileURLToPath(new URL("../../../../openspec/specs", import.meta.url)));
+const specDir = path.resolve(fileURLToPath(new URL("../../../../specs", import.meta.url)));
 
 function readScenarios(file: string): string[] {
   const text = fs.readFileSync(file, "utf8");
